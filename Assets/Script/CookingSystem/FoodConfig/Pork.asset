@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75d2635783c640944a4b1028a1d283d4, type: 3}
+  m_Name: Pork
+  m_EditorClassIdentifier: Assembly-CSharp::FoodData
+  foodName: Pork
+  foodIcon: {fileID: -3181778142699774698, guid: fba80ad72777e0c49baae12ad74a6c79, type: 3}
+  rawSprite: {fileID: 6908634027161224790, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
+  mediumSprite: {fileID: 0}
+  cookedSprite: {fileID: -3181778142699774698, guid: fba80ad72777e0c49baae12ad74a6c79, type: 3}
+  burntSprite: {fileID: 0}
+  mediumTime: 5
+  cookTime: 10
+  burnTime: 15
