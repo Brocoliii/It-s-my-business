@@ -30,8 +30,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4322112279328221831}
-  - {fileID: 7725056182161447569}
-  - {fileID: 3635129561276591474}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1950223972366682766
@@ -66,7 +64,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7725056182161447569}
+  - {fileID: 3635129561276591474}
   m_Father: {fileID: 8692052721107083550}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8001683406577524156
@@ -275,6 +275,9 @@ MonoBehaviour:
   mainRenderer: {fileID: 8001683406577524156}
   sauceRenderer: {fileID: 1914584992269489450}
   spicyRenderer: {fileID: 5832705505061095738}
+  startDragPos: {x: 0, y: 0, z: 0}
+  currentGrill: {fileID: 0}
+  currentSeasoning: {fileID: 0}
 --- !u!1 &6355036061545097637
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,7 +308,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8692052721107083550}
+  m_Father: {fileID: 4322112279328221831}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5832705505061095738
 SpriteRenderer:
@@ -396,7 +399,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8692052721107083550}
+  m_Father: {fileID: 4322112279328221831}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1914584992269489450
 SpriteRenderer:
