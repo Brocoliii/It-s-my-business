@@ -1,28 +1,59 @@
 using UnityEngine;
-using System.Collections;
+using UnityEngine.InputSystem;
 
-public class ChiliBottle : MonoBehaviour, IClickable
+public class ChiliBottle : MonoBehaviour, IDraggable
 {
-    [SerializeField] private SeasoningStation station; // ลากเขียงสีเขียวมาใส่
+    [Header("ตั้งค่าการโรยผง")]
+    [Tooltip("ระยะกระชากเมาส์ต่อ 1 ระดับความเผ็ด")]
+    [SerializeField] private float requiredShake = 150f;
 
-    public void OnClick()
+    private Vector3 startPos;
+    private float shakeDistance = 0f;
+    private SpriteRenderer sr;
+
+    private void Start()
     {
-        // 1. เล่นแอนิเมชันเด้งดึ๋ง
-        StartCoroutine(BounceEffect());
+        startPos = transform.position;
+        sr = GetComponent<SpriteRenderer>();
+    }
 
-        // 2. เช็คว่ามีอาหารวางอยู่บนเขียงไหม ถ้ามีให้เพิ่มความเผ็ด!
-        if (station != null && station.currentFood != null)
+    public void OnBeginDrag()
+    {
+        shakeDistance = 0f;
+        if (sr != null) sr.sortingOrder = 15;
+        transform.rotation = Quaternion.Euler(0, 0, -45f);
+    }
+
+    public void OnDrag(Vector2 mousePos)
+    {
+        transform.position = mousePos;
+
+        float deltaY = Mathf.Abs(Mouse.current.delta.ReadValue().y);
+        shakeDistance += deltaY;
+
+        if (shakeDistance >= requiredShake)
         {
-            station.currentFood.AddSpicy();
+            RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
+            foreach (var hit in hits)
+            {
+                FoodInstance food = hit.collider.GetComponent<FoodInstance>();
+
+                if (food != null && food.currentSeasoning != null && food.spicyLevel < 3)
+                {
+                    food.AddSpicy(); 
+                    shakeDistance = 0f;
+
+                    transform.position += new Vector3(0, 0.2f, 0);
+                    break; 
+                }
+            }
         }
     }
 
-    // ฟังก์ชันทำแอนิเมชันขยายใหญ่แล้วหดกลับ (เหมือนเด้ง)
-    private IEnumerator BounceEffect()
+    public void OnEndDrag()
     {
-        Vector3 originalScale = transform.localScale;
-        transform.localScale = originalScale * 1.2f; // พองขึ้น 20%
-        yield return new WaitForSeconds(0.1f);       // รอ 0.1 วิ
-        transform.localScale = originalScale;        // คืนขนาดเดิม
+        transform.position = startPos; 
+        transform.rotation = Quaternion.identity; 
+        if (sr != null) sr.sortingOrder = 5;
     }
 }

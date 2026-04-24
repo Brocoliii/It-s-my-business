@@ -15,9 +15,13 @@ MonoBehaviour:
   foodName: Mushroom
   foodIcon: {fileID: 4152641109828518758, guid: 00a26b32d392bb34787402b7781aa210, type: 3}
   rawSprite: {fileID: 4152641109828518758, guid: 00a26b32d392bb34787402b7781aa210, type: 3}
-  mediumSprite: {fileID: 0}
+  mediumSprite: {fileID: 4152641109828518758, guid: 00a26b32d392bb34787402b7781aa210, type: 3}
   cookedSprite: {fileID: -7527902527428582168, guid: 87fd61ed397d36442ad8d8aae0084b72, type: 3}
-  burntSprite: {fileID: 0}
+  burntSprite: {fileID: 8589020015655191039, guid: c7a312041644f3a41a05f0eb80f87d00, type: 3}
   mediumTime: 5
   cookTime: 10
   burnTime: 15
+  sauceSprite: {fileID: -2062869132942651798, guid: 6df6e431dcedbaa42971615e6dcff958, type: 3}
+  spicyLevel1Sprite: {fileID: -3895339053664996647, guid: ffb20d58d21e1854c8d54cbbe5763af8, type: 3}
+  spicyLevel2Sprite: {fileID: -1183015524930514676, guid: 15a0d1999e8defb458a9d51053d93e23, type: 3}
+  spicyLevel3Sprite: {fileID: -5627683991014427953, guid: 38c458cb69ef77745b72a490174dd5aa, type: 3}

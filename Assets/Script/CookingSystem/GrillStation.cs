@@ -1,31 +1,53 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class GrillStation : MonoBehaviour
 {
-    [SerializeField] private List<FoodInstance> foodsOnGrill = new List<FoodInstance>();
+    [Header("จุดวางหมู (ลาก Empty Object 3 อันมาใส่)")]
+    public Transform[] slots = new Transform[3];
+    private FoodInstance[] foodsOnSlots = new FoodInstance[3];
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public bool TrySnapToSlot(FoodInstance food, out Vector3 snapPos)
     {
-        FoodInstance food = collision.GetComponent<FoodInstance>();
+        snapPos = Vector3.zero;
+        int bestSlot = -1;
+        float minDistance = float.MaxValue;
 
-        if (food != null && !foodsOnGrill.Contains(food))
+        for (int i = 0; i < slots.Length; i++)
         {
-            foodsOnGrill.Add(food);
-            food.SetGrilling(true); 
-            Debug.Log($"{food.name} เริ่มย่างบนเตา");
+            if (foodsOnSlots[i] == null)
+            {
+                float dist = Vector2.Distance(food.transform.position, slots[i].position);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    bestSlot = i;
+                }
+            }
         }
+
+        if (bestSlot != -1 && minDistance < 3f)
+        {
+            foodsOnSlots[bestSlot] = food;
+            snapPos = slots[bestSlot].position;
+
+            food.currentGrill = this; 
+            food.SetGrilling(true);   
+            return true;
+        }
+        return false;
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    public void RemoveFood(FoodInstance food)
     {
-        FoodInstance food = collision.GetComponent<FoodInstance>();
-
-        if (food != null && foodsOnGrill.Contains(food))
+        for (int i = 0; i < slots.Length; i++)
         {
-            food.SetGrilling(false); 
-            foodsOnGrill.Remove(food);
-            Debug.Log($"{food.name} ถูกหยิบออกจากเตา");
+            if (foodsOnSlots[i] == food)
+            {
+                foodsOnSlots[i] = null;
+                food.currentGrill = null;
+                food.SetGrilling(false);
+                break;
+            }
         }
     }
 }

@@ -1,28 +1,59 @@
 using UnityEngine;
-using System.Collections;
+using UnityEngine.InputSystem;
 
-public class SauceBrush : MonoBehaviour, IClickable
+public class SauceBrush : MonoBehaviour, IDraggable
 {
-    [SerializeField] private SeasoningStation station; // ลากเขียงสีเขียวมาใส่
+    [Header("ตั้งค่าการทาซอส")]
+    [Tooltip("ระยะกระชากเมาส์ที่ต้องการเพื่อทาซอสสำเร็จ (ยิ่งเยอะยิ่งต้องถูนาน)")]
+    [SerializeField] private float requiredDrag = 200f;
 
-    public void OnClick()
+    private Vector3 startPos;
+    private float dragDistance = 0f;
+    private SpriteRenderer sr;
+
+    private void Start()
     {
-        StartCoroutine(BounceEffect());
+        startPos = transform.position; 
+        sr = GetComponent<SpriteRenderer>();
+    }
 
-        // เช็คว่ามีอาหารวางบนเขียงไหม ถ้ามีให้ทาซอส!
-        if (station != null && station.currentFood != null)
+    public void OnBeginDrag()
+    {
+        dragDistance = 0f; 
+
+        if (sr != null) sr.sortingOrder = 15; 
+        transform.rotation = Quaternion.Euler(0, 0, -15f); 
+    }
+
+    public void OnDrag(Vector2 mousePos)
+    {
+        transform.position = mousePos; 
+
+        float deltaY = Mathf.Abs(Mouse.current.delta.ReadValue().y);
+        dragDistance += deltaY; 
+
+        if (dragDistance >= requiredDrag)
         {
-            station.currentFood.ApplySauce();
+            RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
+            foreach (var hit in hits)
+            {
+                FoodInstance food = hit.collider.GetComponent<FoodInstance>();
+
+                if (food != null && food.currentSeasoning != null && !food.hasSauce)
+                {
+                    food.ApplySauce(); 
+                    dragDistance = 0f; 
+                    break; 
+                }
+            }
         }
     }
 
-    private IEnumerator BounceEffect()
+    public void OnEndDrag()
     {
-        Vector3 originalScale = transform.localScale;
-        transform.localScale = originalScale * 1.1f; // พองนิดหน่อย
-        transform.Rotate(0, 0, -15f);                // เอียงขวาเหมือนกำลังทา
-        yield return new WaitForSeconds(0.1f);
-        transform.localScale = originalScale;
-        transform.localRotation = Quaternion.identity; // กลับตรงเหมือนเดิม
+        transform.position = startPos; // ปล่อยเมาส์ปุ๊บ เด้งกลับไปวางที่เดิม
+        transform.rotation = Quaternion.identity; // ตั้งแปรงให้กลับมาตรงเหมือนเดิม
+
+        if (sr != null) sr.sortingOrder = 5; // กลับไปอยู่ชั้นปกติ
     }
 }

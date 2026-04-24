@@ -12,7 +12,16 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
 
     [Header("Seasoning (เครื่องปรุง)")]
     public int spicyLevel = 0;   
-    public bool hasSauce = false; 
+    public bool hasSauce = false;
+
+    [Header("Visual Components")]
+    [SerializeField] private SpriteRenderer mainRenderer;  
+    [SerializeField] private SpriteRenderer sauceRenderer; 
+    [SerializeField] private SpriteRenderer spicyRenderer;
+
+    [HideInInspector] public Vector3 startDragPos;
+    [HideInInspector] public GrillStation currentGrill;
+    [HideInInspector] public SeasoningStation currentSeasoning;
 
     private bool isOnGrill = false;
     private bool isBeingDragged = false;
@@ -25,15 +34,20 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     }
     private void Start()
     {
-        
+        if (sauceRenderer != null) sauceRenderer.gameObject.SetActive(false);
+        if (spicyRenderer != null) spicyRenderer.gameObject.SetActive(false);
         UpdateVisual();
     }
 
     // ระบบ IDraggable
     public void OnBeginDrag()
     {
+        startDragPos = transform.position; 
         isBeingDragged = true;
-        if (TryGetComponent<SpriteRenderer>(out var sr)) sr.sortingOrder = 10;
+
+        if (mainRenderer != null) mainRenderer.sortingOrder = 10;
+        if (sauceRenderer != null) sauceRenderer.sortingOrder = 11;
+        if (spicyRenderer != null) spicyRenderer.sortingOrder = 12;
     }
 
     public void OnDrag(Vector2 mousePos)
@@ -99,8 +113,15 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
 
     private void UpdateCooking()
     {
-        if (isFacingSideA) sideAProgress += Time.deltaTime;
-        else sideBProgress += Time.deltaTime;
+        if (isFacingSideA)
+        {
+            sideBProgress += Time.deltaTime;
+        }
+        else
+        {
+            sideAProgress += Time.deltaTime;
+        }
+
         UpdateVisual();
     }
 
@@ -108,6 +129,7 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     {
         if (sr == null || data == null) return;
 
+        
         float currentFaceProgress = isFacingSideA ? sideAProgress : sideBProgress;
 
         if (currentFaceProgress >= data.burnTime) sr.sprite = data.burntSprite;
@@ -125,15 +147,38 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     //ซอส
     public void AddSpicy()
     {
-        spicyLevel++;
-        Debug.Log($"{gameObject.name} เผ็ดระดับ: {spicyLevel}");
-        // (อนาคตสามารถสั่งเปลี่ยนรูป Sprite ให้มีผงพริกติดอยู่ได้ที่นี่)
+        if (spicyLevel < 3) // ล็อคความเผ็ดไว้สูงสุดที่ 3 ระดับ
+        {
+            spicyLevel++;
+            UpdateSpicyVisual();
+        }
     }
     public void ApplySauce()
     {
-        hasSauce = true;
-        Debug.Log($"{gameObject.name} ทาซอสเรียบร้อย!");
-        // (อนาคตสั่งเปลี่ยนสี Sprite ให้ออกเข้มๆ ฉ่ำๆ ได้ที่นี่)
+        if (!hasSauce)
+        {
+            hasSauce = true;
+            // เช็คว่าเราลากตัว Overlay_Sauce มาใส่ในช่อง sauceRenderer หรือยัง
+            if (sauceRenderer != null && data.sauceSprite != null)
+            {
+                sauceRenderer.sprite = data.sauceSprite;
+                sauceRenderer.gameObject.SetActive(true); // แค่เปิดใช้งานวัตถุที่มีอยู่แล้ว
+            }
+            else
+            {
+                Debug.LogError("ลืมลาก Overlay_Sauce มาใส่ใน Inspector หรือเปล่า?");
+            }
+        }
     }
 
+    private void UpdateSpicyVisual()
+    {
+        if (spicyRenderer == null) return;
+
+        spicyRenderer.gameObject.SetActive(true); 
+
+        if (spicyLevel == 1) spicyRenderer.sprite = data.spicyLevel1Sprite;
+        else if (spicyLevel == 2) spicyRenderer.sprite = data.spicyLevel2Sprite;
+        else if (spicyLevel >= 3) spicyRenderer.sprite = data.spicyLevel3Sprite;
+    }
 }

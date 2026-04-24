@@ -241,8 +241,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2127671943}
   - {fileID: 1480233199}
+  - {fileID: 2127671943}
   m_Father: {fileID: 231688068}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &156569986
@@ -2357,7 +2357,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 6
   m_MaskInteraction: 0
   m_Sprite: {fileID: -367720365318169693, guid: ef863699ec6ae064d863ae24122a014f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

@@ -15,9 +15,13 @@ MonoBehaviour:
   foodName: Pork
   foodIcon: {fileID: -3181778142699774698, guid: fba80ad72777e0c49baae12ad74a6c79, type: 3}
   rawSprite: {fileID: 6908634027161224790, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
-  mediumSprite: {fileID: 0}
+  mediumSprite: {fileID: 6908634027161224790, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
   cookedSprite: {fileID: -3181778142699774698, guid: fba80ad72777e0c49baae12ad74a6c79, type: 3}
-  burntSprite: {fileID: 0}
+  burntSprite: {fileID: 3909090353215070486, guid: 7e0122b726d365f4fb72a6c4b59ab364, type: 3}
   mediumTime: 5
   cookTime: 10
   burnTime: 15
+  sauceSprite: {fileID: 2877418565224197244, guid: 26735b4c86c61504eae25ead9c24f57a, type: 3}
+  spicyLevel1Sprite: {fileID: -3928351074505779233, guid: d08c07c545b06914db79a246d4ca348e, type: 3}
+  spicyLevel2Sprite: {fileID: -4974012655406539797, guid: 24c488df031002e49ada908c56d40815, type: 3}
+  spicyLevel3Sprite: {fileID: 4539942518379027551, guid: cf1263f06a27b9e4dabc5b78751a08e6, type: 3}

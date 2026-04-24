@@ -2,20 +2,50 @@ using UnityEngine;
 
 public class SeasoningStation : MonoBehaviour
 {
-    // อาหารที่กำลังวางอยู่บนเขียงตอนนี้
-    public FoodInstance currentFood;
+    [Header("จุดทาซอส (ลาก Empty Object 3 อันมาใส่)")]
+    public Transform[] slots = new Transform[3];
+    private FoodInstance[] foodsOnSlots = new FoodInstance[3];
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public bool TrySnapToSlot(FoodInstance food, out Vector3 snapPos)
     {
-        FoodInstance food = collision.GetComponent<FoodInstance>();
-        // ถ้านำอาหารมาวาง ให้จำไว้ว่าคือชิ้นไหน
-        if (food != null) currentFood = food;
+        snapPos = Vector3.zero;
+        int bestSlot = -1;
+        float minDistance = float.MaxValue;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (foodsOnSlots[i] == null)
+            {
+                float dist = Vector2.Distance(food.transform.position, slots[i].position);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    bestSlot = i;
+                }
+            }
+        }
+
+        if (bestSlot != -1 && minDistance < 3f)
+        {
+            foodsOnSlots[bestSlot] = food;
+            snapPos = slots[bestSlot].position;
+
+            food.currentSeasoning = this;
+            return true;
+        }
+        return false;
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    public void RemoveFood(FoodInstance food)
     {
-        FoodInstance food = collision.GetComponent<FoodInstance>();
-        // ถ้าหยิบอาหารออกไป ให้ลืมชิ้นนั้นซะ
-        if (food != null && currentFood == food) currentFood = null;
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (foodsOnSlots[i] == food)
+            {
+                foodsOnSlots[i] = null;
+                food.currentSeasoning = null;
+                break;
+            }
+        }
     }
 }

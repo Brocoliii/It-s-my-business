@@ -6,6 +6,7 @@ public class InputManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private CameraController cameraController;
     private Vector2 pressDownPos;
+    private Vector2 dragOffset;
 
     private Camera mainCam;
     private IDraggable currentDraggable;
@@ -34,71 +35,117 @@ public class InputManager : MonoBehaviour
     {
         Vector2 mouseWorldPos = mainCam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
-        // ==========================================
-        // จังหวะที่ 1: เริ่มกดคลิกซ้าย "ลง" (เสกของ หรือ หยิบของ)
-        // ==========================================
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            pressDownPos = mouseWorldPos; // จำตำแหน่งที่เริ่มกดไว้ก่อน
+            pressDownPos = mouseWorldPos;
+            RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
 
-            RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
-
-            if (hit.collider != null)
+            foreach (RaycastHit2D hit in hits)
             {
-                // [คืนชีพโค้ดที่หายไป] 1. เช็คว่าคลิกโดน "ถาดเสกอาหาร" หรือไม่?
-                FoodTray clickedTray = hit.collider.GetComponent<FoodTray>();
-                if (clickedTray != null)
-                {
-                    FoodInstance spawnedFood = clickedTray.SpawnFood(); // สั่งถาดเสกหมู
-                    if (spawnedFood != null)
-                    {
-                        currentDraggable = spawnedFood;
-                        currentDraggable.OnBeginDrag(); // สั่งให้เริ่มจับลากหมูอันใหม่ทันที
-                    }
-                    return; // จบการทำงานรอบนี้เลย ไม่ต้องไปเช็คอย่างอื่นต่อ
-                }
-
-                // 2. ถ้าไม่ได้คลิกถาด ให้เช็คว่าคลิกโดนของที่ "ลากได้" บนเตาหรือไม่?
                 currentDraggable = hit.collider.GetComponent<IDraggable>();
                 if (currentDraggable != null)
                 {
-                    currentDraggable.OnBeginDrag(); // สั่งให้เริ่มจับลาก
+                    FoodInstance food = currentDraggable as FoodInstance;
+                    if (food != null)
+                    {
+                        if (food.currentGrill != null) food.currentGrill.RemoveFood(food);
+                        if (food.currentSeasoning != null) food.currentSeasoning.RemoveFood(food);
+                    }
+
+                    dragOffset = (Vector2)hit.transform.position - mouseWorldPos;
+                    currentDraggable.OnBeginDrag();
+                    return;
+                }
+            }
+
+            foreach (RaycastHit2D hit in hits)
+            {
+                FoodTray clickedTray = hit.collider.GetComponent<FoodTray>();
+                if (clickedTray != null)
+                {
+                    FoodInstance spawnedFood = clickedTray.SpawnFood();
+                    if (spawnedFood != null)
+                    {
+                        currentDraggable = spawnedFood;
+                        dragOffset = Vector2.zero;
+                        currentDraggable.OnBeginDrag();
+                    }
+                    return;
                 }
             }
         }
 
-        // ==========================================
-        // จังหวะที่ 2: กดคลิกซ้าย "ค้าง" (กำลังลาก)
-        // ==========================================
+
         if (Mouse.current.leftButton.isPressed && currentDraggable != null)
         {
-            currentDraggable.OnDrag(mouseWorldPos); // ของขยับตามเมาส์
+            currentDraggable.OnDrag(mouseWorldPos + dragOffset);
         }
 
-        // ==========================================
-        // จังหวะที่ 3: ปล่อยคลิกซ้าย (วางของ หรือ สั่งทำงานแบบคลิก)
-        // ==========================================
+       
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
-            // ✨ ตรวจสอบว่านี่คือการ "คลิก" ใช่ไหม? (โดยดูว่าตอนปล่อย เมาส์ขยับจากตอนกดไม่เกิน 0.1f)
-            if (Vector2.Distance(pressDownPos, mouseWorldPos) < 0.1f)
+            bool isClick = Vector2.Distance(pressDownPos, mouseWorldPos) < 0.1f;
+
+            if (currentDraggable != null)
             {
-                RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
-                if (hit.collider != null)
+                FoodInstance food = currentDraggable as FoodInstance;
+                if (food != null)
+                {
+                    RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
+                    bool placed = false;
+
+                    foreach (RaycastHit2D hit in hits)
+                    {
+                        GrillStation grill = hit.collider.GetComponent<GrillStation>();
+                        if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG))
+                        {
+                            food.transform.position = snapPosG;
+                            placed = true;
+                            break;
+                        }
+
+                        SeasoningStation seasoning = hit.collider.GetComponent<SeasoningStation>();
+                        if (seasoning != null && seasoning.TrySnapToSlot(food, out Vector3 snapPosS))
+                        {
+                            food.transform.position = snapPosS;
+                            placed = true;
+                            break;
+                        }
+                    }
+
+                    if (!placed)
+                    {
+                        food.transform.position = food.startDragPos;
+
+                        RaycastHit2D[] fallBackHits = Physics2D.RaycastAll(food.startDragPos, Vector2.zero);
+                        foreach (var fbHit in fallBackHits)
+                        {
+                            GrillStation g = fbHit.collider.GetComponent<GrillStation>();
+                            if (g != null && g.TrySnapToSlot(food, out _)) break;
+
+                            SeasoningStation s = fbHit.collider.GetComponent<SeasoningStation>();
+                            if (s != null && s.TrySnapToSlot(food, out _)) break;
+                        }
+                    }
+                }
+
+                currentDraggable.OnEndDrag();
+                currentDraggable = null;
+            }
+
+            if (isClick)
+            {
+                RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
+                foreach (RaycastHit2D hit in hits)
                 {
                     IClickable clickableItem = hit.collider.GetComponent<IClickable>();
                     if (clickableItem != null)
                     {
-                        clickableItem.OnClick(); // สั่งให้ พลิกด้าน / เด้งขวดซอส
+                        clickableItem.OnClick();
+                        break;
                     }
                 }
-            }
-
-            // ไม่ว่าจะคลิกหรือลาก ตอนปล่อยเมาส์ต้องล้างค่าการลากทิ้งเสมอ
-            if (currentDraggable != null)
-            {
-                currentDraggable.OnEndDrag();
-                currentDraggable = null;
             }
         }
     }

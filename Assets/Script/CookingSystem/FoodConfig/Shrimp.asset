@@ -15,9 +15,13 @@ MonoBehaviour:
   foodName: Shrimp
   foodIcon: {fileID: 5849791705906355370, guid: 0437eac6b4802d74082f7eb46c27fedc, type: 3}
   rawSprite: {fileID: 5849791705906355370, guid: 0437eac6b4802d74082f7eb46c27fedc, type: 3}
-  mediumSprite: {fileID: 0}
+  mediumSprite: {fileID: 5849791705906355370, guid: 0437eac6b4802d74082f7eb46c27fedc, type: 3}
   cookedSprite: {fileID: -6757685260364061296, guid: a0935d23f176a8b419f41946cac77706, type: 3}
-  burntSprite: {fileID: 0}
+  burntSprite: {fileID: 5723747506209190224, guid: 65a4a1b53dd08ef43a002dce05123b9c, type: 3}
   mediumTime: 5
   cookTime: 10
   burnTime: 15
+  sauceSprite: {fileID: 7821296901199133841, guid: 270d9a99fa5a79b448709d77a672b82a, type: 3}
+  spicyLevel1Sprite: {fileID: -2305468726981800566, guid: 2d9e7a3c951189047bd90678f8cf5b82, type: 3}
+  spicyLevel2Sprite: {fileID: 2559943269283040326, guid: 9ab9122c5be68dd4ab6c14391b91cf71, type: 3}
+  spicyLevel3Sprite: {fileID: 5810474256425566643, guid: d0777fba1111a81499a5b19f8b9cb15f, type: 3}
