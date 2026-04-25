@@ -181,4 +181,9 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         else if (spicyLevel == 2) spicyRenderer.sprite = data.spicyLevel2Sprite;
         else if (spicyLevel >= 3) spicyRenderer.sprite = data.spicyLevel3Sprite;
     }
+    public FoodData GetData()
+    {
+        return data;
+    }
+
 }

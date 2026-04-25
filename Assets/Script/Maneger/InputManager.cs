@@ -3,13 +3,10 @@ using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] private CameraController cameraController;
-    private Vector2 pressDownPos;
-    private Vector2 dragOffset;
-
     private Camera mainCam;
     private IDraggable currentDraggable;
+    private Vector2 pressDownPos;
+    private Vector2 dragOffset;
 
     private void Start()
     {
@@ -18,24 +15,19 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        HandleCameraPan();
         HandleDragAndDrop();
-    }
-
-    private void HandleCameraPan()
-    {
-        if (Mouse.current.rightButton.isPressed)
-        {
-            Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-            if (cameraController != null) cameraController.PanCamera(mouseDelta);
-        }
     }
 
     private void HandleDragAndDrop()
     {
-        Vector2 mouseWorldPos = mainCam.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        if (Mouse.current == null) return;
 
+        Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+        Vector2 mouseWorldPos = mainCam.ScreenToWorldPoint(mouseScreenPos);
 
+        // ==========================================
+        // จังหวะที่ 1: เริ่มกดคลิกซ้าย "ลง"
+        // ==========================================
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             pressDownPos = mouseWorldPos;
@@ -76,13 +68,17 @@ public class InputManager : MonoBehaviour
             }
         }
 
-
+        // ==========================================
+        // จังหวะที่ 2: กดคลิกซ้าย "ค้าง" (กำลังลาก)
+        // ==========================================
         if (Mouse.current.leftButton.isPressed && currentDraggable != null)
         {
             currentDraggable.OnDrag(mouseWorldPos + dragOffset);
         }
 
-       
+        // ==========================================
+        // จังหวะที่ 3: ปล่อยคลิกซ้าย
+        // ==========================================
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
             bool isClick = Vector2.Distance(pressDownPos, mouseWorldPos) < 0.1f;
@@ -90,13 +86,23 @@ public class InputManager : MonoBehaviour
             if (currentDraggable != null)
             {
                 FoodInstance food = currentDraggable as FoodInstance;
+                Cup cup = currentDraggable as Cup;
+
+                RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
+                bool placed = false;
+
                 if (food != null)
                 {
-                    RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
-                    bool placed = false;
-
                     foreach (RaycastHit2D hit in hits)
                     {
+                        Cup targetCup = hit.collider.GetComponent<Cup>();
+                        if (targetCup != null)
+                        {
+                            targetCup.AddFood(food);
+                            placed = true;
+                            break;
+                        }
+
                         GrillStation grill = hit.collider.GetComponent<GrillStation>();
                         if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG))
                         {
@@ -117,7 +123,6 @@ public class InputManager : MonoBehaviour
                     if (!placed)
                     {
                         food.transform.position = food.startDragPos;
-
                         RaycastHit2D[] fallBackHits = Physics2D.RaycastAll(food.startDragPos, Vector2.zero);
                         foreach (var fbHit in fallBackHits)
                         {
@@ -126,6 +131,19 @@ public class InputManager : MonoBehaviour
 
                             SeasoningStation s = fbHit.collider.GetComponent<SeasoningStation>();
                             if (s != null && s.TrySnapToSlot(food, out _)) break;
+                        }
+                    }
+                }
+                else if (cup != null)
+                {
+                    foreach (RaycastHit2D hit in hits)
+                    {
+                        Customer customer = hit.collider.GetComponent<Customer>();
+                        if (customer != null)
+                        {
+                            customer.ReceiveCup(cup);
+                            placed = true;
+                            break;
                         }
                     }
                 }
