@@ -26,6 +26,9 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+            return;
+
         if (isLocked || Mouse.current == null) return;
 
         if (Mouse.current.rightButton.isPressed)
@@ -38,6 +41,7 @@ public class CameraController : MonoBehaviour
         {
             HandleEdgeScrolling();
         }
+        
     }
 
     private void HandleEdgeScrolling()

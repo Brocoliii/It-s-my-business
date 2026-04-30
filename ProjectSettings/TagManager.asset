@@ -11,14 +11,14 @@ TagManager:
   - Grill
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Background
+  - Station
+  - Food
+  - Tools
+  - Dragging
+  - WorldUI
+  - UI
+  - Character
   - 
   - 
   - 
@@ -40,6 +40,30 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 553899955
+    locked: 0
+  - name: Character
+    uniqueID: 2364494271
+    locked: 0
+  - name: Station
+    uniqueID: 1122278901
+    locked: 0
+  - name: Food
+    uniqueID: 4059831101
+    locked: 0
+  - name: Tools
+    uniqueID: 3427684939
+    locked: 0
+  - name: Dragging
+    uniqueID: 2443972105
+    locked: 0
+  - name: WorldUI
+    uniqueID: 2035835011
+    locked: 0
+  - name: UI
+    uniqueID: 1671338879
     locked: 0
   m_RenderingLayers:
   - Default

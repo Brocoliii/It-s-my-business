@@ -19,6 +19,7 @@ public class FoodData : ScriptableObject
     public float burnTime = 15f;
 
     [Header("รูปภาพเครื่องปรุง (Seasoning Overlays)")]
+
     public Sprite sauceSprite;
     public Sprite spicyLevel1Sprite;
     public Sprite spicyLevel2Sprite;

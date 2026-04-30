@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7473013194040127856}
   - component: {fileID: 2099312291167856758}
   - component: {fileID: 3122399079979725189}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SigleCup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,7 +126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7447317506283909283}
   - component: {fileID: 7443101775687351670}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 12_Cup1_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -217,7 +217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2803011426794431383}
   - component: {fileID: 4149826735279041748}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 11_Cup2_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}

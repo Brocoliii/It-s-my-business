@@ -7,6 +7,10 @@ public class SauceBrush : MonoBehaviour, IDraggable
     [Tooltip("ระยะกระชากเมาส์ที่ต้องการเพื่อทาซอสสำเร็จ (ยิ่งเยอะยิ่งต้องถูนาน)")]
     [SerializeField] private float requiredDrag = 200f;
 
+    [Header("Layer Settings")]
+    public string defaultLayer = "Tools";
+    public string dragLayer = "Dragging";
+
     private Vector3 startPos;
     private float dragDistance = 0f;
     private SpriteRenderer sr;
@@ -15,13 +19,14 @@ public class SauceBrush : MonoBehaviour, IDraggable
     {
         startPos = transform.position; 
         sr = GetComponent<SpriteRenderer>();
+        if (sr != null) sr.sortingLayerName = defaultLayer;
     }
 
     public void OnBeginDrag()
     {
-        dragDistance = 0f; 
+        dragDistance = 0f;
 
-        if (sr != null) sr.sortingOrder = 15; 
+        if (sr != null) sr.sortingLayerName = dragLayer;
         transform.rotation = Quaternion.Euler(0, 0, -15f); 
     }
 
@@ -51,9 +56,9 @@ public class SauceBrush : MonoBehaviour, IDraggable
 
     public void OnEndDrag()
     {
-        transform.position = startPos; // ปล่อยเมาส์ปุ๊บ เด้งกลับไปวางที่เดิม
-        transform.rotation = Quaternion.identity; // ตั้งแปรงให้กลับมาตรงเหมือนเดิม
+        transform.position = startPos; 
+        transform.rotation = Quaternion.identity; 
 
-        if (sr != null) sr.sortingOrder = 5; // กลับไปอยู่ชั้นปกติ
+        if (sr != null) sr.sortingLayerName = defaultLayer;
     }
 }

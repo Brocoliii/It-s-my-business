@@ -1,10 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GrillStation : MonoBehaviour
 {
-    [Header("�ش�ҧ��� (�ҡ Empty Object 3 �ѹ�����)")]
+    [Header("จุดวางหมู (ลาก Empty Object 3 อันมาใส่)")]
     public Transform[] slots = new Transform[3];
-    private FoodInstance[] foodsOnSlots = new FoodInstance[3];
+    public FoodInstance[] foodsOnSlots = new FoodInstance[3];
+
+    [Header("ระยะการดูดเข้าช่อง (ปรับลดลงถ้ารู้สึกว่าดูดไกลไป)")]
+    public float snapRadius = 0.5f;
 
     public bool TrySnapToSlot(FoodInstance food, out Vector3 snapPos)
     {
@@ -25,13 +28,14 @@ public class GrillStation : MonoBehaviour
             }
         }
 
-        if (bestSlot != -1 && minDistance < 3f)
+        if (bestSlot != -1 && minDistance < snapRadius)
         {
             foodsOnSlots[bestSlot] = food;
-            snapPos = slots[bestSlot].position;
 
-            food.currentGrill = this; 
-            food.SetGrilling(true);   
+            snapPos = new Vector3(slots[bestSlot].position.x, slots[bestSlot].position.y, food.transform.position.z);
+
+            food.currentGrill = this;
+            food.SetGrilling(true);
             return true;
         }
         return false;

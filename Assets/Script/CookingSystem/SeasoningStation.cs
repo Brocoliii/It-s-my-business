@@ -1,10 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SeasoningStation : MonoBehaviour
 {
-    [Header("�ش�ҫ�� (�ҡ Empty Object 3 �ѹ�����)")]
+    [Header("จุดทาซอส (ลาก Empty Object 3 อันมาใส่)")]
     public Transform[] slots = new Transform[3];
     private FoodInstance[] foodsOnSlots = new FoodInstance[3];
+
+    [Header("ระยะการดูดเข้าช่อง (ปรับลดลงถ้ารู้สึกว่าดูดไกลไป)")]
+    public float snapRadius = 0.5f;
 
     public bool TrySnapToSlot(FoodInstance food, out Vector3 snapPos)
     {
@@ -25,10 +28,11 @@ public class SeasoningStation : MonoBehaviour
             }
         }
 
-        if (bestSlot != -1 && minDistance < 3f)
+        if (bestSlot != -1 && minDistance < snapRadius)
         {
             foodsOnSlots[bestSlot] = food;
-            snapPos = slots[bestSlot].position;
+
+            snapPos = new Vector3(slots[bestSlot].position.x, slots[bestSlot].position.y, food.transform.position.z);
 
             food.currentSeasoning = this;
             return true;

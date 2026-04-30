@@ -4,7 +4,11 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     private Camera mainCam;
+
     private IDraggable currentDraggable;
+
+    private IInvestigatable currentInvestigation;
+
     private Vector2 pressDownPos;
     private Vector2 dragOffset;
 
@@ -15,6 +19,8 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+            return;
         HandleDragAndDrop();
     }
 
@@ -66,14 +72,45 @@ public class InputManager : MonoBehaviour
                     return;
                 }
             }
+
+            if (currentDraggable == null)
+            {
+                Debug.Log("<color=orange>--- เริ่มเช็คคลิกแอบฟัง ---</color>");
+
+                if (hits.Length == 0)
+                {
+                    Debug.Log("เมาส์ชี้ทะลุ... ไม่โดนอะไรเลย (เช็ค BoxCollider หรือ Z-Axis ด่วน!)");
+                }
+
+                foreach (RaycastHit2D hit in hits)
+                {
+                    Debug.Log($"เมาส์ชี้โดน: <color=yellow>{hit.collider.gameObject.name}</color>");
+
+                    currentInvestigation = hit.collider.GetComponent<IInvestigatable>();
+                    if (currentInvestigation != null)
+                    {
+                        Debug.Log("<color=magenta>เจอตัวคนให้สืบแล้ว! สั่งเริ่มฟัง!</color>");
+                        currentInvestigation.OnListenStart();
+                        return;
+                    }
+                }
+                Debug.Log("<color=orange>--------------------------</color>");
+            }
         }
 
         // ==========================================
-        // จังหวะที่ 2: กดคลิกซ้าย "ค้าง" (กำลังลาก)
+        // จังหวะที่ 2: กดคลิกซ้าย "ค้าง" 
         // ==========================================
-        if (Mouse.current.leftButton.isPressed && currentDraggable != null)
+        if (Mouse.current.leftButton.isPressed)
         {
-            currentDraggable.OnDrag(mouseWorldPos + dragOffset);
+            if (currentDraggable != null)
+            {
+                currentDraggable.OnDrag(mouseWorldPos + dragOffset);
+            }
+            else if (currentInvestigation != null)
+            {
+                currentInvestigation.OnListening();
+            }
         }
 
         // ==========================================
@@ -96,28 +133,13 @@ public class InputManager : MonoBehaviour
                     foreach (RaycastHit2D hit in hits)
                     {
                         Cup targetCup = hit.collider.GetComponent<Cup>();
-                        if (targetCup != null)
-                        {
-                            targetCup.AddFood(food);
-                            placed = true;
-                            break;
-                        }
+                        if (targetCup != null) { targetCup.AddFood(food); placed = true; break; }
 
                         GrillStation grill = hit.collider.GetComponent<GrillStation>();
-                        if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG))
-                        {
-                            food.transform.position = snapPosG;
-                            placed = true;
-                            break;
-                        }
+                        if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG)) { food.transform.position = snapPosG; placed = true; break; }
 
                         SeasoningStation seasoning = hit.collider.GetComponent<SeasoningStation>();
-                        if (seasoning != null && seasoning.TrySnapToSlot(food, out Vector3 snapPosS))
-                        {
-                            food.transform.position = snapPosS;
-                            placed = true;
-                            break;
-                        }
+                        if (seasoning != null && seasoning.TrySnapToSlot(food, out Vector3 snapPosS)) { food.transform.position = snapPosS; placed = true; break; }
                     }
 
                     if (!placed)
@@ -139,20 +161,21 @@ public class InputManager : MonoBehaviour
                     foreach (RaycastHit2D hit in hits)
                     {
                         Customer customer = hit.collider.GetComponent<Customer>();
-                        if (customer != null)
-                        {
-                            customer.ReceiveCup(cup);
-                            placed = true;
-                            break;
-                        }
+                        if (customer != null) { customer.ReceiveCup(cup); placed = true; break; }
                     }
                 }
 
                 currentDraggable.OnEndDrag();
                 currentDraggable = null;
             }
+            else if (currentInvestigation != null)
+            {
+                Debug.Log("<color=red>ปล่อยเมาส์ เลิกแอบฟัง!</color>");
+                currentInvestigation.OnListenEnd();
+                currentInvestigation = null;
+            }
 
-            if (isClick)
+            if (isClick && currentInvestigation == null && currentDraggable == null)
             {
                 RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
                 foreach (RaycastHit2D hit in hits)

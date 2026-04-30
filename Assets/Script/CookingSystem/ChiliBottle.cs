@@ -7,6 +7,10 @@ public class ChiliBottle : MonoBehaviour, IDraggable
     [Tooltip("ระยะกระชากเมาส์ต่อ 1 ระดับความเผ็ด")]
     [SerializeField] private float requiredShake = 150f;
 
+    [Header("Layer Settings")]
+    public string defaultLayer = "Tools";
+    public string dragLayer = "Dragging";
+
     private Vector3 startPos;
     private float shakeDistance = 0f;
     private SpriteRenderer sr;
@@ -20,7 +24,7 @@ public class ChiliBottle : MonoBehaviour, IDraggable
     public void OnBeginDrag()
     {
         shakeDistance = 0f;
-        if (sr != null) sr.sortingOrder = 15;
+        if (sr != null) sr.sortingLayerName = dragLayer;
         transform.rotation = Quaternion.Euler(0, 0, -45f);
     }
 
@@ -53,7 +57,7 @@ public class ChiliBottle : MonoBehaviour, IDraggable
     public void OnEndDrag()
     {
         transform.position = startPos; 
-        transform.rotation = Quaternion.identity; 
-        if (sr != null) sr.sortingOrder = 5;
+        transform.rotation = Quaternion.identity;
+        if (sr != null) sr.sortingLayerName = defaultLayer;
     }
 }

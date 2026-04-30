@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 public class FoodInstance : MonoBehaviour, IDraggable, IClickable
 {
@@ -10,7 +10,16 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     [SerializeField] private float sideBProgress = 0f;
     [SerializeField] private bool isFacingSideA = true;
 
-    [Header("Seasoning (à¤Ã×èÍ§»ÃØ§)")]
+    [SerializeField] private float _burnTime = 10f;
+
+    [Header("Layer Settings")]
+    public string defaultLayer = "Food";   
+    public string dragLayer = "Dragging"; 
+    public float BurnTime => _burnTime;
+    public CookState CurrentState => currentState;
+    private CookState currentState = CookState.Raw;
+
+    [Header("Seasoning (à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸›à¸£à¸¸à¸‡)")]
     public int spicyLevel = 0;   
     public bool hasSauce = false;
 
@@ -39,15 +48,16 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         UpdateVisual();
     }
 
-    // ÃÐºº IDraggable
+    // à¸£à¸°à¸šà¸š IDraggable
     public void OnBeginDrag()
     {
         startDragPos = transform.position; 
         isBeingDragged = true;
+        SetSortingLayer(dragLayer);
 
-        if (mainRenderer != null) mainRenderer.sortingOrder = 10;
-        if (sauceRenderer != null) sauceRenderer.sortingOrder = 11;
-        if (spicyRenderer != null) spicyRenderer.sortingOrder = 12;
+        if (mainRenderer != null) mainRenderer.sortingOrder = 1;
+        if (sauceRenderer != null) sauceRenderer.sortingOrder = 2;
+        if (spicyRenderer != null) spicyRenderer.sortingOrder = 3;
     }
 
     public void OnDrag(Vector2 mousePos)
@@ -58,18 +68,23 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     public void OnEndDrag()
     {
         isBeingDragged = false;
-        if (TryGetComponent<SpriteRenderer>(out var sr)) sr.sortingOrder = 5;
+        SetSortingLayer(defaultLayer);
     }
     // Click
     public void OnClick()
     {
-        // ¾ÅÔ¡ä´éà©¾ÒÐµÍ¹ÍÂÙèº¹àµÒ áÅÐäÁèä´é¡ÓÅÑ§¾ÅÔ¡ÍÂÙè
         if (isOnGrill && !isFlipping)
         {
             StartCoroutine(FlipAnimation());
         }
     }
 
+    private void SetSortingLayer(string layerName)
+    {
+        if (mainRenderer != null) mainRenderer.sortingLayerName = layerName;
+        if (sauceRenderer != null) sauceRenderer.sortingLayerName = layerName;
+        if (spicyRenderer != null) spicyRenderer.sortingLayerName = layerName;
+    }
     private IEnumerator FlipAnimation()
     {
         isFlipping = true;
@@ -94,7 +109,7 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         isFlipping = false;
     }
 
-    // ÃÐºº·ÓÍÒËÒÃ
+    // à¸£à¸°à¸šà¸šà¸—à¸³à¸­à¸²à¸«à¸²à¸£
     public void Flip() 
     {
         isFacingSideA = !isFacingSideA;
@@ -144,10 +159,10 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         if (sideAProgress >= data.mediumTime || sideBProgress >= data.mediumTime) return CookState.Medium;
         return CookState.Raw;
     }
-    //«ÍÊ
+    //à¸‹à¸­à¸ª
     public void AddSpicy()
     {
-        if (spicyLevel < 3) // ÅçÍ¤¤ÇÒÁà¼ç´äÇéÊÙ§ÊØ´·Õè 3 ÃÐ´Ñº
+        if (spicyLevel < 3) 
         {
             spicyLevel++;
             UpdateSpicyVisual();
@@ -158,15 +173,14 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         if (!hasSauce)
         {
             hasSauce = true;
-            // àªç¤ÇèÒàÃÒÅÒ¡µÑÇ Overlay_Sauce ÁÒãÊèã¹ªèÍ§ sauceRenderer ËÃ×ÍÂÑ§
             if (sauceRenderer != null && data.sauceSprite != null)
             {
                 sauceRenderer.sprite = data.sauceSprite;
-                sauceRenderer.gameObject.SetActive(true); // á¤èà»Ô´ãªé§Ò¹ÇÑµ¶Ø·ÕèÁÕÍÂÙèáÅéÇ
+                sauceRenderer.gameObject.SetActive(true); 
             }
             else
             {
-                Debug.LogError("Å×ÁÅÒ¡ Overlay_Sauce ÁÒãÊèã¹ Inspector ËÃ×Íà»ÅèÒ?");
+                Debug.LogError("à¸¥à¸·à¸¡à¸¥à¸²à¸ Overlay_Sauce à¸¡à¸²à¹ƒà¸ªà¹ˆà¹ƒà¸™ Inspector");
             }
         }
     }
@@ -184,6 +198,13 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     public FoodData GetData()
     {
         return data;
+    }
+    public float CurrentCookTimer
+    {
+        get
+        {
+            return isFacingSideA ? sideBProgress : sideAProgress;
+        }
     }
 
 }

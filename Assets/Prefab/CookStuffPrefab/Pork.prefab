@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6994356319569839799}
   - component: {fileID: 3297880411702478440}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Overlay_Spicy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2837901690238901071}
   - component: {fileID: 2673479866108573305}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Overlay_Sauce
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,10 +193,10 @@ GameObject:
   - component: {fileID: 528090870398129726}
   - component: {fileID: 278523601063229025}
   - component: {fileID: 7539934567739446598}
-  - component: {fileID: 7846377661907337642}
   - component: {fileID: 3353518967930818889}
-  m_Layer: 0
-  m_Name: Visual
+  - component: {fileID: 6375641586945880509}
+  m_Layer: 8
+  m_Name: VisualP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -266,14 +266,14 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 8
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 6908634027161224790, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.53, y: 4.69}
+  m_Size: {x: 19.2, y: 10.8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -305,7 +305,34 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!60 &7846377661907337642
+--- !u!114 &3353518967930818889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8432627257463808749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cb7f422c23c95b46a34123e9d727ac2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FoodInstance
+  data: {fileID: 11400000, guid: 2a5375419b9b04140ad92527caf60360, type: 2}
+  sideAProgress: 0
+  sideBProgress: 0
+  isFacingSideA: 1
+  _burnTime: 10
+  defaultLayer: Food
+  dragLayer: Dragging
+  spicyLevel: 0
+  hasSauce: 0
+  mainRenderer: {fileID: 278523601063229025}
+  sauceRenderer: {fileID: 2673479866108573305}
+  spicyRenderer: {fileID: 3297880411702478440}
+  startDragPos: {x: 0, y: 0, z: 0}
+  currentGrill: {fileID: 0}
+  currentSeasoning: {fileID: 0}
+--- !u!60 &6375641586945880509
 PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -342,89 +369,68 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.53, y: 4.69}
-    newSize: {x: 1.53, y: 4.69}
+    pivot: {x: 0.07913864, y: 0.44655716}
+    oldSize: {x: 19.2, y: 10.8}
+    newSize: {x: 19.2, y: 10.8}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0.525, y: -1.245}
-      - {x: 0.675, y: -1.0849999}
-      - {x: 0.73499995, y: -0.565}
-      - {x: 0.745, y: -0.415}
-      - {x: 0.715, y: -0.16499999}
-      - {x: 0.635, y: -0.065}
-      - {x: 0.66499996, y: -0.005}
-      - {x: 0.745, y: 0.205}
-      - {x: 0.755, y: 0.505}
-      - {x: 0.715, y: 0.815}
-      - {x: 0.675, y: 0.895}
-      - {x: 0.60499996, y: 0.965}
-      - {x: 0.695, y: 1.115}
-      - {x: 0.755, y: 1.5649999}
-      - {x: 0.755, y: 1.935}
-      - {x: 0.615, y: 2.095}
-      - {x: 0.415, y: 2.135}
-      - {x: 0.345, y: 2.125}
-      - {x: 0.105, y: 2.165}
-      - {x: 0.114999995, y: 2.305}
-      - {x: 0.035, y: 2.345}
-      - {x: -0.074999996, y: 2.345}
-      - {x: -0.114999995, y: 2.325}
-      - {x: -0.125, y: 2.145}
-      - {x: -0.435, y: 2.135}
-      - {x: -0.715, y: 2.0349998}
-      - {x: -0.765, y: 1.9649999}
-      - {x: -0.765, y: 1.685}
-      - {x: -0.645, y: 1.4449999}
-      - {x: -0.685, y: 1.235}
-      - {x: -0.675, y: 0.995}
-      - {x: -0.615, y: 0.945}
-      - {x: -0.755, y: 0.775}
-      - {x: -0.73499995, y: 0.545}
-      - {x: -0.72499996, y: 0.065}
-      - {x: -0.695, y: 0.015}
-      - {x: -0.66499996, y: -0.105}
-      - {x: -0.705, y: -0.175}
-      - {x: -0.705, y: -0.585}
-      - {x: -0.72499996, y: -0.805}
-      - {x: -0.72499996, y: -0.995}
-      - {x: -0.705, y: -1.095}
-      - {x: -0.59499997, y: -1.2149999}
-      - {x: -0.405, y: -1.275}
-      - {x: -0.105, y: -1.305}
-      - {x: -0.105, y: -2.2949998}
-      - {x: -0.085, y: -2.315}
-      - {x: -0.055, y: -2.335}
-      - {x: 0.055, y: -2.335}
-      - {x: 0.095, y: -2.305}
-      - {x: 0.265, y: -1.3149999}
-      - {x: 0.42499998, y: -1.305}
+    - - {x: 0.5405383, y: -1.6128173}
+      - {x: 0.6905383, y: -1.4528173}
+      - {x: 0.7505383, y: -0.93281734}
+      - {x: 0.76053834, y: -0.78281736}
+      - {x: 0.7105383, y: -0.54281735}
+      - {x: 0.6705383, y: -0.40281737}
+      - {x: 0.7105383, y: -0.33281738}
+      - {x: 0.76053834, y: -0.10281738}
+      - {x: 0.76053834, y: 0.13718261}
+      - {x: 0.7305383, y: 0.45718262}
+      - {x: 0.6505383, y: 0.5671826}
+      - {x: 0.6705383, y: 0.6571826}
+      - {x: 0.7205383, y: 0.8271826}
+      - {x: 0.77053833, y: 1.1971825}
+      - {x: 0.77053833, y: 1.4771826}
+      - {x: 0.76053834, y: 1.5671825}
+      - {x: 0.7105383, y: 1.6371826}
+      - {x: 0.63053834, y: 1.7271826}
+      - {x: 0.5305383, y: 1.7671826}
+      - {x: 0.120538324, y: 1.9371825}
+      - {x: 0.080538325, y: 1.9771826}
+      - {x: -0.059461668, y: 1.9771826}
+      - {x: -0.09946167, y: 1.9471825}
+      - {x: -0.109461665, y: 1.7771826}
+      - {x: -0.40946165, y: 1.7571826}
+      - {x: -0.5994617, y: 1.7171826}
+      - {x: -0.72946167, y: 1.6271826}
+      - {x: -0.74946165, y: 1.5571826}
+      - {x: -0.74946165, y: 1.3471826}
+      - {x: -0.62946165, y: 1.0771827}
+      - {x: -0.66946167, y: 0.8671826}
+      - {x: -0.6594617, y: 0.6271826}
+      - {x: -0.5894617, y: 0.5771826}
+      - {x: -0.67946166, y: 0.48718262}
+      - {x: -0.72946167, y: 0.3971826}
+      - {x: -0.7094616, y: -0.30281737}
+      - {x: -0.67946166, y: -0.3528174}
+      - {x: -0.6594617, y: -0.46281737}
+      - {x: -0.69946164, y: -0.6328174}
+      - {x: -0.67946166, y: -0.84281737}
+      - {x: -0.7094616, y: -1.1728173}
+      - {x: -0.7094616, y: -1.3628174}
+      - {x: -0.68946165, y: -1.4628173}
+      - {x: -0.57946163, y: -1.5728173}
+      - {x: -0.50946164, y: -1.6128173}
+      - {x: -0.32946166, y: -1.6428174}
+      - {x: -0.08946167, y: -1.6728173}
+      - {x: -0.08946167, y: -2.7028174}
+      - {x: 0.09053833, y: -2.7028174}
+      - {x: 0.110538326, y: -2.6728172}
+      - {x: 0.28053832, y: -1.6828173}
+      - {x: 0.44053832, y: -1.6728173}
   m_UseDelaunayMesh: 1
---- !u!114 &3353518967930818889
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8432627257463808749}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cb7f422c23c95b46a34123e9d727ac2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FoodInstance
-  data: {fileID: 11400000, guid: 2a5375419b9b04140ad92527caf60360, type: 2}
-  sideAProgress: 0
-  sideBProgress: 0
-  isFacingSideA: 1
-  spicyLevel: 0
-  hasSauce: 0
-  mainRenderer: {fileID: 278523601063229025}
-  sauceRenderer: {fileID: 2673479866108573305}
-  spicyRenderer: {fileID: 3297880411702478440}
 --- !u!1 &8789003479707751955
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,7 +456,7 @@ Transform:
   m_GameObject: {fileID: 8789003479707751955}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 28.73982, y: 8.01051, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
