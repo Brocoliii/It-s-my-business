@@ -539,7 +539,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 294809309178552014, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 895112556152596613, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
       propertyPath: m_Name
@@ -688,7 +688,7 @@ PrefabInstance:
     - target: {fileID: 7389347664815890056, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 544830917817015071, guid: 6c70276b2ec631744877c57588110148, type: 3}
+      objectReference: {fileID: 4295137748883183889, guid: 342fc759b40b578419118165d16b70ec, type: 3}
     - target: {fileID: 7422505120219275093, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 1

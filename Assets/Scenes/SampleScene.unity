@@ -2401,7 +2401,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 8
+  m_SortingOrder: 7
   m_MaskInteraction: 0
   m_Sprite: {fileID: 3998961842769301849, guid: 65f398489ab10164c9ed0655f42a7889, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2542,7 +2542,7 @@ MonoBehaviour:
   - {fileID: 827446766}
   - {fileID: 2134064719}
   - {fileID: 1884766260}
-  snapRadius: 0.5
+  snapRadius: 1.5
 --- !u!61 &716797537
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3127,9 +3127,9 @@ MonoBehaviour:
   customerPrefabs:
   - {fileID: 2070963350704547621, guid: 3edc915a2c161ca4ea017d01757831b3, type: 3}
   - {fileID: 7047328899235377487, guid: ce713e210d500e747ab1105824c7569f, type: 3}
-  - {fileID: 22811793707879948, guid: 06199055801a2364aa4794e9dff53c3e, type: 3}
-  - {fileID: 2276401374429937661, guid: 7944151860ffc1d45883a79922104818, type: 3}
-  - {fileID: 2984897346389072796, guid: 7998f6d29c5fed241b36a6288a013418, type: 3}
+  - {fileID: 2070963350704547621, guid: f08b572489bb284479071c03fa626b41, type: 3}
+  - {fileID: 2070963350704547621, guid: 5d8999a53638ea9469f7150012b00d19, type: 3}
+  - {fileID: 2070963350704547621, guid: f2f8cbffa9663964ba9c733e331f389b, type: 3}
   customerSlots:
   - {fileID: 2033965843}
   - {fileID: 789124043}
@@ -3137,7 +3137,7 @@ MonoBehaviour:
   minInitialDelay: 2
   maxInitialDelay: 5
   minFoodPerOrder: 1
-  maxFoodPerOrder: 3
+  maxFoodPerOrder: 1
 --- !u!4 &1311015195
 Transform:
   m_ObjectHideFlags: 0
