@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FoodData
   foodName: Pork
   foodIcon: {fileID: -3181778142699774698, guid: fba80ad72777e0c49baae12ad74a6c79, type: 3}
-  rawSprite: {fileID: 21300000, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
-  mediumSprite: {fileID: 21300000, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
+  rawSprite: {fileID: 6908634027161224790, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
+  mediumSprite: {fileID: 6908634027161224790, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
   cookedSprite: {fileID: -3181778142699774698, guid: fba80ad72777e0c49baae12ad74a6c79, type: 3}
   burntSprite: {fileID: 3909090353215070486, guid: 7e0122b726d365f4fb72a6c4b59ab364, type: 3}
   mediumTime: 5

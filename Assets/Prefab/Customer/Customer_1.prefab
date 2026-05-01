@@ -562,6 +562,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2601784799288685862, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 6.432
+      objectReference: {fileID: 0}
+    - target: {fileID: 2601784799288685862, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -693,6 +697,22 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 6813ed40d21a3da42b5a81e16ace32a3, type: 3}
+    - target: {fileID: 8090382568370112520, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8090382568370112520, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
+      propertyPath: m_Spacing
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8090382568370112520, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
+      propertyPath: m_ChildForceExpandWidth
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8090382568370112520, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
+      propertyPath: m_ChildForceExpandHeight
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9117115399325582240, guid: 4e76929e807a715428d0645383e85ef3, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
