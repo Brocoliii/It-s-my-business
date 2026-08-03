@@ -4,10 +4,12 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     private Camera mainCam;
+    private CameraController cameraController;
 
     private IDraggable currentDraggable;
 
     private IInvestigatable currentInvestigation;
+    private Transform currentInvestigationTarget;
 
     private Vector2 pressDownPos;
     private Vector2 dragOffset;
@@ -15,6 +17,7 @@ public class InputManager : MonoBehaviour
     private void Start()
     {
         mainCam = Camera.main;
+        cameraController = FindObjectOfType<CameraController>();
     }
 
     private void Update()
@@ -24,9 +27,19 @@ public class InputManager : MonoBehaviour
         HandleDragAndDrop();
     }
 
+    private void UpdateCameraBlockState()
+    {
+        if (cameraController == null || Mouse.current == null) return;
+
+        bool shouldBlock = currentInvestigation != null && Mouse.current.leftButton.isPressed;
+        cameraController.SetInvestigationInputBlocked(shouldBlock);
+    }
+
     private void HandleDragAndDrop()
     {
         if (Mouse.current == null) return;
+
+        UpdateCameraBlockState();
 
         Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
         Vector2 mouseWorldPos = mainCam.ScreenToWorldPoint(mouseScreenPos);
@@ -90,7 +103,10 @@ public class InputManager : MonoBehaviour
                     if (currentInvestigation != null)
                     {
                         Debug.Log("<color=magenta>เจอตัวคนให้สืบแล้ว! สั่งเริ่มฟัง!</color>");
+                        currentInvestigationTarget = hit.collider.transform;
+                        cameraController?.BeginInvestigationFocus(currentInvestigationTarget);
                         currentInvestigation.OnListenStart();
+                        UpdateCameraBlockState();
                         return;
                     }
                 }
@@ -132,14 +148,36 @@ public class InputManager : MonoBehaviour
                 {
                     foreach (RaycastHit2D hit in hits)
                     {
+                        TrashBin trashBin = hit.collider.GetComponent<TrashBin>();
+                        if (trashBin != null)
+                        {
+                            trashBin.TrashFood(food);
+                            placed = true;
+                            break;
+                        }
+
                         Cup targetCup = hit.collider.GetComponent<Cup>();
                         if (targetCup != null) { targetCup.AddFood(food); placed = true; break; }
 
                         GrillStation grill = hit.collider.GetComponent<GrillStation>();
                         if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG)) { food.transform.position = snapPosG; placed = true; break; }
 
-                        SeasoningStation seasoning = hit.collider.GetComponent<SeasoningStation>();
+                        SeasoningStation seasoning = hit.collider.GetComponentInParent<SeasoningStation>();
                         if (seasoning != null && seasoning.TrySnapToSlot(food, out Vector3 snapPosS)) { food.transform.position = snapPosS; placed = true; break; }
+                    }
+
+                    if (!placed)
+                    {
+                        SeasoningStation[] seasonings = FindObjectsOfType<SeasoningStation>();
+                        foreach (SeasoningStation seasoning in seasonings)
+                        {
+                            if (seasoning != null && seasoning.IsWithinDropArea(mouseWorldPos) && seasoning.TrySnapToSlot(food, out Vector3 snapPosS))
+                            {
+                                food.transform.position = snapPosS;
+                                placed = true;
+                                break;
+                            }
+                        }
                     }
 
                     if (!placed)
@@ -151,8 +189,25 @@ public class InputManager : MonoBehaviour
                             GrillStation g = fbHit.collider.GetComponent<GrillStation>();
                             if (g != null && g.TrySnapToSlot(food, out _)) break;
 
-                            SeasoningStation s = fbHit.collider.GetComponent<SeasoningStation>();
-                            if (s != null && s.TrySnapToSlot(food, out _)) break;
+                            SeasoningStation s = fbHit.collider.GetComponentInParent<SeasoningStation>();
+                            if (s != null && s.TrySnapToSlot(food, out _))
+                            {
+                                placed = true;
+                                break;
+                            }
+                        }
+
+                        if (!placed)
+                        {
+                            SeasoningStation[] seasonings = FindObjectsOfType<SeasoningStation>();
+                            foreach (SeasoningStation seasoning in seasonings)
+                            {
+                                if (seasoning != null && seasoning.IsWithinDropArea(food.startDragPos) && seasoning.TrySnapToSlot(food, out _))
+                                {
+                                    placed = true;
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -173,6 +228,9 @@ public class InputManager : MonoBehaviour
                 Debug.Log("<color=red>ปล่อยเมาส์ เลิกแอบฟัง!</color>");
                 currentInvestigation.OnListenEnd();
                 currentInvestigation = null;
+                currentInvestigationTarget = null;
+                cameraController?.EndInvestigationFocus();
+                UpdateCameraBlockState();
             }
 
             if (isClick && currentInvestigation == null && currentDraggable == null)

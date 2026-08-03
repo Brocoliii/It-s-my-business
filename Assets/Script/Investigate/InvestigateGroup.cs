@@ -46,6 +46,7 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         {
             isBeingListened = true;
             UIManager.Instance.ShowListeningBar(true);
+            UIManager.Instance.ShowBinocularsOverlay(true);
         }
     }
 
@@ -61,6 +62,7 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
             isBeingListened = false;
 
             UIManager.Instance.ShowListeningBar(false);
+            UIManager.Instance.ShowBinocularsOverlay(false);
             manager.CollectClue(clueDetail);
             RemoveGroup();
         }
@@ -72,12 +74,17 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         {
             isBeingListened = false;
             UIManager.Instance.ShowListeningBar(false);
+            UIManager.Instance.ShowBinocularsOverlay(false);
         }
     }
 
     private void RemoveGroup()
     {
-        if (isBeingListened) UIManager.Instance.ShowListeningBar(false);
+        if (isBeingListened)
+        {
+            UIManager.Instance.ShowListeningBar(false);
+            UIManager.Instance.ShowBinocularsOverlay(false);
+        }
 
         manager.OnGroupLeft(this);
         Destroy(gameObject);

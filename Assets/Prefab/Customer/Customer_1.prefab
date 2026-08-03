@@ -488,9 +488,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Customer
   maxPatience: 90
+  lowPatienceThreshold: 0.35
+  customerRenderer: {fileID: 5121610101292596040}
+  normalSprite: {fileID: 8137820567943639655, guid: 7ccfe444007a9dd4a9bf91bddb2e9120, type: 3}
+  lowPatienceSprite: {fileID: -5922435368439867125, guid: 347a3ae2b89b1994c9f205b1e4c18389, type: 3}
+  exhaustedSprite: {fileID: 2735936603487851556, guid: a7a66876e6fab3a4fa1c4a2f37450247, type: 3}
+  correctReactionSprite: {fileID: 21300000, guid: 08960bd19be27af4ea83d58aa2b76b26, type: 3}
+  wrongReactionSprite: {fileID: -1155428663902404480, guid: ef7b22e74bde76d4abfdc53e5a28ab9c, type: 3}
+  reactionDuration: 0.7
   bubbleAnimator: {fileID: 0}
   foodIconPrefab: {fileID: 6674446399637427169, guid: 8c82aeeea31f5174fabe9f2951db1302, type: 3}
   foodContainer: {fileID: 3505375049052729531}
+  foodIconPositions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
   spicyIcon: {fileID: 8228852746093353749}
   sauceIcon: {fileID: 8827642136646493644}
   patienceFill: {fileID: 4818900448398681055}

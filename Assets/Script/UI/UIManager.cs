@@ -1,22 +1,25 @@
-using UnityEngine;
-using TMPro; // ÊÓ¤Ñ­: µéÍ§ãÊèà¾×èÍãªé TextMeshPro
+ï»¿using UnityEngine;
+using TMPro; // ï¿½Ó¤Ñ­: ï¿½ï¿½Í§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ TextMeshPro
 using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
-    // ·Óà»ç¹ Singleton à¾×èÍãËéä¿ÅìÍ×è¹àÃÕÂ¡ãªé UI ä´é§èÒÂæ
+    // ï¿½ï¿½ï¿½ï¿½ Singleton ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¡ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public static UIManager Instance { get; private set; }
 
-    [Header("Ë¹éÒ¨ÍËÅÑ¡ (HUD)")]
-    public TextMeshProUGUI clueCounterText; // ¢éÍ¤ÇÒÁºÍ¡¨Ó¹Ç¹àºÒÐáÊ
-    public TextMeshProUGUI centerWarningText; // µÑÇË¹Ñ§Ê×Íàµ×Í¹¡ÅÒ§¨Í (àªè¹ àÇÅÒ¹Ñº¶ÍÂËÅÑ§)
+    [Header("Ë¹ï¿½Ò¨ï¿½ï¿½ï¿½Ñ¡ (HUD)")]
+    public TextMeshProUGUI clueCounterText; // ï¿½ï¿½Í¤ï¿½ï¿½ï¿½ï¿½Í¡ï¿½Ó¹Ç¹ï¿½ï¿½ï¿½ï¿½ï¿½
+    public TextMeshProUGUI centerWarningText; // ï¿½ï¿½ï¿½Ë¹Ñ§ï¿½ï¿½ï¿½ï¿½ï¿½Í¹ï¿½ï¿½Ò§ï¿½ï¿½ (ï¿½ï¿½ ï¿½ï¿½ï¿½Ò¹Ñºï¿½ï¿½ï¿½ï¿½ï¿½Ñ§)
 
-    [Header("ÃÐºº UI áÍº¿Ñ§")]
+    [Header("ï¿½Ðºï¿½ UI ï¿½Íºï¿½Ñ§")]
     public Canvas listeningCanvas;
     public UnityEngine.UI.Image listeningFill;
 
-    [Header("Ë¹éÒµèÒ§»êÍ»ÍÑ»")]
-    public GameObject endOfDayPanel; // Ë¹éÒ¨Í·Öºæ ·Õè¨Ðà´é§¢Öé¹ÁÒµÍ¹¨ºÇÑ¹
+    [Header("Binoculars Overlay")]
+    public GameObject binocularsOverlay;
+
+    [Header("Ë¹ï¿½Òµï¿½Ò§ï¿½ï¿½Í»ï¿½Ñ»")]
+    public GameObject endOfDayPanel; // Ë¹ï¿½Ò¨Í·Öºï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½é§¢ï¿½ï¿½ï¿½ÒµÍ¹ï¿½ï¿½ï¿½Ñ¹
 
     private void Awake()
     {
@@ -26,22 +29,23 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        // »Ô´¢éÍ¤ÇÒÁàµ×Í¹ áÅÐË¹éÒ¨Í¨ºÇÑ¹äÇé¡èÍ¹µÍ¹àÃÔèÁà¡Á
+        // ï¿½Ô´ï¿½ï¿½Í¤ï¿½ï¿½ï¿½ï¿½ï¿½Í¹ ï¿½ï¿½ï¿½Ë¹ï¿½Ò¨Í¨ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½Í¹ï¿½Í¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (centerWarningText != null) centerWarningText.gameObject.SetActive(false);
         if (endOfDayPanel != null) endOfDayPanel.SetActive(false);
         ShowListeningBar(false);
+        ShowBinocularsOverlay(false);
     }
 
-    // ¿Ñ§¡ìªÑ¹ÊÓËÃÑºÍÑ»à´µËÅÍ´àºÒÐáÊ
+    // ï¿½Ñ§ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½Ñºï¿½Ñ»à´µï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½ï¿½
     public void UpdateClueText(int current, int total)
     {
         if (clueCounterText != null)
         {
-            clueCounterText.text = $"àºÒÐáÊ: {current} / {total}";
+            clueCounterText.text = $"ï¿½ï¿½ï¿½ï¿½ï¿½: {current} / {total}";
         }
     }
 
-    // ¿Ñ§¡ìªÑ¹¹Ñº¶ÍÂËÅÑ§¡ÅÒ§¨Í (àÃÕÂ¡¨Ò¡ GameManager)
+    // ï¿½Ñ§ï¿½ï¿½Ñ¹ï¿½Ñºï¿½ï¿½ï¿½ï¿½ï¿½Ñ§ï¿½ï¿½Ò§ï¿½ï¿½ (ï¿½ï¿½ï¿½Â¡ï¿½Ò¡ GameManager)
     public void StartCountdownDisplay(int seconds)
     {
         StartCoroutine(CountdownRoutine(seconds));
@@ -53,16 +57,16 @@ public class UIManager : MonoBehaviour
 
         for (int i = seconds; i > 0; i--)
         {
-            centerWarningText.text = $"¨ºÇÑ¹ã¹... {i}";
+            centerWarningText.text = $"ï¿½ï¿½ï¿½Ñ¹ï¿½... {i}";
             yield return new WaitForSeconds(1f);
         }
 
-        centerWarningText.text = "ËÁ´àÇÅÒ!";
+        centerWarningText.text = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!";
         yield return new WaitForSeconds(1f);
 
         centerWarningText.gameObject.SetActive(false);
 
-        // à´é§Ë¹éÒ¨Í¨ºÇÑ¹¢Öé¹ÁÒ
+        // ï¿½ï¿½Ë¹ï¿½Ò¨Í¨ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½
         if (endOfDayPanel != null) endOfDayPanel.SetActive(true);
 
 
@@ -75,7 +79,7 @@ public class UIManager : MonoBehaviour
             listeningCanvas.enabled = isVisible;
         }
 
-        // ¶éÒÃÐººÊÑè§à»Ô´ ãËéÃÕà«çµËÅÍ´¡ÅÑºà»ç¹ 0 ´éÇÂ
+        // ï¿½ï¿½ï¿½ï¿½Ðºï¿½ï¿½ï¿½ï¿½ï¿½Ô´ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í´ï¿½ï¿½Ñºï¿½ï¿½ 0 ï¿½ï¿½ï¿½ï¿½
         if (isVisible && listeningFill != null)
         {
             listeningFill.fillAmount = 0f;
@@ -87,6 +91,14 @@ public class UIManager : MonoBehaviour
         if (listeningFill != null)
         {
             listeningFill.fillAmount = Mathf.Clamp01(progress);
+        }
+    }
+
+    public void ShowBinocularsOverlay(bool isVisible)
+    {
+        if (binocularsOverlay != null)
+        {
+            binocularsOverlay.SetActive(isVisible);
         }
     }
 }

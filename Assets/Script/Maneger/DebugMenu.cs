@@ -2,6 +2,10 @@
 
 public class DebugMenu : MonoBehaviour
 {
+    [Header("Debug Win Button")]
+    public bool showWinDebugButton = true;
+    public Vector2 winButtonPosition = new Vector2(20f, 20f);
+    public Vector2 winButtonSize = new Vector2(180f, 44f);
 
     [ContextMenu("บังคับเสกลูกค้า")]
     public void ForceSpawnCustomer()
@@ -27,8 +31,21 @@ public class DebugMenu : MonoBehaviour
         }
     }
 
+    [ContextMenu("Skip to Win (Debug)")]
+    public void ForceWin()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ChangeState(GameManager.GameState.Win);
+            Debug.Log("<color=cyan>[Debug]</color> ข้ามไปสถานะชนะ");
+        }
+        else
+        {
+            Debug.LogWarning("<color=cyan>[Debug]</color> ไม่พบ GameManager เพื่อ skip ไป win");
+        }
+    }
+
     [ContextMenu("บังคับจบวันและเคลียร์ฉาก")]
-   
     public void ForceEndDay()
     {
         if (GameManager.Instance != null)
@@ -62,6 +79,16 @@ public class DebugMenu : MonoBehaviour
                 notebook.OpenNotebook();
                 Debug.Log("<color=cyan>[Debug]</color> เคลียร์ฉากและเปิดสมุดแล้ว!");
             }
+        }
+    }
+
+    private void OnGUI()
+    {
+        if (!showWinDebugButton || !Application.isPlaying) return;
+
+        if (GUI.Button(new Rect(winButtonPosition.x, winButtonPosition.y, winButtonSize.x, winButtonSize.y), "Debug: Skip to Win"))
+        {
+            ForceWin();
         }
     }
 }

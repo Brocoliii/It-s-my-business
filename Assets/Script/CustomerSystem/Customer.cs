@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 
 [System.Serializable]
 public class OrderData
 {
-    public List<FoodData> wantedFoods; 
+    public List<FoodData> wantedFoods;
     public int wantedSpicyLevel;
     public bool wantedSauce;
 }
@@ -17,6 +17,25 @@ public class Customer : MonoBehaviour
     public float maxPatience = 90f;
     private float currentPatience;
 
+    [Tooltip("เปอร์เซ็นต์ความอดทนที่เริ่มเปลี่ยนเป็นสปริทตอนใกล้หมด")]
+    [Range(0f, 1f)] public float lowPatienceThreshold = 0.35f;
+
+    [Header("สปริทลูกค้า")]
+    [Tooltip("คอมโพเนนต์ SpriteRenderer ของลูกค้า (ถ้าไม่มีจะไม่เปลี่ยนสปริท)")]
+    public SpriteRenderer customerRenderer;
+    [Tooltip("สปริทตอนปกติ")]
+    public Sprite normalSprite;
+    [Tooltip("สปริทตอนใกล้หมดความอดทน")]
+    public Sprite lowPatienceSprite;
+    [Tooltip("สปริทตอนความอดทนหมดหรือกำลังจากไป")]
+    public Sprite exhaustedSprite;
+    [Tooltip("สปริทตอนลูกค้าพอใจเมื่อรับอาหารถูก")]
+    public Sprite correctReactionSprite;
+    [Tooltip("สปริทตอนลูกค้าไม่พอใจเมื่อรับอาหารผิด")]
+    public Sprite wrongReactionSprite;
+    [Tooltip("ระยะเวลาที่แสดงสปริทตอบสนองก่อนจากไป")]
+    public float reactionDuration = 1.5f;
+
     [Header("UI ออเดอร์ (ลากจากในลูกของตัวเองมาใส่)")]
     public Animator bubbleAnimator;
 
@@ -25,6 +44,9 @@ public class Customer : MonoBehaviour
     [Tooltip("กล่องที่จะเอาไอคอนอาหารไปเรียงใส่ (ลากตัวแบคกราวด์กรอบออเดอร์มาใส่)")]
     public Transform foodContainer;
 
+    [Tooltip("ตำแหน่งของไอคอนอาหาร (สูงสุด 3 ตำแหน่ง)")]
+    public Vector3[] foodIconPositions = new Vector3[3];
+
     public Image spicyIcon;
     public Image sauceIcon;
     public Image patienceFill;
@@ -32,12 +54,13 @@ public class Customer : MonoBehaviour
     [Header("ฐานข้อมูลรูปภาพ (ลากรูปจาก Project มาใส่)")]
     public Sprite[] spicySprites;
     public Sprite sauceSprite;
-    public Sprite noSauceSprite;  
+    public Sprite noSauceSprite;
 
     [HideInInspector] public OrderData myOrder;
     [HideInInspector] public int mySlotIndex;
     private CustomerManager manager;
     private bool isLeaving = false;
+    private bool isShowingReaction = false;
 
     public void Init(OrderData order, int slotIndex, CustomerManager mgr)
     {
@@ -51,6 +74,7 @@ public class Customer : MonoBehaviour
 
         if (foodIconPrefab != null && foodContainer != null)
         {
+            int foodIndex = 0;
             foreach (FoodData food in order.wantedFoods)
             {
                 GameObject newIconObj = Instantiate(foodIconPrefab, foodContainer, false);
@@ -60,6 +84,18 @@ public class Customer : MonoBehaviour
                 {
                     iconImage.sprite = food.foodIcon;
                 }
+
+                // ตั้งตำแหน่งของไอคอน
+                if (foodIndex < foodIconPositions.Length)
+                {
+                    RectTransform rectTransform = newIconObj.GetComponent<RectTransform>();
+                    if (rectTransform != null)
+                    {
+                        rectTransform.localPosition = foodIconPositions[foodIndex];
+                    }
+                }
+
+                foodIndex++;
             }
         }
 
@@ -67,7 +103,7 @@ public class Customer : MonoBehaviour
         {
             if (order.wantedSpicyLevel == 0)
             {
-                spicyIcon.gameObject.SetActive(false); 
+                spicyIcon.gameObject.SetActive(false);
             }
             else
             {
@@ -79,7 +115,7 @@ public class Customer : MonoBehaviour
 
         if (sauceIcon != null)
         {
-            sauceIcon.gameObject.SetActive(true); 
+            sauceIcon.gameObject.SetActive(true);
 
             if (order.wantedSauce)
             {
@@ -94,6 +130,7 @@ public class Customer : MonoBehaviour
         string foodNames = "";
         foreach (var f in order.wantedFoods) foodNames += f.foodName + " ";
 
+        ApplyCustomerSprite(false);
         StartCoroutine(PopInAnimation());
 
         Debug.Log($"<color=orange>[ออเดอร์ช่อง {slotIndex}]</color> ลูกค้าสั่ง: <b>{foodNames}</b> | เผ็ด: <b>{order.wantedSpicyLevel}</b> | <b>{sauceText}</b>");
@@ -116,7 +153,12 @@ public class Customer : MonoBehaviour
 
         if (currentPatience <= 0)
         {
+            ApplyCustomerSprite(true);
             Leave(false);
+        }
+        else
+        {
+            ApplyCustomerSprite(false);
         }
     }
 
@@ -128,7 +170,7 @@ public class Customer : MonoBehaviour
         {
             Debug.Log("ทำผิด! จำนวนอาหารไม่ตรงกับที่สั่ง");
             Destroy(cup.gameObject);
-            Leave(false);
+            StartCoroutine(ShowReactionAndLeave(false));
             return;
         }
 
@@ -137,22 +179,22 @@ public class Customer : MonoBehaviour
 
         foreach (var itemInCup in cup.contents)
         {
-          
+
             if (itemInCup.state != FoodInstance.CookState.Cooked ||
                 itemInCup.spicy != myOrder.wantedSpicyLevel ||
                 itemInCup.sauce != myOrder.wantedSauce)
             {
                 isCorrect = false;
-                break; 
+                break;
             }
 
             if (checklist.Contains(itemInCup.data))
             {
-                checklist.Remove(itemInCup.data); 
+                checklist.Remove(itemInCup.data);
             }
             else
             {
-                isCorrect = false; 
+                isCorrect = false;
                 break;
             }
         }
@@ -161,14 +203,54 @@ public class Customer : MonoBehaviour
         {
             Debug.Log("ถูกต้อง!");
             Destroy(cup.gameObject);
-            Leave(true);
+            StartCoroutine(ShowReactionAndLeave(true));
         }
         else
         {
             Debug.Log("ทำผิด!");
             Destroy(cup.gameObject);
-            Leave(false);
+            StartCoroutine(ShowReactionAndLeave(false));
         }
+    }
+
+    private void ApplyCustomerSprite(bool isExhausted)
+    {
+        if (customerRenderer == null || isShowingReaction) return;
+
+        if (isExhausted)
+        {
+            if (exhaustedSprite != null)
+            {
+                customerRenderer.sprite = exhaustedSprite;
+            }
+            return;
+        }
+
+        if (currentPatience <= maxPatience * lowPatienceThreshold && lowPatienceSprite != null)
+        {
+            customerRenderer.sprite = lowPatienceSprite;
+        }
+        else if (normalSprite != null)
+        {
+            customerRenderer.sprite = normalSprite;
+        }
+    }
+
+    private IEnumerator ShowReactionAndLeave(bool isSatisfied)
+    {
+        if (isLeaving) yield break;
+
+        isShowingReaction = true;
+        Sprite reactionSprite = isSatisfied ? correctReactionSprite : wrongReactionSprite;
+
+        if (customerRenderer != null && reactionSprite != null)
+        {
+            customerRenderer.sprite = reactionSprite;
+        }
+
+        yield return new WaitForSeconds(reactionDuration);
+        isShowingReaction = false;
+        Leave(isSatisfied);
     }
 
     private void Leave(bool isSatisfied)
