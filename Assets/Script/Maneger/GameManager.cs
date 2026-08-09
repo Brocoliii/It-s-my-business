@@ -139,7 +139,16 @@ public class GameManager : MonoBehaviour
     private System.Collections.IEnumerator EndOfDayCoroutine()
     {
         Debug.Log("<color=white>ลูกค้าหมดแล้ว... จะจบวันใน 5 วินาที</color>");
-        yield return new WaitForSeconds(5f);
+
+        // นับถอยหลังบนจอ แล้วค่อยเด้งหน้าจอจบวัน (พร้อมหน้าต่างเบาะแส)
+        if (UIManager.Instance != null)
+        {
+            yield return UIManager.Instance.StartCountdownDisplay(5);
+        }
+        else
+        {
+            yield return new WaitForSeconds(5f);
+        }
 
         ChangeState(GameState.CulpritSelection);
 

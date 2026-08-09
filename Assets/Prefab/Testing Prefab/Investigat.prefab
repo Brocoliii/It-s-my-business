@@ -105,6 +105,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 464fd270818cbc24b852a58294276436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InvestigateGroup
+  stratagemLength: 5
+  progressPerSuccess: 10
+  correctFlashDuration: 0.15
   clueDetail: "\u0E21\u0E35\u0E04\u0E19\u0E41\u0E2D\u0E1A\u0E43\u0E2A\u0E48\u0E22\u0E32\u0E1E\u0E34\u0E29\u0E43\u0E19\u0E40\u0E19\u0E37\u0E49\u0E2D\u0E2B\u0E21\u0E39\u0E40\u0E21\u0E37\u0E48\u0E2D\u0E04\u0E37\u0E19\u0E19\u0E35\u0E49!"
   assignedSpawnPoint: {fileID: 0}
 --- !u!60 &2628966601446767398

@@ -57,20 +57,22 @@ public class Cup : MonoBehaviour, IDraggable
             state = food.GetCurrentState()
         };
         contents.Add(newData);
-        StartCoroutine(SuckFoodIntoCup(food.gameObject));
+        StartCoroutine(SuckFoodIntoCup(food));
     }
 
-    private IEnumerator SuckFoodIntoCup(GameObject foodObj)
+    private IEnumerator SuckFoodIntoCup(FoodInstance food)
     {
-        if (foodObj.TryGetComponent<Collider2D>(out var col)) col.enabled = false;
-        foodObj.transform.SetParent(this.transform);
+        // ย้ายทั้งชิ้น (เผื่อ prefab เป็น root เปล่าครอบตัวภาพไว้) ไม่งั้น root เปล่าจะค้างอยู่นอกถ้วย
+        Transform foodObj = food.FoodRoot;
+        foreach (Collider2D col in foodObj.GetComponentsInChildren<Collider2D>(true)) col.enabled = false;
+        foodObj.SetParent(this.transform);
 
         float duration = 0.2f;
         float elapsed = 0;
 
-        Vector3 startLocalPos = foodObj.transform.localPosition;
-        Vector3 startScale = foodObj.transform.localScale;
-        Quaternion startRotation = foodObj.transform.localRotation;
+        Vector3 startLocalPos = foodObj.localPosition;
+        Vector3 startScale = foodObj.localScale;
+        Quaternion startRotation = foodObj.localRotation;
 
         int itemIndex = contents.Count - 1;
         Vector3 targetScale = new Vector3(inCupScale, inCupScale, 1f);
@@ -79,7 +81,7 @@ public class Cup : MonoBehaviour, IDraggable
         float randomX = Random.Range(-0.05f, 0.05f);
         Vector3 targetLocalPos = new Vector3(randomX, baseHeightOffset + (itemIndex * stackHeightSpacing), 0);
 
-        SpriteRenderer foodSr = foodObj.GetComponent<SpriteRenderer>();
+        SpriteRenderer foodSr = foodObj.GetComponentInChildren<SpriteRenderer>();
         if (foodSr != null && sr != null)
         {
             foodSr.sortingOrder = sr.sortingOrder + 1 + itemIndex;
@@ -89,15 +91,15 @@ public class Cup : MonoBehaviour, IDraggable
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
-            foodObj.transform.localPosition = Vector3.Lerp(startLocalPos, targetLocalPos, t);
-            foodObj.transform.localScale = Vector3.Lerp(startScale, targetScale, t);
-            foodObj.transform.localRotation = Quaternion.Lerp(startRotation, targetRotation, t);
+            foodObj.localPosition = Vector3.Lerp(startLocalPos, targetLocalPos, t);
+            foodObj.localScale = Vector3.Lerp(startScale, targetScale, t);
+            foodObj.localRotation = Quaternion.Lerp(startRotation, targetRotation, t);
             yield return null;
         }
 
-        foodObj.transform.localPosition = targetLocalPos;
-        foodObj.transform.localScale = targetScale;
-        foodObj.transform.localRotation = targetRotation;
+        foodObj.localPosition = targetLocalPos;
+        foodObj.localScale = targetScale;
+        foodObj.localRotation = targetRotation;
     }
 
     public void ClearCup()
@@ -133,7 +135,9 @@ public class Cup : MonoBehaviour, IDraggable
         int index = 1;
         foreach (Transform child in transform)
         {
-            if (child.TryGetComponent<SpriteRenderer>(out var childSr))
+            // อาหารบางชิ้นเป็น root เปล่าครอบตัวภาพไว้ ต้องมองเข้าไปข้างในด้วย
+            SpriteRenderer childSr = child.GetComponentInChildren<SpriteRenderer>();
+            if (childSr != null)
             {
                 childSr.sortingOrder = order + index;
                 index++;

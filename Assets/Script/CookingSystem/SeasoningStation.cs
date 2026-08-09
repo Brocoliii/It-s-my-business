@@ -41,7 +41,7 @@ public class SeasoningStation : MonoBehaviour
         {
             if (foodsOnSlots[i] == null)
             {
-                float dist = Vector2.Distance(food.transform.position, slots[i].position);
+                float dist = Vector2.Distance(food.Position, slots[i].position);
                 if (dist < minDistance)
                 {
                     minDistance = dist;
@@ -54,7 +54,7 @@ public class SeasoningStation : MonoBehaviour
         {
             foodsOnSlots[bestSlot] = food;
 
-            snapPos = new Vector3(slots[bestSlot].position.x, slots[bestSlot].position.y, food.transform.position.z);
+            snapPos = new Vector3(slots[bestSlot].position.x, slots[bestSlot].position.y, food.Position.z);
 
             food.currentSeasoning = this;
             return true;

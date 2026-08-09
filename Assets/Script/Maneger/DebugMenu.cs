@@ -2,10 +2,12 @@
 
 public class DebugMenu : MonoBehaviour
 {
-    [Header("Debug Win Button")]
+    [Header("Debug Buttons")]
     public bool showWinDebugButton = true;
     public Vector2 winButtonPosition = new Vector2(20f, 20f);
     public Vector2 winButtonSize = new Vector2(180f, 44f);
+    public bool showInvestSelectorDebugButton = true;
+    public Vector2 investSelectorButtonPosition = new Vector2(20f, 80f);
 
     [ContextMenu("บังคับเสกลูกค้า")]
     public void ForceSpawnCustomer()
@@ -45,6 +47,30 @@ public class DebugMenu : MonoBehaviour
         }
     }
 
+    [ContextMenu("Skip to Invest Selector (Debug)")]
+    public void SkipToInvestSelector()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ChangeState(GameManager.GameState.CulpritSelection);
+
+            NotebookManager notebook = Object.FindAnyObjectByType<NotebookManager>(FindObjectsInactive.Include);
+            if (notebook != null)
+            {
+                notebook.OpenNotebook();
+                Debug.Log("<color=cyan>[Debug]</color> ข้ามไปเลือกผู้ต้องสงสัยแล้ว");
+            }
+            else
+            {
+                Debug.LogWarning("<color=cyan>[Debug]</color> ไม่พบ NotebookManager เพื่อเปิดตัวเลือกผู้ต้องสงสัย");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("<color=cyan>[Debug]</color> ไม่พบ GameManager เพื่อ skip ไป invest selector");
+        }
+    }
+
     [ContextMenu("บังคับจบวันและเคลียร์ฉาก")]
     public void ForceEndDay()
     {
@@ -66,7 +92,7 @@ public class DebugMenu : MonoBehaviour
             foreach (Customer c in activeCustomers) Destroy(c.gameObject);
 
             FoodInstance[] activeFoods = Object.FindObjectsByType<FoodInstance>(FindObjectsSortMode.None);
-            foreach (FoodInstance f in activeFoods) Destroy(f.gameObject);
+            foreach (FoodInstance f in activeFoods) Destroy(f.RootObject);
 
             Cup currentCup = Object.FindAnyObjectByType<Cup>();
             if (currentCup != null) Destroy(currentCup.gameObject);
@@ -84,11 +110,16 @@ public class DebugMenu : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!showWinDebugButton || !Application.isPlaying) return;
+        if (!Application.isPlaying) return;
 
-        if (GUI.Button(new Rect(winButtonPosition.x, winButtonPosition.y, winButtonSize.x, winButtonSize.y), "Debug: Skip to Win"))
+        if (showWinDebugButton && GUI.Button(new Rect(winButtonPosition.x, winButtonPosition.y, winButtonSize.x, winButtonSize.y), "Debug:Skip to Win"))
         {
             ForceWin();
+        }
+
+        if (showInvestSelectorDebugButton && GUI.Button(new Rect(investSelectorButtonPosition.x, investSelectorButtonPosition.y, winButtonSize.x, winButtonSize.y), "Debug:Skip to Invest"))
+        {
+            SkipToInvestSelector();
         }
     }
 }

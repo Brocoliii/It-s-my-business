@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
@@ -6,7 +7,15 @@ public class InputManager : MonoBehaviour
     private Camera mainCam;
     private CameraController cameraController;
 
+    private InputAction investigateUpAction;
+    private InputAction investigateDownAction;
+    private InputAction investigateLeftAction;
+    private InputAction investigateRightAction;
+
+    private readonly Queue<StratagemDirection> bufferedInvestigationInputs = new Queue<StratagemDirection>();
+
     private IDraggable currentDraggable;
+    private bool isDraggingFreshFromTray;
 
     private IInvestigatable currentInvestigation;
     private Transform currentInvestigationTarget;
@@ -14,25 +23,191 @@ public class InputManager : MonoBehaviour
     private Vector2 pressDownPos;
     private Vector2 dragOffset;
 
+    private void Awake()
+    {
+        CreateInvestigationInputActions();
+    }
+
     private void Start()
     {
         mainCam = Camera.main;
         cameraController = FindObjectOfType<CameraController>();
     }
 
+    private void OnEnable()
+    {
+        SetInvestigationInputActionsEnabled(true);
+    }
+
+    private void OnDisable()
+    {
+        SetInvestigationInputActionsEnabled(false);
+        ClearBufferedInvestigationInputs();
+    }
+
+    private void OnDestroy()
+    {
+        DisposeInvestigationInputActions();
+    }
+
     private void Update()
     {
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+        {
             return;
+        }
+
+        if (currentInvestigation != null && !HasActiveInvestigation())
+        {
+            ResetInvestigationState();
+        }
+
         HandleDragAndDrop();
+        HandleInvestigationInput();
     }
 
     private void UpdateCameraBlockState()
     {
         if (cameraController == null || Mouse.current == null) return;
 
-        bool shouldBlock = currentInvestigation != null && Mouse.current.leftButton.isPressed;
+        bool shouldBlock = HasActiveInvestigation() && Mouse.current.leftButton.isPressed;
         cameraController.SetInvestigationInputBlocked(shouldBlock);
+    }
+
+    private void CreateInvestigationInputActions()
+    {
+        if (investigateUpAction != null)
+        {
+            return;
+        }
+
+        investigateUpAction = new InputAction("InvestigateUp", InputActionType.Button, "<Keyboard>/w");
+        investigateDownAction = new InputAction("InvestigateDown", InputActionType.Button, "<Keyboard>/s");
+        investigateLeftAction = new InputAction("InvestigateLeft", InputActionType.Button, "<Keyboard>/a");
+        investigateRightAction = new InputAction("InvestigateRight", InputActionType.Button, "<Keyboard>/d");
+
+        investigateUpAction.performed += OnInvestigateUpPerformed;
+        investigateDownAction.performed += OnInvestigateDownPerformed;
+        investigateLeftAction.performed += OnInvestigateLeftPerformed;
+        investigateRightAction.performed += OnInvestigateRightPerformed;
+    }
+
+    private void SetInvestigationInputActionsEnabled(bool isEnabled)
+    {
+        if (investigateUpAction == null)
+        {
+            return;
+        }
+
+        if (isEnabled)
+        {
+            investigateUpAction.Enable();
+            investigateDownAction.Enable();
+            investigateLeftAction.Enable();
+            investigateRightAction.Enable();
+        }
+        else
+        {
+            investigateUpAction.Disable();
+            investigateDownAction.Disable();
+            investigateLeftAction.Disable();
+            investigateRightAction.Disable();
+        }
+    }
+
+    private void DisposeInvestigationInputActions()
+    {
+        if (investigateUpAction != null)
+        {
+            investigateUpAction.performed -= OnInvestigateUpPerformed;
+            investigateUpAction.Dispose();
+            investigateUpAction = null;
+        }
+
+        if (investigateDownAction != null)
+        {
+            investigateDownAction.performed -= OnInvestigateDownPerformed;
+            investigateDownAction.Dispose();
+            investigateDownAction = null;
+        }
+
+        if (investigateLeftAction != null)
+        {
+            investigateLeftAction.performed -= OnInvestigateLeftPerformed;
+            investigateLeftAction.Dispose();
+            investigateLeftAction = null;
+        }
+
+        if (investigateRightAction != null)
+        {
+            investigateRightAction.performed -= OnInvestigateRightPerformed;
+            investigateRightAction.Dispose();
+            investigateRightAction = null;
+        }
+    }
+
+    private void OnInvestigateUpPerformed(InputAction.CallbackContext context)
+    {
+        QueueInvestigationInput(StratagemDirection.Up);
+    }
+
+    private void OnInvestigateDownPerformed(InputAction.CallbackContext context)
+    {
+        QueueInvestigationInput(StratagemDirection.Down);
+    }
+
+    private void OnInvestigateLeftPerformed(InputAction.CallbackContext context)
+    {
+        QueueInvestigationInput(StratagemDirection.Left);
+    }
+
+    private void OnInvestigateRightPerformed(InputAction.CallbackContext context)
+    {
+        QueueInvestigationInput(StratagemDirection.Right);
+    }
+
+    private void QueueInvestigationInput(StratagemDirection direction)
+    {
+        if (!HasActiveInvestigation())
+        {
+            return;
+        }
+
+        if (Mouse.current == null || !Mouse.current.leftButton.isPressed)
+        {
+            return;
+        }
+
+        bufferedInvestigationInputs.Enqueue(direction);
+    }
+
+    private bool HasActiveInvestigation()
+    {
+        if (currentInvestigation == null)
+        {
+            return false;
+        }
+
+        if (currentInvestigation is Component component && component == null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void ResetInvestigationState()
+    {
+        currentInvestigation = null;
+        currentInvestigationTarget = null;
+        ClearBufferedInvestigationInputs();
+        cameraController?.EndInvestigationFocus();
+        UpdateCameraBlockState();
+    }
+
+    private void ClearBufferedInvestigationInputs()
+    {
+        bufferedInvestigationInputs.Clear();
     }
 
     private void HandleDragAndDrop()
@@ -55,6 +230,8 @@ public class InputManager : MonoBehaviour
             foreach (RaycastHit2D hit in hits)
             {
                 currentDraggable = hit.collider.GetComponent<IDraggable>();
+                if (currentDraggable == null) currentDraggable = hit.collider.GetComponentInParent<IDraggable>();
+
                 if (currentDraggable != null)
                 {
                     FoodInstance food = currentDraggable as FoodInstance;
@@ -64,7 +241,13 @@ public class InputManager : MonoBehaviour
                         if (food.currentSeasoning != null) food.currentSeasoning.RemoveFood(food);
                     }
 
-                    dragOffset = (Vector2)hit.transform.position - mouseWorldPos;
+                    // อ้างอิงตำแหน่งจากตัวที่จะถูกลากจริงๆ ไม่ใช่ collider ที่โดน
+                    // (ถ้า collider อยู่ที่ลูก สองอันนี้คนละตำแหน่ง แล้ววัตถุจะกระโดดตอนหยิบ)
+                    Component draggableComponent = currentDraggable as Component;
+                    Transform draggedTransform = draggableComponent != null ? draggableComponent.transform : hit.transform;
+                    if (food != null) draggedTransform = food.FoodRoot;
+                    dragOffset = (Vector2)draggedTransform.position - mouseWorldPos;
+                    isDraggingFreshFromTray = false;
                     currentDraggable.OnBeginDrag();
                     return;
                 }
@@ -73,15 +256,12 @@ public class InputManager : MonoBehaviour
             foreach (RaycastHit2D hit in hits)
             {
                 FoodTray clickedTray = hit.collider.GetComponent<FoodTray>();
+                if (clickedTray == null) clickedTray = hit.collider.GetComponentInParent<FoodTray>();
+
                 if (clickedTray != null)
                 {
-                    FoodInstance spawnedFood = clickedTray.SpawnFood();
-                    if (spawnedFood != null)
-                    {
-                        currentDraggable = spawnedFood;
-                        dragOffset = Vector2.zero;
-                        currentDraggable.OnBeginDrag();
-                    }
+                    // หยิบวัตถุดิบออกมาทันทีที่กด แล้วลากต่อได้เลยในทีเดียว
+                    GrabFoodFromTray(clickedTray, mouseWorldPos);
                     return;
                 }
             }
@@ -121,9 +301,16 @@ public class InputManager : MonoBehaviour
         {
             if (currentDraggable != null)
             {
+                // วัตถุดิบที่เพิ่งหยิบจากถาด คำนวณระยะเยื้องใหม่ทุกเฟรม
+                // เผื่อ sprite เปลี่ยนขนาดระหว่างลาก จะได้เกาะกลางเมาส์ตลอด
+                if (isDraggingFreshFromTray && currentDraggable is FoodInstance freshFood)
+                {
+                    dragOffset = freshFood.VisualCenterOffset;
+                }
+
                 currentDraggable.OnDrag(mouseWorldPos + dragOffset);
             }
-            else if (currentInvestigation != null)
+            else if (HasActiveInvestigation())
             {
                 currentInvestigation.OnListening();
             }
@@ -160,10 +347,10 @@ public class InputManager : MonoBehaviour
                         if (targetCup != null) { targetCup.AddFood(food); placed = true; break; }
 
                         GrillStation grill = hit.collider.GetComponent<GrillStation>();
-                        if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG)) { food.transform.position = snapPosG; placed = true; break; }
+                        if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG)) { food.Position = snapPosG; placed = true; break; }
 
                         SeasoningStation seasoning = hit.collider.GetComponentInParent<SeasoningStation>();
-                        if (seasoning != null && seasoning.TrySnapToSlot(food, out Vector3 snapPosS)) { food.transform.position = snapPosS; placed = true; break; }
+                        if (seasoning != null && seasoning.TrySnapToSlot(food, out Vector3 snapPosS)) { food.Position = snapPosS; placed = true; break; }
                     }
 
                     if (!placed)
@@ -173,16 +360,25 @@ public class InputManager : MonoBehaviour
                         {
                             if (seasoning != null && seasoning.IsWithinDropArea(mouseWorldPos) && seasoning.TrySnapToSlot(food, out Vector3 snapPosS))
                             {
-                                food.transform.position = snapPosS;
+                                food.Position = snapPosS;
                                 placed = true;
                                 break;
                             }
                         }
                     }
 
+                    if (!placed && isDraggingFreshFromTray)
+                    {
+                        currentDraggable.OnEndDrag();
+                        currentDraggable = null;
+                        isDraggingFreshFromTray = false;
+                        Destroy(food.RootObject);
+                        return;
+                    }
+
                     if (!placed)
                     {
-                        food.transform.position = food.startDragPos;
+                        food.Position = food.startDragPos;
                         RaycastHit2D[] fallBackHits = Physics2D.RaycastAll(food.startDragPos, Vector2.zero);
                         foreach (var fbHit in fallBackHits)
                         {
@@ -215,6 +411,9 @@ public class InputManager : MonoBehaviour
                 {
                     foreach (RaycastHit2D hit in hits)
                     {
+                        TrashBin trashBin = hit.collider.GetComponent<TrashBin>();
+                        if (trashBin != null) { trashBin.TrashCup(cup); placed = true; break; }
+
                         Customer customer = hit.collider.GetComponent<Customer>();
                         if (customer != null) { customer.ReceiveCup(cup); placed = true; break; }
                     }
@@ -222,18 +421,16 @@ public class InputManager : MonoBehaviour
 
                 currentDraggable.OnEndDrag();
                 currentDraggable = null;
+                isDraggingFreshFromTray = false;
             }
-            else if (currentInvestigation != null)
+            else if (HasActiveInvestigation())
             {
                 Debug.Log("<color=red>ปล่อยเมาส์ เลิกแอบฟัง!</color>");
                 currentInvestigation.OnListenEnd();
-                currentInvestigation = null;
-                currentInvestigationTarget = null;
-                cameraController?.EndInvestigationFocus();
-                UpdateCameraBlockState();
+                ResetInvestigationState();
             }
 
-            if (isClick && currentInvestigation == null && currentDraggable == null)
+            if (isClick && !HasActiveInvestigation() && currentDraggable == null)
             {
                 RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
                 foreach (RaycastHit2D hit in hits)
@@ -245,6 +442,61 @@ public class InputManager : MonoBehaviour
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    // กดถาดปุ๊บ วัตถุดิบเด้งออกมาอยู่กลางเมาส์ทันที แล้วลากไปไหนต่อก็ได้ในการกดครั้งเดียว
+    private void GrabFoodFromTray(FoodTray tray, Vector2 mouseWorldPos)
+    {
+        FoodInstance spawnedFood = tray.SpawnFoodAt(mouseWorldPos);
+        if (spawnedFood == null) return;
+
+        currentDraggable = spawnedFood;
+        // ให้ภาพวัตถุดิบมาอยู่กลางเมาส์พอดี (เผื่อ pivot ของ prefab ไม่ได้อยู่กลางภาพ)
+        dragOffset = spawnedFood.VisualCenterOffset;
+        // วัตถุดิบที่เพิ่งหยิบจากถาด จะอยู่แค่ตอนกดค้างไว้ ถ้าปล่อยมือแล้วไม่ได้วางที่ไหน = หายไป
+        isDraggingFreshFromTray = true;
+        currentDraggable.OnBeginDrag();
+        currentDraggable.OnDrag(mouseWorldPos + dragOffset);
+    }
+
+    private void HandleInvestigationInput()
+    {
+        if (bufferedInvestigationInputs.Count == 0)
+            return;
+
+        if (!HasActiveInvestigation() || Mouse.current == null || !Mouse.current.leftButton.isPressed)
+        {
+            if (currentInvestigation != null)
+            {
+                ResetInvestigationState();
+            }
+
+            ClearBufferedInvestigationInputs();
+            return;
+        }
+
+        while (bufferedInvestigationInputs.Count > 0)
+        {
+            if (!HasActiveInvestigation() || Mouse.current == null || !Mouse.current.leftButton.isPressed)
+            {
+                ClearBufferedInvestigationInputs();
+                return;
+            }
+
+            StratagemDirection bufferedDirection = bufferedInvestigationInputs.Dequeue();
+            currentInvestigation.OnStratagemInput(bufferedDirection);
+
+            if (!HasActiveInvestigation())
+            {
+                if (currentInvestigation != null)
+                {
+                    ResetInvestigationState();
+                }
+
+                ClearBufferedInvestigationInputs();
+                return;
             }
         }
     }
