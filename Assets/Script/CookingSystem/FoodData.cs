@@ -1,27 +1,32 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Food Data", menuName = "MyGame/FoodData")]
 public class FoodData : ScriptableObject
 {
-    [Header("¢éÍÁÙÅ¾×é¹°Ò¹")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½Å¾ï¿½é¹°Ò¹")]
     public string foodName;
     public Sprite foodIcon;
 
-    [Header("ÃÙ»ÀÒ¾¤ÇÒÁÊØ¡ (Visuals)")]
-    public Sprite rawSprite;     
-    public Sprite mediumSprite;  
-    public Sprite cookedSprite;  
-    public Sprite burntSprite;   
+    [Header("ï¿½Ù»ï¿½Ò¾ï¿½ï¿½ï¿½ï¿½ï¿½Ø¡ (Visuals)")]
+    public Sprite rawSprite;
+    public Sprite mediumSprite;
+    public Sprite cookedSprite;
+    public Sprite burntSprite;
 
-    [Header("¡ÒÃµÑé§¤èÒàÇÅÒ (ÇÔ¹Ò·Õ)")]
-    public float mediumTime = 5f; 
-    public float cookTime = 10f;  
+    [Header("ï¿½ï¿½Ãµï¿½é§¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½Ô¹Ò·ï¿½)")]
+    public float mediumTime = 5f;
+    public float cookTime = 10f;
     public float burnTime = 15f;
 
-    [Header("ÃÙ»ÀÒ¾à¤Ã×èÍ§»ÃØ§ (Seasoning Overlays)")]
+    [Header("ï¿½Ù»ï¿½Ò¾ï¿½ï¿½ï¿½ï¿½Í§ï¿½ï¿½Ø§ (Seasoning Overlays)")]
 
     public Sprite sauceSprite;
     public Sprite spicyLevel1Sprite;
     public Sprite spicyLevel2Sprite;
     public Sprite spicyLevel3Sprite;
+
+    [Header("Spicy Overlays when hasSauce (Sauce + Spicy Combo)")]
+    public Sprite sauceSpicyLevel1Sprite;
+    public Sprite sauceSpicyLevel2Sprite;
+    public Sprite sauceSpicyLevel3Sprite;
 }

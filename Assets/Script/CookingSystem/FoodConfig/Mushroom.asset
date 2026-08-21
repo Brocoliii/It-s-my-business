@@ -13,15 +13,18 @@ MonoBehaviour:
   m_Name: Mushroom
   m_EditorClassIdentifier: Assembly-CSharp::FoodData
   foodName: Mushroom
-  foodIcon: {fileID: -7527902527428582168, guid: 87fd61ed397d36442ad8d8aae0084b72, type: 3}
-  rawSprite: {fileID: 4152641109828518758, guid: 00a26b32d392bb34787402b7781aa210, type: 3}
-  mediumSprite: {fileID: 4152641109828518758, guid: 00a26b32d392bb34787402b7781aa210, type: 3}
-  cookedSprite: {fileID: -7527902527428582168, guid: 87fd61ed397d36442ad8d8aae0084b72, type: 3}
-  burntSprite: {fileID: 8589020015655191039, guid: c7a312041644f3a41a05f0eb80f87d00, type: 3}
+  foodIcon: {fileID: 21300000, guid: b450c14ffaa73e941aff8274690862c5, type: 3}
+  rawSprite: {fileID: 21300000, guid: 038602adcd76e144d842f3ea75219fe7, type: 3}
+  mediumSprite: {fileID: 21300000, guid: 038602adcd76e144d842f3ea75219fe7, type: 3}
+  cookedSprite: {fileID: 21300000, guid: 45d621def6801d049b9232324ad8fc0b, type: 3}
+  burntSprite: {fileID: 21300000, guid: 4004c95dc0155d24e80987095ae9b796, type: 3}
   mediumTime: 5
   cookTime: 10
   burnTime: 15
-  sauceSprite: {fileID: -2062869132942651798, guid: 6df6e431dcedbaa42971615e6dcff958, type: 3}
-  spicyLevel1Sprite: {fileID: -3895339053664996647, guid: ffb20d58d21e1854c8d54cbbe5763af8, type: 3}
-  spicyLevel2Sprite: {fileID: -1183015524930514676, guid: 15a0d1999e8defb458a9d51053d93e23, type: 3}
-  spicyLevel3Sprite: {fileID: -5627683991014427953, guid: 38c458cb69ef77745b72a490174dd5aa, type: 3}
+  sauceSprite: {fileID: 21300000, guid: 0570e35fdc6671f4dbeb28983efbbde4, type: 3}
+  spicyLevel1Sprite: {fileID: 21300000, guid: 2d712e0cc00d2b845bfa47ae0ba39ad9, type: 3}
+  spicyLevel2Sprite: {fileID: 21300000, guid: b80cffb840336c84db8aa08b7ec380c2, type: 3}
+  spicyLevel3Sprite: {fileID: 21300000, guid: a9b72b10c577e6347810975fbd70d132, type: 3}
+  sauceSpicyLevel1Sprite: {fileID: 21300000, guid: 77176dd602dd63347918189a3d805292, type: 3}
+  sauceSpicyLevel2Sprite: {fileID: 21300000, guid: 2bd5a6c31867ed2458733b41be0edc21, type: 3}
+  sauceSpicyLevel3Sprite: {fileID: 21300000, guid: 992089da4aee2064ab727b168a9a9ead, type: 3}

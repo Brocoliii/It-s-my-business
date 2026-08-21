@@ -104,7 +104,7 @@ public class GameManager : MonoBehaviour
         StageConfig config = GetCurrentStage();
         int collectedClues = investigationManager.collectedClues.Count;
 
-        
+
         if (collectedClues >= config.requiredCluesToPass && chosenName == config.correctCulpritName)
         {
             ChangeState(GameState.Win);
@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(EndOfDayCoroutine());
     }
 
-    
+
     private System.Collections.IEnumerator EndOfDayCoroutine()
     {
         Debug.Log("<color=white>ลูกค้าหมดแล้ว... จะจบวันใน 5 วินาที</color>");
@@ -151,6 +151,13 @@ public class GameManager : MonoBehaviour
         }
 
         ChangeState(GameState.CulpritSelection);
+
+        // ปิดจอด้วยม่านก่อน แล้วค่อยเปิดสมุดหลักฐาน ให้ดูเป็นการเปลี่ยนฉาก
+        SceneShutterTransition shutter = FindObjectOfType<SceneShutterTransition>(true);
+        if (shutter != null)
+        {
+            yield return shutter.PlayCloseSequence();
+        }
 
         NotebookManager notebook = FindObjectOfType<NotebookManager>(true);
         if (notebook != null)

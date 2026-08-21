@@ -19,12 +19,25 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     [Header("Flip Settings")]
     // กลับด้าน B ให้ภาพเป็นกระจกเงา ผู้เล่นจะได้เห็นชัดว่าตอนนี้พลิกอีกด้านขึ้นมาแล้ว
     [SerializeField] private bool mirrorSpriteWhenFlipped = true;
+    [SerializeField] private float flipDuration = 0.35f;
+    [SerializeField] private float flipHopHeight = 0.18f;
+    [SerializeField] private float flipTiltAngle = 12f;
+    [SerializeField] private float landingSquashAmount = 0.15f;
+    [SerializeField] private float landingSquashDuration = 0.08f;
     public float BurnTime => _burnTime;
     public CookState CurrentState => currentState;
     private CookState currentState = CookState.Raw;
 
+    // ความคืบหน้าการสุกของแต่ละด้าน แยกกัน ใช้โชว์ Side A / Side B UI บนเตา
+    public float SideAProgress => sideAProgress;
+    public float SideBProgress => sideBProgress;
+    public bool IsFacingSideA => isFacingSideA;
+
+    // แจ้งเตือนตอนพลิกด้านจริง (กลางแอนิเมชั่น) ให้ UI ภายนอก (เช่น GrillSlotUI) เล่นเอฟเฟกต์ตามได้
+    public event System.Action OnFlipped;
+
     [Header("Seasoning (เครื่องปรุง)")]
-    public int spicyLevel = 0;   
+    public int spicyLevel = 0;
     public bool hasSauce = false;
 
     [Header("Visual Components")]
@@ -32,9 +45,19 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     [SerializeField] private SpriteRenderer sauceRenderer;
     [SerializeField] private SpriteRenderer spicyRenderer;
 
+    [Header("Shadow (โชว์เฉพาะตอนอยู่บนโต๊ะปรุงรส)")]
+    [SerializeField] private GameObject shadowObject;
+
     [Header("Smoke (ควันตอนย่าง)")]
     [SerializeField] private bool enableGrillSmoke = true;
     [SerializeField] private FoodSmokeEffect smokeEffect;
+
+    [Header("Snap Animation")]
+    [SerializeField] private float snapMoveDuration = 0.15f;
+
+    [Header("Tray Pickup Animation")]
+    [SerializeField] private float trayPopDuration = 0.2f;
+    [SerializeField] private float trayPopOvershoot = 1.15f;
 
     [HideInInspector] public Vector3 startDragPos;
     [HideInInspector] public GrillStation currentGrill;
@@ -44,7 +67,10 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     private bool isBeingDragged = false;
     private bool isFlipping = false;
     private SpriteRenderer sr;
+    private SpriteRenderer shadowRenderer;
     private Transform foodRoot;
+    private Coroutine snapMoveCoroutine;
+    private Coroutine trayPopCoroutine;
 
     // prefab บางตัวทำเป็น Root เปล่าๆ แล้วเอา FoodInstance ไปไว้ที่ลูก เช่น Pork(Empty) > VisualPork(FoodInstance)
     // เวลาจะย้าย/ทิ้ง/ยัดลงถ้วย ต้องทำกับ "ตัวแม่" ไม่งั้น Root เปล่าจะค้างอยู่ใน Hierarchy
@@ -56,6 +82,80 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     {
         get => FoodRoot.position;
         set => FoodRoot.position = value;
+    }
+
+    // ใช้ตอนดูดอาหารเข้าช่อง (เตาย่าง/โต๊ะปรุงรส) หรือดีดกลับจุดเดิม
+    // จะได้ค่อยๆ เลื่อนเข้าตำแหน่งแบบนุ่มนวล ไม่ใช่การกระโดดไปทันที
+    public void SnapToPosition(Vector3 targetPos)
+    {
+        if (snapMoveCoroutine != null) StopCoroutine(snapMoveCoroutine);
+
+        if (!gameObject.activeInHierarchy)
+        {
+            Position = targetPos;
+            return;
+        }
+
+        snapMoveCoroutine = StartCoroutine(SmoothMoveTo(targetPos));
+    }
+
+    private IEnumerator SmoothMoveTo(Vector3 targetPos)
+    {
+        Vector3 start = FoodRoot.position;
+        float elapsed = 0f;
+
+        while (elapsed < snapMoveDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / snapMoveDuration);
+            t = t * t * (3f - 2f * t); // smoothstep เพื่อให้เริ่ม/หยุดนุ่มนวล ไม่กระตุก
+            FoodRoot.position = Vector3.Lerp(start, targetPos, t);
+            yield return null;
+        }
+
+        FoodRoot.position = targetPos;
+        snapMoveCoroutine = null;
+    }
+
+    // เรียกจาก FoodTray ตอนเพิ่งหยิบวัตถุดิบออกมา ให้ตัวเนื้อผุดขึ้นมาแบบเด้งๆ แทนที่จะโผล่มาเฉยๆ
+    public void PlayTrayPickupAnimation()
+    {
+        if (trayPopCoroutine != null) StopCoroutine(trayPopCoroutine);
+        trayPopCoroutine = StartCoroutine(TrayPickupPop());
+    }
+
+    private IEnumerator TrayPickupPop()
+    {
+        Vector3 targetScale = transform.localScale;
+        Vector3 overshootScale = targetScale * trayPopOvershoot;
+        transform.localScale = Vector3.zero;
+
+        // แบ่งสองช่วง: พุ่งขึ้นเกินขนาดจริงก่อน แล้วค่อยหดกลับมาพอดี ให้ความรู้สึกเด้งมีน้ำหนัก
+        float growDuration = trayPopDuration * 0.6f;
+        float settleDuration = trayPopDuration - growDuration;
+
+        float elapsed = 0f;
+        while (elapsed < growDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / growDuration);
+            t = t * t * (3f - 2f * t); // smoothstep
+            transform.localScale = Vector3.LerpUnclamped(Vector3.zero, overshootScale, t);
+            yield return null;
+        }
+
+        elapsed = 0f;
+        while (elapsed < settleDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / settleDuration);
+            t = t * t * (3f - 2f * t);
+            transform.localScale = Vector3.Lerp(overshootScale, targetScale, t);
+            yield return null;
+        }
+
+        transform.localScale = targetScale;
+        trayPopCoroutine = null;
     }
 
     // ให้คนที่ Instantiate prefab มาบอกได้ว่าตัวแม่จริงๆ คืออันไหน (แม่นกว่าการเดาเอง)
@@ -86,6 +186,7 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
+        if (shadowObject != null) shadowRenderer = shadowObject.GetComponent<SpriteRenderer>();
         ResolveFoodRoot();
         SetupSmokeEffect();
 
@@ -93,7 +194,14 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         // ทันทีในเฟรมเดียวกับที่ Instantiate เพื่อคำนวณจุดกึ่งกลางให้ตรงเมาส์
         if (sauceRenderer != null) sauceRenderer.gameObject.SetActive(false);
         if (spicyRenderer != null) spicyRenderer.gameObject.SetActive(false);
+        if (shadowObject != null) shadowObject.SetActive(false);
         UpdateVisual();
+    }
+
+    // เรียกจาก SeasoningStation ตอนวาง/ยกอาหารออกจากช่อง เพื่อโชว์เงาเฉพาะตอนอยู่บนโต๊ะปรุงรสเท่านั้น
+    public void SetShadowVisible(bool visible)
+    {
+        if (shadowObject != null) shadowObject.SetActive(visible);
     }
 
     // ระยะเยื้องระหว่าง origin ของ object กับจุดกึ่งกลางของภาพ
@@ -120,6 +228,12 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     // ระบบ IDraggable
     public void OnBeginDrag()
     {
+        if (snapMoveCoroutine != null)
+        {
+            StopCoroutine(snapMoveCoroutine);
+            snapMoveCoroutine = null;
+        }
+
         startDragPos = FoodRoot.position;
         isBeingDragged = true;
         SetSortingLayer(dragLayer);
@@ -157,32 +271,79 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     private IEnumerator FlipAnimation()
     {
         isFlipping = true;
+
         Vector3 originalScale = transform.localScale;
-        float flipSpeed = 10f;
+        Vector3 originalPosition = transform.localPosition;
+        Quaternion originalRotation = transform.localRotation;
 
-        while (transform.localScale.x > 0.01f)
+        // ทิศทางเอียงสลับกันทุกครั้งที่พลิก จะได้ไม่รู้สึกซ้ำๆ เหมือนโดนดีดไปทางเดียวตลอด
+        float tiltDirection = isFacingSideA ? 1f : -1f;
+
+        float elapsed = 0f;
+        bool hasSwappedFace = false;
+
+        while (elapsed < flipDuration)
         {
-            transform.localScale -= new Vector3(flipSpeed * Time.deltaTime, 0, 0);
-            yield return null;
-        }
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / flipDuration);
+            float arc = Mathf.Sin(t * Mathf.PI); // 0 -> 1 -> 0 ตลอดช่วงพลิก ใช้ทำทั้งกระโดดขึ้นและโค้งเอียง
 
-        Flip(); 
+            // บีบความกว้างจนเหลือ 0 ตรงกลาง (มองเหมือนพลิกด้านข้าง) แล้วคลายกลับ = ภาพลวงตาการหมุน 180 องศา
+            float squash = Mathf.Abs(Mathf.Cos(t * Mathf.PI));
+            transform.localScale = new Vector3(originalScale.x * squash, originalScale.y, originalScale.z);
 
-        while (transform.localScale.x < originalScale.x)
-        {
-            transform.localScale += new Vector3(flipSpeed * Time.deltaTime, 0, 0);
+            // กระโดดขึ้นเป็นโค้งพาราโบลา ให้ดูเหมือนถูกดีดขึ้นจริงๆ ไม่ใช่แค่บีบแบนอยู่กับที่
+            transform.localPosition = originalPosition + new Vector3(0f, arc * flipHopHeight, 0f);
+
+            // เอียงเล็กน้อยระหว่างลอยขึ้น แล้วคลายกลับตรงตอนลงพื้น เสริมความรู้สึกว่ากำลังหมุนตัวอยู่
+            transform.localRotation = originalRotation * Quaternion.Euler(0f, 0f, arc * flipTiltAngle * tiltDirection);
+
+            if (!hasSwappedFace && t >= 0.5f)
+            {
+                Flip();
+                hasSwappedFace = true;
+            }
+
             yield return null;
         }
 
         transform.localScale = originalScale;
+        transform.localPosition = originalPosition;
+        transform.localRotation = originalRotation;
+
+        yield return StartCoroutine(LandingSquash(originalScale));
+
         isFlipping = false;
     }
 
+    // บีบแป้นเนื้อแบนลงแวบเดียวตอนตกกระทบเตา แล้วเด้งกลับ ให้รู้สึกถึงน้ำหนักตอนลงพื้น
+    private IEnumerator LandingSquash(Vector3 baseScale)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < landingSquashDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / landingSquashDuration);
+            float squash = Mathf.Sin(t * Mathf.PI) * landingSquashAmount;
+
+            transform.localScale = new Vector3(
+                baseScale.x * (1f + squash),
+                baseScale.y * (1f - squash),
+                baseScale.z);
+
+            yield return null;
+        }
+
+        transform.localScale = baseScale;
+    }
+
     // ระบบทำอาหาร
-    public void Flip() 
+    public void Flip()
     {
         isFacingSideA = !isFacingSideA;
-        UpdateVisual(); 
+        UpdateVisual();
+        OnFlipped?.Invoke();
     }
 
     // ตัวควันคอยอ่านค่านี้เพื่อรู้ว่าตอนนี้ต้องพ่นควันอยู่ไหม
@@ -229,7 +390,7 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
 
         if (sr == null || data == null) return;
 
-        
+
         float currentFaceProgress = isFacingSideA ? sideAProgress : sideBProgress;
 
         if (currentFaceProgress >= data.burnTime) sr.sprite = data.burntSprite;
@@ -247,6 +408,7 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         SetRendererFlip(mainRenderer, mirrored);
         SetRendererFlip(sauceRenderer, mirrored);
         SetRendererFlip(spicyRenderer, mirrored);
+        SetRendererFlip(shadowRenderer, mirrored);
     }
 
     private static void SetRendererFlip(SpriteRenderer renderer, bool mirrored)
@@ -261,9 +423,17 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         return CookState.Raw;
     }
     //ซอส
+    // ดิบ/ไหม้ ปรุงรสไม่ได้ ต้องผ่านการย่างให้สุกระดับหนึ่งก่อน ทั้งสองด้าน ไม่ใช่แค่ด้านใดด้านหนึ่ง
+    public bool CanSeason()
+    {
+        if (sideAProgress > data.burnTime || sideBProgress > data.burnTime) return false;
+        return sideAProgress >= data.mediumTime && sideBProgress >= data.mediumTime;
+    }
     public void AddSpicy()
     {
-        if (spicyLevel < 3) 
+        if (!CanSeason()) return;
+
+        if (spicyLevel < 3)
         {
             spicyLevel++;
             UpdateSpicyVisual();
@@ -271,30 +441,87 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
     }
     public void ApplySauce()
     {
+        if (!CanSeason()) return;
+
         if (!hasSauce)
         {
             hasSauce = true;
             if (sauceRenderer != null && data.sauceSprite != null)
             {
                 sauceRenderer.sprite = data.sauceSprite;
-                sauceRenderer.gameObject.SetActive(true); 
+                sauceRenderer.gameObject.SetActive(true);
+                // Preview may have pushed sauceRenderer above spicyRenderer to crossfade the merged sprite in;
+                // once applied, spicyRenderer itself switches to the merged sprite, so sauce goes back underneath.
+                if (spicyRenderer != null) sauceRenderer.sortingOrder = spicyRenderer.sortingOrder - 1;
+                SetSauceAlpha(1f);
             }
             else
             {
                 Debug.LogError("ลืมลาก Overlay_Sauce มาใส่ใน Inspector");
             }
+
+            // ซอสมาทีหลังพริกได้ ต้องรีเฟรชภาพพริกให้เป็นเวอร์ชันผสมซอสด้วย
+            if (spicyLevel > 0) UpdateSpicyVisual();
         }
+    }
+
+    // เรียกระหว่างแปรงกำลังลากอยู่ เพื่อค่อยๆ ให้ซอสจางๆ ปรากฏขึ้นตามตำแหน่งที่แปรงผ่าน
+    // ก่อนซอสจะติดจริงตอนแปรงครบจำนวนครั้งที่กำหนด
+    public void SetSaucePreview(float progress)
+    {
+        if (hasSauce || sauceRenderer == null || data == null) return;
+
+        Sprite previewSprite = GetSaucePreviewSprite();
+        if (previewSprite == null) return;
+
+        if (progress <= 0f)
+        {
+            sauceRenderer.gameObject.SetActive(false);
+            return;
+        }
+
+        sauceRenderer.sprite = previewSprite;
+        sauceRenderer.gameObject.SetActive(true);
+        SetSauceAlpha(Mathf.Clamp01(progress));
+
+        // Crossfade the merged sprite in over the plain spicy overlay (which stays put underneath)
+        // instead of popping the plain sprite away and fading up from nothing.
+        if (spicyLevel > 0 && spicyRenderer != null) sauceRenderer.sortingOrder = spicyRenderer.sortingOrder + 1;
+    }
+
+    private Sprite GetSaucePreviewSprite()
+    {
+        if (spicyLevel <= 0) return data.sauceSprite;
+        if (spicyLevel == 1) return data.sauceSpicyLevel1Sprite;
+        if (spicyLevel == 2) return data.sauceSpicyLevel2Sprite;
+        return data.sauceSpicyLevel3Sprite;
+    }
+
+    private void SetSauceAlpha(float alpha)
+    {
+        Color c = sauceRenderer.color;
+        c.a = alpha;
+        sauceRenderer.color = c;
     }
 
     private void UpdateSpicyVisual()
     {
         if (spicyRenderer == null) return;
 
-        spicyRenderer.gameObject.SetActive(true); 
+        spicyRenderer.gameObject.SetActive(true);
 
-        if (spicyLevel == 1) spicyRenderer.sprite = data.spicyLevel1Sprite;
-        else if (spicyLevel == 2) spicyRenderer.sprite = data.spicyLevel2Sprite;
-        else if (spicyLevel >= 3) spicyRenderer.sprite = data.spicyLevel3Sprite;
+        if (hasSauce)
+        {
+            if (spicyLevel == 1) spicyRenderer.sprite = data.sauceSpicyLevel1Sprite;
+            else if (spicyLevel == 2) spicyRenderer.sprite = data.sauceSpicyLevel2Sprite;
+            else if (spicyLevel >= 3) spicyRenderer.sprite = data.sauceSpicyLevel3Sprite;
+        }
+        else
+        {
+            if (spicyLevel == 1) spicyRenderer.sprite = data.spicyLevel1Sprite;
+            else if (spicyLevel == 2) spicyRenderer.sprite = data.spicyLevel2Sprite;
+            else if (spicyLevel >= 3) spicyRenderer.sprite = data.spicyLevel3Sprite;
+        }
     }
     public FoodData GetData()
     {
@@ -306,6 +533,16 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
         {
             return isFacingSideA ? sideBProgress : sideAProgress;
         }
+    }
+
+    // ปุ่ม Debug: บังคับให้สุกทันทีทั้งสองด้าน (ใช้ตอนทดสอบสถานีปรุงรส)
+    public void ForceCook()
+    {
+        if (data == null) return;
+
+        sideAProgress = data.cookTime;
+        sideBProgress = data.cookTime;
+        UpdateVisual();
     }
 
 }

@@ -2,6 +2,23 @@
 
 public class TrashBin : MonoBehaviour
 {
+    [Header("Highlight")]
+    [SerializeField] private SpriteRenderer binRenderer;
+    [SerializeField] private Color normalColor = Color.white;
+    [SerializeField] private Color highlightColor = Color.red;
+
+    private void Awake()
+    {
+        if (binRenderer == null) binRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    // เรียกทุกเฟรมตอนลากของมาอยู่เหนือ/ออกจากถังขยะ เพื่อสลับสีเตือน
+    public void SetHighlighted(bool isHighlighted)
+    {
+        if (binRenderer == null) return;
+        binRenderer.color = isHighlighted ? highlightColor : normalColor;
+    }
+
     public void TrashFood(FoodInstance food)
     {
         if (food == null) return;

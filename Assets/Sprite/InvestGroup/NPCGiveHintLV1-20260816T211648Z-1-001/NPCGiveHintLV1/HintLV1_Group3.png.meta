@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: 1d871eca7deead545a38125d52537c6b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5997784667932467736
+    second: HintLV1_Group3_0
+  - first:
+      213: 8993257234127370341
+    second: HintLV1_Group3_1
+  - first:
+      213: 5663952979672507684
+    second: HintLV1_Group3_2
+  - first:
+      213: 5289969517701290959
+    second: HintLV1_Group3_3
+  - first:
+      213: 7171849002470884916
+    second: HintLV1_Group3_4
+  - first:
+      213: 3611038607453165655
+    second: HintLV1_Group3_5
+  - first:
+      213: 9200906461362254950
+    second: HintLV1_Group3_6
+  - first:
+      213: -8789708682736578626
+    second: HintLV1_Group3_7
+  - first:
+      213: 3539145148980237235
+    second: HintLV1_Group3_8
+  - first:
+      213: -8310314310242625488
+    second: HintLV1_Group3_9
+  - first:
+      213: -1753320903714104585
+    second: HintLV1_Group3_10
+  - first:
+      213: -34862888733971492
+    second: HintLV1_Group3_11
+  - first:
+      213: -3084107203798414293
+    second: HintLV1_Group3_12
+  - first:
+      213: -7061375483749691995
+    second: HintLV1_Group3_13
+  - first:
+      213: 9014884430875406635
+    second: HintLV1_Group3_14
+  - first:
+      213: -728643510713614209
+    second: HintLV1_Group3_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: HintLV1_Group3_0
+      rect:
+        serializedVersion: 2
+        x: 641
+        y: 169
+        width: 358
+        height: 1229
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8edd9944f9693cca0800000000000000
+      internalID: -5997784667932467736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_1
+      rect:
+        serializedVersion: 2
+        x: 1036
+        y: 161
+        width: 405
+        height: 1152
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 568bfdd5ec77ecc70800000000000000
+      internalID: 8993257234127370341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_2
+      rect:
+        serializedVersion: 2
+        x: 1067
+        y: 1033
+        width: 17
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42525e1e9376a9e40800000000000000
+      internalID: 5663952979672507684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_3
+      rect:
+        serializedVersion: 2
+        x: 1071
+        y: 1059
+        width: 11
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcbda37bf3fb96940800000000000000
+      internalID: 5289969517701290959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_4
+      rect:
+        serializedVersion: 2
+        x: 1054
+        y: 1000
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 436440f6ba6878360800000000000000
+      internalID: 7171849002470884916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_5
+      rect:
+        serializedVersion: 2
+        x: 1059
+        y: 999
+        width: 33
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 758977b3b7cfc1230800000000000000
+      internalID: 3611038607453165655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_6
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 984
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 664f7199daf20bf70800000000000000
+      internalID: 9200906461362254950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_7
+      rect:
+        serializedVersion: 2
+        x: 973
+        y: 932
+        width: 33
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebfc15ed58ea40680800000000000000
+      internalID: -8789708682736578626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_8
+      rect:
+        serializedVersion: 2
+        x: 1004
+        y: 933
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b3938503c19d1130800000000000000
+      internalID: 3539145148980237235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_9
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 826
+        width: 18
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 038942e2a25dbac80800000000000000
+      internalID: -8310314310242625488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_10
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 721
+        width: 9
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7fa9ad47de3faa7e0800000000000000
+      internalID: -1753320903714104585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_11
+      rect:
+        serializedVersion: 2
+        x: 545
+        y: 687
+        width: 7
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cdbea2d2364248ff0800000000000000
+      internalID: -34862888733971492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_12
+      rect:
+        serializedVersion: 2
+        x: 1047
+        y: 656
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2c4f54a6dc0335d0800000000000000
+      internalID: -3084107203798414293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_13
+      rect:
+        serializedVersion: 2
+        x: 1515
+        y: 600
+        width: 6
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ad82790964f00e90800000000000000
+      internalID: -7061375483749691995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_14
+      rect:
+        serializedVersion: 2
+        x: 378
+        y: 361
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b21378180ad4b1d70800000000000000
+      internalID: 9014884430875406635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: HintLV1_Group3_15
+      rect:
+        serializedVersion: 2
+        x: 1777
+        y: 365
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f708508669653e5f0800000000000000
+      internalID: -728643510713614209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      HintLV1_Group3_0: -5997784667932467736
+      HintLV1_Group3_1: 8993257234127370341
+      HintLV1_Group3_10: -1753320903714104585
+      HintLV1_Group3_11: -34862888733971492
+      HintLV1_Group3_12: -3084107203798414293
+      HintLV1_Group3_13: -7061375483749691995
+      HintLV1_Group3_14: 9014884430875406635
+      HintLV1_Group3_15: -728643510713614209
+      HintLV1_Group3_2: 5663952979672507684
+      HintLV1_Group3_3: 5289969517701290959
+      HintLV1_Group3_4: 7171849002470884916
+      HintLV1_Group3_5: 3611038607453165655
+      HintLV1_Group3_6: 9200906461362254950
+      HintLV1_Group3_7: -8789708682736578626
+      HintLV1_Group3_8: 3539145148980237235
+      HintLV1_Group3_9: -8310314310242625488
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

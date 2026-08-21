@@ -1,0 +1,507 @@
+fileFormatVersion: 2
+guid: 17225c2b76356eb42a6347505e4862d7
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4725357355540096944
+    second: Customer4_ Nugget_CorrectOrder_0
+  - first:
+      213: 906013033680806706
+    second: Customer4_ Nugget_CorrectOrder_1
+  - first:
+      213: 5231820283123422799
+    second: Customer4_ Nugget_CorrectOrder_2
+  - first:
+      213: -9203336313342873588
+    second: Customer4_ Nugget_CorrectOrder_3
+  - first:
+      213: 2596875751508324756
+    second: Customer4_ Nugget_CorrectOrder_4
+  - first:
+      213: 4071339553923016820
+    second: Customer4_ Nugget_CorrectOrder_5
+  - first:
+      213: 4604394968755840267
+    second: Customer4_ Nugget_CorrectOrder_6
+  - first:
+      213: 7494494147683269636
+    second: Customer4_ Nugget_CorrectOrder_7
+  - first:
+      213: -7305290290248751438
+    second: Customer4_ Nugget_CorrectOrder_8
+  - first:
+      213: 2443114897850006153
+    second: Customer4_ Nugget_CorrectOrder_9
+  - first:
+      213: 4557355642188061113
+    second: Customer4_ Nugget_CorrectOrder_10
+  - first:
+      213: 8683647423814199445
+    second: Customer4_ Nugget_CorrectOrder_11
+  - first:
+      213: -1948585854621751478
+    second: Customer4_ Nugget_CorrectOrder_12
+  - first:
+      213: 7398230509246122843
+    second: Customer4_ Nugget_CorrectOrder_13
+  - first:
+      213: 427564275198934224
+    second: Customer4_ Nugget_CorrectOrder_14
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_0
+      rect:
+        serializedVersion: 2
+        x: 654
+        y: 1605
+        width: 24
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 058d04a65882c6eb0800000000000000
+      internalID: -4725357355540096944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_1
+      rect:
+        serializedVersion: 2
+        x: 691
+        y: 1615
+        width: 62
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2332b6acd0ec29c00800000000000000
+      internalID: 906013033680806706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_2
+      rect:
+        serializedVersion: 2
+        x: 762
+        y: 1609
+        width: 8
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f46514004d82b9840800000000000000
+      internalID: 5231820283123422799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_3
+      rect:
+        serializedVersion: 2
+        x: 777
+        y: 1608
+        width: 10
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c00beb6626e274080800000000000000
+      internalID: -9203336313342873588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_4
+      rect:
+        serializedVersion: 2
+        x: 492
+        y: 1474
+        width: 54
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 491ba76bcb4f90420800000000000000
+      internalID: 2596875751508324756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_5
+      rect:
+        serializedVersion: 2
+        x: 539
+        y: 1495
+        width: 57
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 478249fd0cd408830800000000000000
+      internalID: 4071339553923016820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_6
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 472
+        width: 364
+        height: 1122
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b05a94634d816ef30800000000000000
+      internalID: 4604394968755840267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_7
+      rect:
+        serializedVersion: 2
+        x: 957
+        y: 1501
+        width: 43
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40cb7e348bac10860800000000000000
+      internalID: 7494494147683269636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_8
+      rect:
+        serializedVersion: 2
+        x: 968
+        y: 1495
+        width: 30
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b6ec94af256e9a90800000000000000
+      internalID: -7305290290248751438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_9
+      rect:
+        serializedVersion: 2
+        x: 541
+        y: 1479
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a70df2e00b7e120800000000000000
+      internalID: 2443114897850006153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_10
+      rect:
+        serializedVersion: 2
+        x: 952
+        y: 1430
+        width: 67
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b9ddb78fcafe3f30800000000000000
+      internalID: 4557355642188061113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_11
+      rect:
+        serializedVersion: 2
+        x: 498
+        y: 1387
+        width: 92
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5986e23f253828870800000000000000
+      internalID: 8683647423814199445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_12
+      rect:
+        serializedVersion: 2
+        x: 515
+        y: 1364
+        width: 42
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a476be04d7b35f4e0800000000000000
+      internalID: -1948585854621751478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_13
+      rect:
+        serializedVersion: 2
+        x: 522
+        y: 1348
+        width: 41
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5b821e537bcba660800000000000000
+      internalID: 7398230509246122843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Customer4_ Nugget_CorrectOrder_14
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 1336
+        width: 19
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0dc31e561730fe500800000000000000
+      internalID: 427564275198934224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Customer4_ Nugget_CorrectOrder_0: -4725357355540096944
+      Customer4_ Nugget_CorrectOrder_1: 906013033680806706
+      Customer4_ Nugget_CorrectOrder_10: 4557355642188061113
+      Customer4_ Nugget_CorrectOrder_11: 8683647423814199445
+      Customer4_ Nugget_CorrectOrder_12: -1948585854621751478
+      Customer4_ Nugget_CorrectOrder_13: 7398230509246122843
+      Customer4_ Nugget_CorrectOrder_14: 427564275198934224
+      Customer4_ Nugget_CorrectOrder_2: 5231820283123422799
+      Customer4_ Nugget_CorrectOrder_3: -9203336313342873588
+      Customer4_ Nugget_CorrectOrder_4: 2596875751508324756
+      Customer4_ Nugget_CorrectOrder_5: 4071339553923016820
+      Customer4_ Nugget_CorrectOrder_6: 4604394968755840267
+      Customer4_ Nugget_CorrectOrder_7: 7494494147683269636
+      Customer4_ Nugget_CorrectOrder_8: -7305290290248751438
+      Customer4_ Nugget_CorrectOrder_9: 2443114897850006153
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

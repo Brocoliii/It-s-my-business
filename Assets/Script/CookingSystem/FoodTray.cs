@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class FoodTray : MonoBehaviour
 {
@@ -6,6 +7,16 @@ public class FoodTray : MonoBehaviour
     [Tooltip("ลาก Prefab ของไม้หมาล่าชนิดนั้นๆ มาใส่ตรงนี้")]
     [SerializeField] private GameObject foodPrefab;
     [SerializeField] private Transform spawnPoint;
+
+    [Header("Pickup Animation (ถาดเด้งตอนของถูกหยิบออกไป)")]
+    [Tooltip("ตัวที่จะเล่นแอนิเมชัน ถ้าไม่ตั้งจะใช้ตัวถาดเอง")]
+    [SerializeField] private Transform visualRoot;
+    [SerializeField] private float pickupAnimDuration = 0.25f;
+    [SerializeField] private float pickupSquashAmount = 0.12f;
+
+    private Coroutine pickupAnimCoroutine;
+    private Vector3 baseScale;
+    private bool hasCachedBaseScale;
 
     public FoodInstance SpawnFood()
     {
@@ -38,6 +49,44 @@ public class FoodTray : MonoBehaviour
         // บอกให้ชัดว่าตัวแม่คือ root ที่เพิ่งเกิดมา เวลาลาก/ทิ้ง จะได้ยกไปทั้งชิ้น ไม่เหลือ root เปล่าค้างใน Hierarchy
         foodInstance.SetFoodRoot(newFoodObj.transform);
 
+        // ให้ทั้งถาดและวัตถุดิบเด้งตอบรับพร้อมกัน ผู้เล่นจะได้รู้สึกว่าหยิบของออกมาจริงๆ
+        PlayPickupAnimation();
+        foodInstance.PlayTrayPickupAnimation();
+
         return foodInstance;
+    }
+
+    // ถาดยุบตัวแวบนึงแล้วเด้งกลับ เหมือนสั่นตอบรับตอนของถูกหยิบออกไป
+    private void PlayPickupAnimation()
+    {
+        Transform target = visualRoot != null ? visualRoot : transform;
+
+        // แคชขนาดจริงไว้ครั้งแรกเท่านั้น ไม่งั้นถ้าสแปมคลิกรัวๆ ระหว่างที่ยังยุบตัวไม่ทันเด้งกลับ
+        // ค่าที่อ่านมาจะเพี้ยนไปเรื่อยๆ (เอาขนาดตอนยุบค้างมาอ้างอิงแทนขนาดจริง) ทำให้ถาดค่อยๆ เล็กลง/ผิดรูปสะสม
+        if (!hasCachedBaseScale)
+        {
+            baseScale = target.localScale;
+            hasCachedBaseScale = true;
+        }
+
+        if (pickupAnimCoroutine != null) StopCoroutine(pickupAnimCoroutine);
+        pickupAnimCoroutine = StartCoroutine(PickupSquash(target));
+    }
+
+    private IEnumerator PickupSquash(Transform target)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < pickupAnimDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / pickupAnimDuration);
+            float squash = Mathf.Sin(t * Mathf.PI) * pickupSquashAmount;
+            target.localScale = new Vector3(baseScale.x * (1f + squash), baseScale.y * (1f - squash), baseScale.z);
+            yield return null;
+        }
+
+        target.localScale = baseScale;
+        pickupAnimCoroutine = null;
     }
 }

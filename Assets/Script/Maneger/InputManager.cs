@@ -16,6 +16,10 @@ public class InputManager : MonoBehaviour
 
     private IDraggable currentDraggable;
     private bool isDraggingFreshFromTray;
+    private bool foodRemovedFromStation;
+    private TrashBin hoveredTrashBin;
+
+    private const float ClickMoveThreshold = 0.1f;
 
     private IInvestigatable currentInvestigation;
     private Transform currentInvestigationTarget;
@@ -235,11 +239,10 @@ public class InputManager : MonoBehaviour
                 if (currentDraggable != null)
                 {
                     FoodInstance food = currentDraggable as FoodInstance;
-                    if (food != null)
-                    {
-                        if (food.currentGrill != null) food.currentGrill.RemoveFood(food);
-                        if (food.currentSeasoning != null) food.currentSeasoning.RemoveFood(food);
-                    }
+                    // ยังไม่ถอดออกจากเตา/โต๊ะปรุงรสตอนนี้ เผื่อแค่ "คลิก" เฉยๆ (เช่น พลิกอาหาร)
+                    // ไม่งั้น GrillSlotUI จะมองว่าช่องว่างแล้วหายไปแวบนึงทั้งที่ไม่ได้ลากจริง
+                    // ค่อยถอดตอนขยับเมาส์เกิน threshold จริงๆ (ดูจังหวะที่ 2 ด้านล่าง)
+                    foodRemovedFromStation = false;
 
                     // อ้างอิงตำแหน่งจากตัวที่จะถูกลากจริงๆ ไม่ใช่ collider ที่โดน
                     // (ถ้า collider อยู่ที่ลูก สองอันนี้คนละตำแหน่ง แล้ววัตถุจะกระโดดตอนหยิบ)
@@ -248,6 +251,13 @@ public class InputManager : MonoBehaviour
                     if (food != null) draggedTransform = food.FoodRoot;
                     dragOffset = (Vector2)draggedTransform.position - mouseWorldPos;
                     isDraggingFreshFromTray = false;
+
+                    // เครื่องมือปรุงรส (แปรงซอส/ขวดพริก) ให้เกาะกึ่งกลางเมาส์เสมอ ไม่สนใจจุดที่คลิกโดนตัว sprite
+                    if (currentDraggable is SauceBrush || currentDraggable is ChiliBottle)
+                    {
+                        dragOffset = Vector2.zero;
+                    }
+
                     currentDraggable.OnBeginDrag();
                     return;
                 }
@@ -308,7 +318,18 @@ public class InputManager : MonoBehaviour
                     dragOffset = freshFood.VisualCenterOffset;
                 }
 
+                // เพิ่งรู้ว่านี่คือการ "ลาก" จริงๆ (ขยับเกิน threshold) ไม่ใช่แค่คลิก
+                // ค่อยถอดออกจากเตา/โต๊ะปรุงรสตอนนี้ ไม่ใช่ตั้งแต่ตอนกดลง
+                if (!foodRemovedFromStation && currentDraggable is FoodInstance draggedFood
+                    && Vector2.Distance(pressDownPos, mouseWorldPos) >= ClickMoveThreshold)
+                {
+                    if (draggedFood.currentGrill != null) draggedFood.currentGrill.RemoveFood(draggedFood);
+                    if (draggedFood.currentSeasoning != null) draggedFood.currentSeasoning.RemoveFood(draggedFood);
+                    foodRemovedFromStation = true;
+                }
+
                 currentDraggable.OnDrag(mouseWorldPos + dragOffset);
+                UpdateTrashHighlight(mouseWorldPos);
             }
             else if (HasActiveInvestigation())
             {
@@ -321,7 +342,7 @@ public class InputManager : MonoBehaviour
         // ==========================================
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
-            bool isClick = Vector2.Distance(pressDownPos, mouseWorldPos) < 0.1f;
+            bool isClick = Vector2.Distance(pressDownPos, mouseWorldPos) < ClickMoveThreshold;
 
             if (currentDraggable != null)
             {
@@ -331,7 +352,13 @@ public class InputManager : MonoBehaviour
                 RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
                 bool placed = false;
 
-                if (food != null)
+                // แค่คลิกเฉยๆ ไม่ได้ลากออกจากช่องจริง (ดูจังหวะที่ 2) จึงไม่ต้องหาที่วางใหม่
+                // ปล่อยให้ระบบคลิกด้านล่างสุดจัดการแทน (เช่น สั่งพลิกอาหาร)
+                if (food != null && !foodRemovedFromStation && !isDraggingFreshFromTray)
+                {
+                    // ไม่ต้องทำอะไร อาหารยังอยู่ที่ช่องเดิมของมันครบถ้วน
+                }
+                else if (food != null)
                 {
                     foreach (RaycastHit2D hit in hits)
                     {
@@ -347,10 +374,24 @@ public class InputManager : MonoBehaviour
                         if (targetCup != null) { targetCup.AddFood(food); placed = true; break; }
 
                         GrillStation grill = hit.collider.GetComponent<GrillStation>();
-                        if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG)) { food.Position = snapPosG; placed = true; break; }
+                        if (grill != null && grill.TrySnapToSlot(food, out Vector3 snapPosG)) { food.SnapToPosition(snapPosG); placed = true; break; }
 
                         SeasoningStation seasoning = hit.collider.GetComponentInParent<SeasoningStation>();
-                        if (seasoning != null && seasoning.TrySnapToSlot(food, out Vector3 snapPosS)) { food.Position = snapPosS; placed = true; break; }
+                        if (seasoning != null && seasoning.TrySnapToSlot(food, out Vector3 snapPosS)) { food.SnapToPosition(snapPosS); placed = true; break; }
+                    }
+
+                    if (!placed)
+                    {
+                        GrillStation[] grills = FindObjectsOfType<GrillStation>();
+                        foreach (GrillStation grillStation in grills)
+                        {
+                            if (grillStation != null && grillStation.IsWithinDropArea(mouseWorldPos) && grillStation.TrySnapToSlot(food, out Vector3 snapPosG))
+                            {
+                                food.SnapToPosition(snapPosG);
+                                placed = true;
+                                break;
+                            }
+                        }
                     }
 
                     if (!placed)
@@ -360,7 +401,7 @@ public class InputManager : MonoBehaviour
                         {
                             if (seasoning != null && seasoning.IsWithinDropArea(mouseWorldPos) && seasoning.TrySnapToSlot(food, out Vector3 snapPosS))
                             {
-                                food.Position = snapPosS;
+                                food.SnapToPosition(snapPosS);
                                 placed = true;
                                 break;
                             }
@@ -372,24 +413,48 @@ public class InputManager : MonoBehaviour
                         currentDraggable.OnEndDrag();
                         currentDraggable = null;
                         isDraggingFreshFromTray = false;
+                        ClearTrashHighlight();
                         Destroy(food.RootObject);
                         return;
                     }
 
                     if (!placed)
                     {
-                        food.Position = food.startDragPos;
+                        // เช็คระยะโดยใช้ startDragPos ตรงๆ (ไม่ใช่ food.Position ปัจจุบัน)
+                        // เพราะ SnapToPosition ด้านล่างเป็นแค่แอนิเมชันค่อยๆ เลื่อน ตำแหน่งจริงยังไม่ขยับตอนเช็คระยะ
+                        Vector3 fallbackTargetPos = food.startDragPos;
+
                         RaycastHit2D[] fallBackHits = Physics2D.RaycastAll(food.startDragPos, Vector2.zero);
                         foreach (var fbHit in fallBackHits)
                         {
                             GrillStation g = fbHit.collider.GetComponent<GrillStation>();
-                            if (g != null && g.TrySnapToSlot(food, out _)) break;
-
-                            SeasoningStation s = fbHit.collider.GetComponentInParent<SeasoningStation>();
-                            if (s != null && s.TrySnapToSlot(food, out _))
+                            if (g != null && g.TrySnapToSlot(food, food.startDragPos, out Vector3 snapPosFbG))
                             {
+                                fallbackTargetPos = snapPosFbG;
                                 placed = true;
                                 break;
+                            }
+
+                            SeasoningStation s = fbHit.collider.GetComponentInParent<SeasoningStation>();
+                            if (s != null && s.TrySnapToSlot(food, food.startDragPos, out Vector3 snapPosFbS))
+                            {
+                                fallbackTargetPos = snapPosFbS;
+                                placed = true;
+                                break;
+                            }
+                        }
+
+                        if (!placed)
+                        {
+                            GrillStation[] grills = FindObjectsOfType<GrillStation>();
+                            foreach (GrillStation grillStation in grills)
+                            {
+                                if (grillStation != null && grillStation.IsWithinDropArea(food.startDragPos) && grillStation.TrySnapToSlot(food, food.startDragPos, out Vector3 snapPosG2))
+                                {
+                                    fallbackTargetPos = snapPosG2;
+                                    placed = true;
+                                    break;
+                                }
                             }
                         }
 
@@ -398,13 +463,16 @@ public class InputManager : MonoBehaviour
                             SeasoningStation[] seasonings = FindObjectsOfType<SeasoningStation>();
                             foreach (SeasoningStation seasoning in seasonings)
                             {
-                                if (seasoning != null && seasoning.IsWithinDropArea(food.startDragPos) && seasoning.TrySnapToSlot(food, out _))
+                                if (seasoning != null && seasoning.IsWithinDropArea(food.startDragPos) && seasoning.TrySnapToSlot(food, food.startDragPos, out Vector3 snapPosS2))
                                 {
+                                    fallbackTargetPos = snapPosS2;
                                     placed = true;
                                     break;
                                 }
                             }
                         }
+
+                        food.SnapToPosition(fallbackTargetPos);
                     }
                 }
                 else if (cup != null)
@@ -422,6 +490,8 @@ public class InputManager : MonoBehaviour
                 currentDraggable.OnEndDrag();
                 currentDraggable = null;
                 isDraggingFreshFromTray = false;
+                foodRemovedFromStation = false;
+                ClearTrashHighlight();
             }
             else if (HasActiveInvestigation())
             {
@@ -443,6 +513,33 @@ public class InputManager : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    // เช็คทุกเฟรมตอนลากของว่าเมาส์อยู่เหนือถังขยะไหม เพื่อสลับสีเตือนเฉพาะถังที่ชี้อยู่
+    private void UpdateTrashHighlight(Vector2 mouseWorldPos)
+    {
+        TrashBin trashBin = null;
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
+        foreach (RaycastHit2D hit in hits)
+        {
+            trashBin = hit.collider.GetComponent<TrashBin>();
+            if (trashBin != null) break;
+        }
+
+        if (trashBin == hoveredTrashBin) return;
+
+        if (hoveredTrashBin != null) hoveredTrashBin.SetHighlighted(false);
+        if (trashBin != null) trashBin.SetHighlighted(true);
+        hoveredTrashBin = trashBin;
+    }
+
+    private void ClearTrashHighlight()
+    {
+        if (hoveredTrashBin != null)
+        {
+            hoveredTrashBin.SetHighlighted(false);
+            hoveredTrashBin = null;
         }
     }
 

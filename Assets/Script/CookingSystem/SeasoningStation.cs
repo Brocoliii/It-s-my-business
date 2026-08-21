@@ -13,6 +13,9 @@ public class SeasoningStation : MonoBehaviour
     [Header("ระยะการดูดเข้าช่อง (ปรับลดลงถ้ารู้สึกว่าดูดไกลไป)")]
     public float snapRadius = 0.5f;
 
+    // ให้ debug/สคริปต์ภายนอกอ่านได้ว่าตอนนี้มีอาหารอยู่ในช่องไหนบ้าง
+    public FoodInstance[] FoodsOnSlots => foodsOnSlots;
+
     private void Awake()
     {
         if (dropArea == null) dropArea = GetComponent<Collider2D>();
@@ -33,6 +36,13 @@ public class SeasoningStation : MonoBehaviour
 
     public bool TrySnapToSlot(FoodInstance food, out Vector3 snapPos)
     {
+        return TrySnapToSlot(food, food.Position, out snapPos);
+    }
+
+    // รับตำแหน่งที่จะใช้เช็คระยะแยกจาก food.Position ปัจจุบัน
+    // (เคสดีดกลับ startDragPos ยังไม่ได้ขยับจริงตอนเช็ค เพราะ SnapToPosition เป็นแอนิเมชันค่อยๆ เลื่อน)
+    public bool TrySnapToSlot(FoodInstance food, Vector2 checkPosition, out Vector3 snapPos)
+    {
         snapPos = Vector3.zero;
         int bestSlot = -1;
         float minDistance = float.MaxValue;
@@ -41,7 +51,7 @@ public class SeasoningStation : MonoBehaviour
         {
             if (foodsOnSlots[i] == null)
             {
-                float dist = Vector2.Distance(food.Position, slots[i].position);
+                float dist = Vector2.Distance(checkPosition, slots[i].position);
                 if (dist < minDistance)
                 {
                     minDistance = dist;
@@ -57,6 +67,7 @@ public class SeasoningStation : MonoBehaviour
             snapPos = new Vector3(slots[bestSlot].position.x, slots[bestSlot].position.y, food.Position.z);
 
             food.currentSeasoning = this;
+            food.SetShadowVisible(true);
             return true;
         }
         return false;
@@ -70,6 +81,7 @@ public class SeasoningStation : MonoBehaviour
             {
                 foodsOnSlots[i] = null;
                 food.currentSeasoning = null;
+                food.SetShadowVisible(false);
                 break;
             }
         }

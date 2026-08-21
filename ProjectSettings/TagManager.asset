@@ -19,7 +19,7 @@ TagManager:
   - WorldUI
   - UI
   - Character
-  - 
+  - Extra
   - 
   - 
   - 
@@ -64,6 +64,24 @@ TagManager:
     locked: 0
   - name: UI
     uniqueID: 1671338879
+    locked: 0
+  - name: Extra
+    uniqueID: 2044792797
+    locked: 0
+  - name: Extra2
+    uniqueID: 3460496409
+    locked: 0
+  - name: Extra3
+    uniqueID: 4107346959
+    locked: 0
+  - name: Extra4
+    uniqueID: 2922435591
+    locked: 0
+  - name: Extra5
+    uniqueID: 2613795693
+    locked: 0
+  - name: Extra6
+    uniqueID: 4112339631
     locked: 0
   m_RenderingLayers:
   - Default

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
@@ -13,8 +13,8 @@ using UnityEngine.UI;
 public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("References")]
-    [Tooltip("The valid stamping area. Releasing here confirms the action.")]
-    public RectTransform stampZone;
+    [Tooltip("The valid stamping area (BaseStamp). Releasing here confirms the action.")]
+    public RectTransform baseStamp;
 
     [Tooltip("Optional parent used while dragging so the stamp draws on top. Defaults to the canvas root.")]
     public RectTransform dragLayer;
@@ -47,6 +47,10 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public float holdOnPaperDuration = 0.25f;
     [Tooltip("How fast the stamp flies back home when released outside the area.")]
     public float returnSpeed = 14f;
+
+    [Header("Appear Animation")]
+    [Tooltip("Duration of the pop-in when the stamp first appears (e.g. when the notebook opens).")]
+    public float appearDuration = 0.35f;
 
     [Header("Events")]
     public UnityEvent onStampConfirmed;
@@ -129,6 +133,72 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (stampImprint != null) stampImprint.rectTransform.anchoredPosition = homeImprintPosition;
     }
 
+    /// <summary>Same end state as ResetStamp, but pops in from zero scale instead of snapping there instantly.</summary>
+    public void PlayAppearAnimation()
+    {
+        EnsureInitialized();
+
+        if (activeRoutine != null)
+        {
+            StopCoroutine(activeRoutine);
+            activeRoutine = null;
+        }
+
+        isDragging = false;
+        isLocked = false;
+
+        ReturnToHomeParent(false);
+        rectTransform.SetSiblingIndex(homeSiblingIndex);
+        rectTransform.anchoredPosition = homeAnchoredPosition;
+
+        ApplyDragSprite(false);
+        ApplyZoneHighlight(false);
+        ShowImprint(false);
+        if (stampImprint != null) stampImprint.rectTransform.anchoredPosition = homeImprintPosition;
+
+        // ห้ามลากตราปั๊มได้ระหว่างที่มันกำลังเด้งเข้ามา ไม่งั้นผู้เล่นอาจคว้าโดนตอนตัวยังจางๆ อยู่
+        canvasGroup.blocksRaycasts = false;
+
+        activeRoutine = StartCoroutine(AppearRoutine());
+    }
+
+    // เด้งขึ้นมาจากขนาดศูนย์แบบ ease-out back พร้อมจางเข้า จังหวะเดียวกับที่สมุด/รายการอื่นในสมุดใช้ตอนโผล่มา
+    private IEnumerator AppearRoutine()
+    {
+        rectTransform.localScale = Vector3.zero;
+        canvasGroup.alpha = 0f;
+
+        float duration = Mathf.Max(0.01f, appearDuration);
+        float time = 0f;
+
+        while (time < duration)
+        {
+            // unscaledDeltaTime เผื่อสมุดเปิดไปพร้อมกับหน้าที่หยุดเวลาเกม
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / duration);
+
+            rectTransform.localScale = homeScale * EaseOutBack(t);
+            canvasGroup.alpha = t;
+
+            yield return null;
+        }
+
+        rectTransform.localScale = homeScale;
+        canvasGroup.alpha = 1f;
+        canvasGroup.blocksRaycasts = true;
+
+        activeRoutine = null;
+    }
+
+    // ease-out back: พุ่งเลยเป้าไปนิดหนึ่งแล้วค่อยดีดกลับ ค่าเดียวกับที่ NotebookManager ใช้กับรายการในสมุด
+    private static float EaseOutBack(float t)
+    {
+        float overshoot = 1.70158f;
+        float easedT = t - 1f;
+
+        return 1f + (overshoot + 1f) * Mathf.Pow(easedT, 3f) + overshoot * Mathf.Pow(easedT, 2f);
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (isLocked || eventData.button != PointerEventData.InputButton.Left) return;
@@ -190,11 +260,11 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     private bool IsOverStampZone(PointerEventData eventData)
     {
-        if (stampZone == null) return false;
+        if (baseStamp == null) return false;
 
         Camera cam = GetEventCamera();
 
-        return RectTransformUtility.RectangleContainsScreenPoint(stampZone, eventData.position, cam);
+        return RectTransformUtility.RectangleContainsScreenPoint(baseStamp, eventData.position, cam);
     }
 
     private IEnumerator StampRoutine()

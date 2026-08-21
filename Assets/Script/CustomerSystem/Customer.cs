@@ -36,8 +36,27 @@ public class Customer : MonoBehaviour
     [Tooltip("ระยะเวลาที่แสดงสปริทตอบสนองก่อนจากไป")]
     public float reactionDuration = 1.5f;
 
+    [Header("Investigate Hide Effect")]
+    [Tooltip("ระยะเวลาที่สปริทลูกค้าค่อยๆ ดำลง ก่อนจะเริ่มจางหาย")]
+    public float blackenDuration = 0.25f;
+    [Tooltip("ระยะเวลาที่สปริทลูกค้า (ตอนดำแล้ว) ค่อยๆ จางหายไป")]
+    public float fadeOutDuration = 0.35f;
+
+    [Header("การเดินเข้ามา (ตอนลูกค้าปรากฏตัว)")]
+    [Tooltip("ความเร็วในการเดินเข้ามายังจุดยืน")]
+    public float walkInSpeed = 5f;
+    [Tooltip("ความสูงของการเด้งขึ้นลงตอนเดินเข้ามา (ใส่ 0 ถ้าไม่ต้องการเด้ง)")]
+    public float walkBobHeight = 0.15f;
+    [Tooltip("ความเร็วของการเด้งขึ้นลงตอนเดินเข้ามา (ยิ่งมากยิ่งเดินถี่)")]
+    public float walkBobSpeed = 10f;
+
     [Header("UI ออเดอร์ (ลากจากในลูกของตัวเองมาใส่)")]
+    [Tooltip("ถ้าใส่ Animator นี้ไว้ จะสั่ง Trigger \"Show\" ตอน Canvas ปรากฏ แทนการเล่นแอนิเมชันขยายจากโค้ด")]
     public Animator bubbleAnimator;
+    [Tooltip("Canvas ที่แสดงออเดอร์เหนือหัวลูกค้า จะถูกซ่อนตอนผู้เล่นกำลังสืบสวน (กดค้างที่กลุ่มเป้าหมาย)")]
+    public GameObject customerCanvas;
+    [Tooltip("ระยะเวลาแอนิเมชันขยาย Canvas ออเดอร์ตอนลูกค้าเดินมาถึงจุดยืน (ใช้ตอนไม่มี bubbleAnimator)")]
+    public float canvasPopDuration = 0.3f;
 
     [Tooltip("พรีแฟบรูปไอคอนอาหาร (ลากจาก Project มาใส่)")]
     public GameObject foodIconPrefab;
@@ -51,6 +70,14 @@ public class Customer : MonoBehaviour
     public Image sauceIcon;
     public Image patienceFill;
 
+    [Header("สีแถบความอดทน (Patience Bar Colors)")]
+    [Tooltip("สีตอนความอดทนเหลือมากกว่า 50%")]
+    public Color highPatienceColor = Color.green;
+    [Tooltip("สีตอนความอดทนเหลือ 25%-50%")]
+    public Color medPatienceColor = new Color(1f, 0.5f, 0f);
+    [Tooltip("สีตอนความอดทนเหลือน้อยกว่า 25%")]
+    public Color lowPatienceColor = Color.red;
+
     [Header("ฐานข้อมูลรูปภาพ (ลากรูปจาก Project มาใส่)")]
     public Sprite[] spicySprites;
     public Sprite sauceSprite;
@@ -60,15 +87,27 @@ public class Customer : MonoBehaviour
     [HideInInspector] public int mySlotIndex;
     private CustomerManager manager;
     private bool isLeaving = false;
+    private bool isWalkingIn = false;
     private bool isShowingReaction = false;
+    private Color normalRendererColor = Color.white;
+    private Coroutine visibilityCoroutine;
+    private bool isHiddenForInvestigation = false;
+    private Vector3 spawnPosition;
 
-    public void Init(OrderData order, int slotIndex, CustomerManager mgr)
+    // standPosition คือจุดยืนจริงของลูกค้า (ตำแหน่งช่อง) ส่วน transform.position ตอนเรียกเมธอดนี้
+    // ควรถูกตั้งเป็นจุดที่ลูกค้าจะโผล่ออกมาก่อน (เช่น นอกจอ) แล้วค่อยเดินเข้ามายัง standPosition
+    public void Init(OrderData order, int slotIndex, CustomerManager mgr, Vector3 standPosition)
     {
         myOrder = order;
         mySlotIndex = slotIndex;
         manager = mgr;
         currentPatience = maxPatience;
         isLeaving = false;
+        isWalkingIn = true;
+        spawnPosition = transform.position;
+
+        if (customerRenderer != null) normalRendererColor = customerRenderer.color;
+        if (customerCanvas != null) customerCanvas.SetActive(false);
 
         string sauceText = order.wantedSauce ? "ทาซอสด้วย" : "ไม่เอาซอส";
 
@@ -131,14 +170,14 @@ public class Customer : MonoBehaviour
         foreach (var f in order.wantedFoods) foodNames += f.foodName + " ";
 
         ApplyCustomerSprite(false);
-        StartCoroutine(PopInAnimation());
+        StartCoroutine(WalkInAnimation(standPosition));
 
         Debug.Log($"<color=orange>[ออเดอร์ช่อง {slotIndex}]</color> ลูกค้าสั่ง: <b>{foodNames}</b> | เผ็ด: <b>{order.wantedSpicyLevel}</b> | <b>{sauceText}</b>");
     }
 
     private void Update()
     {
-        if (isLeaving) return;
+        if (isLeaving || isWalkingIn || isShowingReaction) return;
 
         currentPatience -= Time.deltaTime;
 
@@ -146,15 +185,14 @@ public class Customer : MonoBehaviour
         {
             patienceFill.fillAmount = currentPatience / maxPatience;
 
-            if (patienceFill.fillAmount > 0.5f) patienceFill.color = Color.green;
-            else if (patienceFill.fillAmount > 0.25f) patienceFill.color = new Color(1f, 0.5f, 0f);
-            else patienceFill.color = Color.red;
+            if (patienceFill.fillAmount > 0.5f) patienceFill.color = highPatienceColor;
+            else if (patienceFill.fillAmount > 0.25f) patienceFill.color = medPatienceColor;
+            else patienceFill.color = lowPatienceColor;
         }
 
         if (currentPatience <= 0)
         {
-            ApplyCustomerSprite(true);
-            Leave(false);
+            StartCoroutine(ShowExhaustedAndLeave());
         }
         else
         {
@@ -162,9 +200,87 @@ public class Customer : MonoBehaviour
         }
     }
 
+    // animate = false ใช้ตอนลูกค้าเพิ่งเกิดขึ้นมาระหว่างที่ผู้เล่นกำลังสืบสวนอยู่แล้ว
+    // ต้องซ่อนทันทีเลย ไม่งั้นจะโผล่มาเป็นสปริทปกติแวบนึงก่อนค่อยเล่นแอนิเมชันจางหาย
+    public void SetCustomerVisible(bool isVisible, bool animate = true)
+    {
+        isHiddenForInvestigation = !isVisible;
+
+        // ถ้าเลิกสืบสวนแต่ลูกค้ายังเดินไม่ถึงจุดยืน อย่าเพิ่งโชว์ Canvas
+        // ให้ WalkInAnimation เป็นคนสั่งโชว์เองตอนเดินถึง (พร้อมแอนิเมชันปรากฏ) แทน
+        bool shouldSkipCanvasChange = isVisible && isWalkingIn;
+        if (customerCanvas != null && !shouldSkipCanvasChange) customerCanvas.SetActive(isVisible);
+
+        if (customerRenderer == null) return;
+
+        if (visibilityCoroutine != null)
+        {
+            StopCoroutine(visibilityCoroutine);
+            visibilityCoroutine = null;
+        }
+
+        if (!animate)
+        {
+            if (isVisible)
+            {
+                customerRenderer.enabled = true;
+                customerRenderer.color = normalRendererColor;
+            }
+            else
+            {
+                customerRenderer.enabled = false;
+            }
+            return;
+        }
+
+        visibilityCoroutine = StartCoroutine(isVisible ? FadeInRoutine() : FadeOutRoutine());
+    }
+
+    // ค่อยๆ ดำลงก่อน แล้วค่อยจางหาย (ตอนผู้เล่นเริ่มสืบสวน)
+    private IEnumerator FadeOutRoutine()
+    {
+        Color blackOpaque = new Color(0f, 0f, 0f, normalRendererColor.a);
+        yield return LerpRendererColor(customerRenderer.color, blackOpaque, blackenDuration);
+
+        Color blackTransparent = new Color(0f, 0f, 0f, 0f);
+        yield return LerpRendererColor(blackOpaque, blackTransparent, fadeOutDuration);
+
+        customerRenderer.enabled = false;
+        visibilityCoroutine = null;
+    }
+
+    // ค่อยๆ ปรากฏขึ้นมาเป็นเงาดำก่อน แล้วค่อยคืนสีปกติ (ตอนผู้เล่นเลิกสืบสวน)
+    private IEnumerator FadeInRoutine()
+    {
+        Color blackTransparent = new Color(0f, 0f, 0f, 0f);
+        customerRenderer.color = blackTransparent;
+        customerRenderer.enabled = true;
+
+        Color blackOpaque = new Color(0f, 0f, 0f, normalRendererColor.a);
+        yield return LerpRendererColor(blackTransparent, blackOpaque, fadeOutDuration);
+
+        yield return LerpRendererColor(blackOpaque, normalRendererColor, blackenDuration);
+
+        visibilityCoroutine = null;
+    }
+
+    private IEnumerator LerpRendererColor(Color from, Color to, float duration)
+    {
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            customerRenderer.color = Color.Lerp(from, to, time / duration);
+            yield return null;
+        }
+
+        customerRenderer.color = to;
+    }
+
     public void ReceiveCup(Cup cup)
     {
-        if (isLeaving || cup.contents.Count == 0) return;
+        if (isLeaving || isWalkingIn || cup.contents.Count == 0) return;
 
         if (cup.contents.Count != myOrder.wantedFoods.Count)
         {
@@ -253,6 +369,17 @@ public class Customer : MonoBehaviour
         Leave(isSatisfied);
     }
 
+    // ตอนความอดทนหมด ให้ค้างสปริท exhausted ไว้ครู่นึงก่อนค่อยเดินจากไป เหมือนตอนรับอาหารถูก/ผิด
+    private IEnumerator ShowExhaustedAndLeave()
+    {
+        ApplyCustomerSprite(true);
+        isShowingReaction = true;
+
+        yield return new WaitForSeconds(reactionDuration);
+        isShowingReaction = false;
+        Leave(false);
+    }
+
     private void Leave(bool isSatisfied)
     {
         isLeaving = true;
@@ -260,25 +387,116 @@ public class Customer : MonoBehaviour
         else Debug.Log("ลูกค้าพอใจ จ่ายเงิน!");
 
         manager.OnCustomerLeft(mySlotIndex);
-        Destroy(gameObject, 0.5f);
+        StartCoroutine(WalkOutAnimation());
     }
 
-    private IEnumerator PopInAnimation()
+    // ลูกค้าเดินเข้ามาจากตำแหน่งที่เกิด (นอกจอ) ยัง standPosition (จุดยืนในช่อง)
+    // ชะลอความเร็วตอนใกล้ถึง (ease-out) พร้อมเด้งขึ้นลงตอนเดิน เหมือนกับ NPC ใน IntroDialogue
+    private IEnumerator WalkInAnimation(Vector3 standPosition)
     {
-        Vector3 originalScale = transform.localScale;
-        transform.localScale = Vector3.zero;
-        float duration = 0.4f;
-        float time = 0f;
+        yield return WalkTo(standPosition);
 
-        while (time < duration)
+        isWalkingIn = false;
+
+        // ถ้าผู้เล่นกำลังสืบสวนอยู่พอดีตอนเดินมาถึง ห้ามโชว์ Canvas ออกมา
+        // ต้องรอให้ SetCustomerVisible(true) จาก CustomerManager สั่งแสดงตอนเลิกสืบสวนแทน
+        if (customerCanvas != null && !isHiddenForInvestigation) StartCoroutine(ShowOrderCanvasAnimation());
+    }
+
+    // หลังจากลูกค้าถือสปริทตอบสนอง (ถูก/ผิด) ค้างไว้ครบ reactionDuration แล้ว
+    // ให้เดินกลับไปยังจุดที่เกิด (spawnPosition) ก่อนค่อยหายไปจากฉาก
+    private IEnumerator WalkOutAnimation()
+    {
+        if (customerCanvas != null && customerCanvas.activeSelf) StartCoroutine(HideOrderCanvasAnimation());
+
+        yield return WalkTo(spawnPosition);
+
+        Destroy(gameObject);
+    }
+
+    // เดินจากตำแหน่งปัจจุบันไปยัง targetPosition แบบชะลอความเร็วตอนใกล้ถึง (ease-out)
+    // พร้อมเด้งขึ้นลงตอนเดิน ใช้ร่วมกันทั้งตอนเดินเข้ามาและเดินกลับออกไป
+    private IEnumerator WalkTo(Vector3 targetPosition)
+    {
+        Vector3 logicalPos = transform.position;
+        float totalDistance = Vector3.Distance(logicalPos, targetPosition);
+        float easeZone = Mathf.Max(totalDistance * 0.3f, 0.01f);
+        float bobTimer = 0f;
+
+        while (Vector3.Distance(logicalPos, targetPosition) > 0.01f)
         {
-            time += Time.deltaTime;
-            float t = time / duration;
-            float scaleFactor = 1f + 2.70158f * Mathf.Pow(t - 1f, 3f) + 1.70158f * Mathf.Pow(t - 1f, 2f);
-            transform.localScale = originalScale * scaleFactor;
+            float remaining = Vector3.Distance(logicalPos, targetPosition);
+            float easeFactor = Mathf.Clamp01(remaining / easeZone);
+            float currentSpeed = walkInSpeed * Mathf.Lerp(0.25f, 1f, easeFactor);
+            logicalPos = Vector3.MoveTowards(logicalPos, targetPosition, currentSpeed * Time.deltaTime);
+
+            bobTimer += Time.deltaTime * walkBobSpeed;
+            // คูณด้วย easeFactor ให้การเด้งค่อยๆ แผ่วลงจนเหลือ 0 พอดีตอนถึงจุดหมาย
+            // ไม่งั้นพอลูปจบแล้วบังคับ position ให้ตรงจุดยืนเป๊ะ จะเห็นเป็นการกระตุกสะดุดลงกะทันหัน
+            float bobOffset = Mathf.Abs(Mathf.Sin(bobTimer)) * walkBobHeight * easeFactor;
+            transform.position = logicalPos + Vector3.up * bobOffset;
+
             yield return null;
         }
-        transform.localScale = originalScale;
+        transform.position = targetPosition;
+    }
+
+    // แสดง Canvas ออเดอร์พร้อมแอนิเมชันตอนลูกค้าเดินมาถึงจุดยืน
+    // ถ้ามี bubbleAnimator จะสั่ง Trigger "Show" ให้ Animator Controller เล่นเอง
+    // ถ้าไม่มีจะเล่นแอนิเมชันขยายจาก 0 ขึ้นมาแบบเด้ง (ease-out back) จากโค้ดแทน
+    private IEnumerator ShowOrderCanvasAnimation()
+    {
+        customerCanvas.SetActive(true);
+
+        if (bubbleAnimator != null)
+        {
+            bubbleAnimator.SetTrigger("Show");
+            yield break;
+        }
+
+        Transform canvasTransform = customerCanvas.transform;
+        Vector3 targetScale = canvasTransform.localScale;
+        canvasTransform.localScale = Vector3.zero;
+
+        float time = 0f;
+        while (time < canvasPopDuration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / canvasPopDuration);
+            float overshoot = 1.70158f;
+            float easedT = t - 1f;
+            float easeOutBack = 1f + (overshoot + 1f) * Mathf.Pow(easedT, 3f) + overshoot * Mathf.Pow(easedT, 2f);
+            canvasTransform.localScale = targetScale * easeOutBack;
+            yield return null;
+        }
+        canvasTransform.localScale = targetScale;
+    }
+
+    // ซ่อน Canvas ออเดอร์พร้อมแอนิเมชันตอนลูกค้ากำลังจะจากไป (อิ่มแล้ว/โดนดุ/หมดความอดทน)
+    // ถ้ามี bubbleAnimator จะสั่ง Trigger "Hide" ให้ Animator Controller เล่นเอง
+    // ถ้าไม่มีจะเล่นแอนิเมชันหดขนาดลงเหลือ 0 จากโค้ดแทน
+    private IEnumerator HideOrderCanvasAnimation()
+    {
+        if (bubbleAnimator != null)
+        {
+            bubbleAnimator.SetTrigger("Hide");
+            yield break;
+        }
+
+        Transform canvasTransform = customerCanvas.transform;
+        Vector3 startScale = canvasTransform.localScale;
+
+        float time = 0f;
+        while (time < canvasPopDuration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / canvasPopDuration);
+            canvasTransform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
+            yield return null;
+        }
+        canvasTransform.localScale = Vector3.zero;
+
+        customerCanvas.SetActive(false);
     }
 
     private IEnumerator PopOutAnimation()

@@ -13,15 +13,18 @@ MonoBehaviour:
   m_Name: Pork
   m_EditorClassIdentifier: Assembly-CSharp::FoodData
   foodName: Pork
-  foodIcon: {fileID: -3181778142699774698, guid: fba80ad72777e0c49baae12ad74a6c79, type: 3}
-  rawSprite: {fileID: 6908634027161224790, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
-  mediumSprite: {fileID: 6908634027161224790, guid: 311a161cfc21eef419fdb08f8d2579b1, type: 3}
-  cookedSprite: {fileID: -3181778142699774698, guid: fba80ad72777e0c49baae12ad74a6c79, type: 3}
-  burntSprite: {fileID: 3909090353215070486, guid: 7e0122b726d365f4fb72a6c4b59ab364, type: 3}
+  foodIcon: {fileID: 21300000, guid: 04269e08107e05c43a7900ffcab1a45e, type: 3}
+  rawSprite: {fileID: -5427246110697564293, guid: 8e5e09ea4aa1b82419d48d6a56457801, type: 3}
+  mediumSprite: {fileID: -5427246110697564293, guid: 8e5e09ea4aa1b82419d48d6a56457801, type: 3}
+  cookedSprite: {fileID: -6843734661672478383, guid: 7252bbf507a2c9b42ae4e91944908395, type: 3}
+  burntSprite: {fileID: 7795457302516897869, guid: 37ed332d2d7956d45b4b1d8ee930dd15, type: 3}
   mediumTime: 5
   cookTime: 10
   burnTime: 15
-  sauceSprite: {fileID: 2877418565224197244, guid: 26735b4c86c61504eae25ead9c24f57a, type: 3}
-  spicyLevel1Sprite: {fileID: -3928351074505779233, guid: d08c07c545b06914db79a246d4ca348e, type: 3}
-  spicyLevel2Sprite: {fileID: -4974012655406539797, guid: 24c488df031002e49ada908c56d40815, type: 3}
-  spicyLevel3Sprite: {fileID: 4539942518379027551, guid: cf1263f06a27b9e4dabc5b78751a08e6, type: 3}
+  sauceSprite: {fileID: 97041417502136574, guid: fab749d382d452a439180eb1ab0534e0, type: 3}
+  spicyLevel1Sprite: {fileID: 3041593466457241715, guid: 919be75821c0d8d4a9511014fdb2fb71, type: 3}
+  spicyLevel2Sprite: {fileID: 8542412644417971613, guid: f9389ca0fcb53cf4d892258241cd553f, type: 3}
+  spicyLevel3Sprite: {fileID: 7317420235831211320, guid: 0bc35d66bbcba1a4fbd555fa3073c7be, type: 3}
+  sauceSpicyLevel1Sprite: {fileID: 7513626913660756789, guid: 8d811d754c13b8242ab21db7dfaeb000, type: 3}
+  sauceSpicyLevel2Sprite: {fileID: 375698722581463552, guid: 32d88dd747fa1074fbc86ffb5ed41640, type: 3}
+  sauceSpicyLevel3Sprite: {fileID: -5439997438787580033, guid: 3623d0583834cc146bee58438dea2498, type: 3}
