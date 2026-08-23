@@ -63,7 +63,11 @@ public class CustomerManager : MonoBehaviour
 
     public void SpawnCustomer(int slotIndex)
     {
-        if (GameManager.Instance.allCluesCollected) return;
+        if (GameManager.Instance.stopSpawningCustomers) return;
+
+        // จบเกมไปแล้ว (แพ้/ชนะ) ห้ามมีลูกค้าใหม่เดินเข้ามาทับหน้าจอแพ้
+        // คิวเกิดจาก SpawnCooldownRoutine ที่ตั้งไว้ก่อนแพ้ยังเดินต่ออยู่ ต้องกันตรงนี้
+        if (GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
 
         StageConfig currentStage = GameManager.Instance.GetCurrentStage();
         if (currentStage == null || currentStage.availableMenu.Count == 0 || customerPrefabs.Length == 0) return;
@@ -131,7 +135,7 @@ public class CustomerManager : MonoBehaviour
         activeCustomerPrefabIndex[slotIndex] = -1;
         currentActiveCustomerCount--;
 
-        if (GameManager.Instance.allCluesCollected && currentActiveCustomerCount <= 0)
+        if (GameManager.Instance.stopSpawningCustomers && currentActiveCustomerCount <= 0)
         {
             GameManager.Instance.StartEndOfDaySequence();
         }
@@ -139,6 +143,16 @@ public class CustomerManager : MonoBehaviour
         {
             StartCoroutine(SpawnCooldownRoutine(slotIndex));
         }
+    }
+
+    // GameManager เรียกตอนสั่งปิดร้าน (เบาะแสครบ หรือเบาะแสหมดกอง)
+    // ถ้าจังหวะนั้นบนจอไม่มีลูกค้าเหลืออยู่เลย ต้องจบวันเองทันที เพราะจะไม่มี OnCustomerLeft มาปลุกอีกแล้ว
+    public void NotifyShopClosed()
+    {
+        if (GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
+        if (currentActiveCustomerCount > 0) return;
+
+        GameManager.Instance.StartEndOfDaySequence();
     }
 
     private IEnumerator SpawnCooldownRoutine(int slotIndex)

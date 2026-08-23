@@ -115,7 +115,9 @@ MonoBehaviour:
   progressPerSuccess: 5
   correctFlashDuration: 0.35
   sequenceClearedDelay: 0.28
-  blinkStartTime: 10
+  clueCompleteHoldDuration: 0.45
+  fillCompleteWaitTimeout: 1
+  blinkStartTime: 3
   maxBlinkSpeed: 0.5
   minBlinkSpeed: 2.5
   minBlinkAlpha: 0.3

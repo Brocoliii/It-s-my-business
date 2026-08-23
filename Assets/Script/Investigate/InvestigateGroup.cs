@@ -76,12 +76,15 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
 
     // สำหรับ Debug/Skip เท่านั้น: บังคับให้กลุ่มออกจากฉากทันที ผ่านเส้นทางเดิม (RemoveGroup)
     // เพื่อให้ manager.OnGroupLeft ถูกเรียกด้วย ไม่งั้น activeGroups/occupiedPoints ใน InvestigationManager จะค้าง
-    public void ForceRemove()
+    // ค่าเริ่มต้นไม่ทิ้งเบาะแส เพราะนี่ไม่ใช่การที่ผู้เล่นฟังไม่ทันจริง ๆ
+    public void ForceRemove(bool discardClue = false)
     {
-        RemoveGroup();
+        RemoveGroup(discardClue);
     }
 
-    public void Init(InvestigationManager mgr, string text, float duration)
+    // lifetime = เวลาที่กลุ่มอยู่บนจอก่อนหายไป ส่งมาจาก InvestigationManager ตามค่าใน StageConfig
+    // ใส่ <= 0 มา จะย้อนไปใช้สูตรเดิม (เวลาแอบฟัง + 10 วินาที) เผื่อฉากไหนยังไม่ได้ตั้งค่าในด่าน
+    public void Init(InvestigationManager mgr, string text, float duration, float lifetime = 0f)
     {
         manager = mgr;
         clueDetail = text;
@@ -89,7 +92,7 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         currentListenTime = 0f;
         currentStratagem.Clear();
         currentStratagemIndex = 0;
-        lifeTimer = requiredListenTime + 10f;
+        lifeTimer = lifetime > 0f ? lifetime : requiredListenTime + 10f;
         blinkPhase = 0.25f;
         baseGroupScale = transform.localScale;
         ApplyRandomSprite();
@@ -521,7 +524,7 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         RefreshInvestigationUI();
     }
 
-    private void RemoveGroup()
+    private void RemoveGroup(bool discardClue = true)
     {
         // กันเรียกซ้ำ เพราะตอนนี้ยังไม่ Destroy ทันที ต้องรอแอนิเมชันจางหายจบก่อน
         if (isRemoving)
@@ -559,6 +562,14 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         {
             if (colliders[i] != null)
                 colliders[i].enabled = false;
+        }
+
+        // ผู้เล่นฟังไม่จบจนกลุ่มหายไป = เบาะแสนี้หลุดถาวร ไม่ถูกสุ่มกลับมาอีก
+        // ต้องทิ้งก่อนเรียก OnGroupLeft เพราะหลังจากนั้นกลุ่มถัดไปมีสิทธิ์เกิดได้แล้ว
+        // ถ้าทิ้งทีหลังกลุ่มใหม่อาจหยิบเบาะแสเดิมไปใช้ซ้ำ
+        if (discardClue && !isClueCollected)
+        {
+            manager.DiscardClue(clueDetail);
         }
 
         // บอก manager ให้ปล่อยจุดเกิดคืนทันที ไม่ต้องรอแอนิเมชันจบ

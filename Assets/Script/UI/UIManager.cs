@@ -161,6 +161,21 @@ public class UIManager : MonoBehaviour
     public GameObject endOfDayPanel; // ˹�Ҩͷֺ� �����駢���ҵ͹���ѹ
     public NotebookManager notebookManager; // ���Դ˹�ҵ�ҧ����辽�����˹�Ҩͨ��ѹ
 
+    [Header("หน้าจอแพ้ (Lose)")]
+    [Tooltip("แผงหน้าจอแพ้ทั้งใบ ปล่อยว่าง = ไม่มีหน้าจอแพ้ (โค้ดจะข้ามไปเฉย ๆ ไม่พัง)")]
+    public GameObject losePanel;
+    [Tooltip("ข้อความบอกสาเหตุที่แพ้ เช่น ทำพลาดเกินโควตา หรือเก็บเบาะแสไม่ครบ")]
+    public TextMeshProUGUI loseReasonText;
+    [Tooltip("ทางเลือก: ถ้าใส่ Animator ไว้ จะยิง Trigger \"Show\" แทนการเด้งด้วยโค้ด")]
+    public Animator losePanelAnimator;
+    [Tooltip("เวลาที่หน้าจอแพ้ใช้เด้งขึ้นมา")]
+    public float losePanelPopDuration = 0.4f;
+
+    private Coroutine losePanelRoutine;
+    private CanvasGroup losePanelCanvasGroup;
+    private Vector3 losePanelBaseScale = Vector3.one;
+    private bool hasLosePanelBase = false;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -172,6 +187,7 @@ public class UIManager : MonoBehaviour
         // �Դ��ͤ�����͹ ���˹�Ҩͨ��ѹ����͹�͹�������
         if (centerWarningText != null) centerWarningText.gameObject.SetActive(false);
         if (endOfDayPanel != null) endOfDayPanel.SetActive(false);
+        if (losePanel != null) losePanel.SetActive(false);
         ShowListeningBar(false);
         ShowInvestigateSequence(false);
         ShowBinocularsOverlay(false);
@@ -245,7 +261,8 @@ public class UIManager : MonoBehaviour
             yield return new WaitForSeconds(seconds);
         }
 
-        ShowEndOfDayPanel(true);
+        // ไม่เปิดหน้าจอจบวัน/สมุดหลักฐานตรงนี้แล้ว ปล่อยให้ GameManager.EndOfDayCoroutine สั่งเองหลังม่านปิดจอเสร็จ
+        // ไม่งั้นสมุดจะเด้งขึ้นมาทับป้าย DAY COMPLETE! กับม่านที่กำลังเลื่อนลงมาอยู่
     }
 
     // ��˹�Ҩͨ��ѹ ��������˹�ҵ�ҧ����辽������¡ѹ
@@ -269,6 +286,92 @@ public class UIManager : MonoBehaviour
         {
             Debug.LogWarning("[UIManager] ��辽�����������˹�ҵ�ҧ����辽�͹��ѹ");
         }
+    }
+
+    // หน้าจอแพ้ เรียกจาก GameManager ตอนเข้าสถานะ Lose
+    // (ทำพลาดเกิน Max Mistakes Allowed / เก็บเบาะแสไม่ถึง Required Clues To Pass / จับผิดคน)
+    public void ShowLosePanel(string reason)
+    {
+        // เก็บ HUD ตอนเล่นให้หมดก่อน ไม่งั้นแถบสืบสวน/กล้องส่องทางไกล/ข้อความนับถอยหลัง
+        // จะค้างทับอยู่บนหน้าจอแพ้ (แพ้กลางวันได้ เช่นทำพลาดครบโควตาระหว่างกำลังสืบสวนอยู่)
+        ShowListeningBar(false);
+        ShowBinocularsOverlay(false);
+        ShowInvestigateTimer(false);
+        if (centerWarningText != null) centerWarningText.gameObject.SetActive(false);
+
+        if (loseReasonText != null && !string.IsNullOrEmpty(reason))
+        {
+            loseReasonText.text = reason;
+        }
+
+        if (losePanel == null)
+        {
+            Debug.LogWarning("[UIManager] ยังไม่ได้ผูก losePanel ไว้ใน Inspector เลยไม่มีหน้าจอแพ้ให้โชว์");
+            return;
+        }
+
+        losePanel.SetActive(true);
+
+        if (losePanelAnimator != null)
+        {
+            // ทางเลือกให้อาร์ตทำแอนิเมชันเอง โค้ดแค่เปิดแผงให้เท่านั้น
+            losePanelAnimator.SetTrigger("Show");
+            return;
+        }
+
+        if (losePanelRoutine != null) StopCoroutine(losePanelRoutine);
+        losePanelRoutine = StartCoroutine(LosePanelPopRoutine());
+    }
+
+    public void HideLosePanel()
+    {
+        if (losePanelRoutine != null)
+        {
+            StopCoroutine(losePanelRoutine);
+            losePanelRoutine = null;
+        }
+
+        if (losePanel != null) losePanel.SetActive(false);
+    }
+
+    private IEnumerator LosePanelPopRoutine()
+    {
+        Transform root = losePanel.transform;
+
+        if (!hasLosePanelBase)
+        {
+            // จำสเกลจริงไว้ครั้งเดียวก่อนจะไปเขียนทับเป็น 0 เหมือนที่ทำกับแถบสืบสวน
+            // ถ้าไปจำตอนกำลังเล่นอยู่ จะได้ค่าที่ถูกย่อไว้มาเป็นค่าฐาน แล้วแผงจะจิ๋วค้างถาวร
+            hasLosePanelBase = true;
+            losePanelBaseScale = root.localScale == Vector3.zero ? Vector3.one : root.localScale;
+
+            losePanelCanvasGroup = losePanel.GetComponent<CanvasGroup>();
+            if (losePanelCanvasGroup == null) losePanelCanvasGroup = losePanel.AddComponent<CanvasGroup>();
+        }
+
+        float duration = Mathf.Max(0.01f, losePanelPopDuration);
+        float time = 0f;
+
+        root.localScale = Vector3.zero;
+        if (losePanelCanvasGroup != null) losePanelCanvasGroup.alpha = 0f;
+
+        while (time < duration)
+        {
+            // unscaledDeltaTime เผื่อวันไหนหน้าจอแพ้ไปสั่งหยุดเวลาเกม แผงจะได้ยังเด้งขึ้นมาได้อยู่
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / duration);
+
+            root.localScale = losePanelBaseScale * EaseOutBack(t);
+
+            // ให้จางเข้ามาไวกว่าการเด้ง ผู้เล่นจะได้อ่านสาเหตุที่แพ้ได้ก่อนแผงจะหยุดสนิท
+            if (losePanelCanvasGroup != null) losePanelCanvasGroup.alpha = Mathf.Clamp01(t * 3f);
+
+            yield return null;
+        }
+
+        root.localScale = losePanelBaseScale;
+        if (losePanelCanvasGroup != null) losePanelCanvasGroup.alpha = 1f;
+        losePanelRoutine = null;
     }
 
     public void ShowListeningBar(bool isVisible)
