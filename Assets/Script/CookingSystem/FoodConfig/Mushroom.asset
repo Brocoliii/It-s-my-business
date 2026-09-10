@@ -19,7 +19,7 @@ MonoBehaviour:
   cookedSprite: {fileID: 21300000, guid: 45d621def6801d049b9232324ad8fc0b, type: 3}
   burntSprite: {fileID: 21300000, guid: 4004c95dc0155d24e80987095ae9b796, type: 3}
   mediumTime: 5
-  cookTime: 10
+  cookTime: 5
   burnTime: 15
   sauceSprite: {fileID: 21300000, guid: 0570e35fdc6671f4dbeb28983efbbde4, type: 3}
   spicyLevel1Sprite: {fileID: 21300000, guid: 2d712e0cc00d2b845bfa47ae0ba39ad9, type: 3}

@@ -36,6 +36,14 @@ public class NotebookManager : MonoBehaviour
     [Header("�ҹ�����ż���ͧʧ���")]
     public List<SuspectData> allSuspects;
 
+    [Header("เพลงตอนสมุดเปิด")]
+    [Tooltip("เพลงที่จะสลับไปเล่นตอนสมุดเด้งขึ้นมา (ช่วงเลือกคนร้าย)\nปล่อยว่าง = ไม่เปลี่ยนเพลง ปล่อยเพลงเดิมเล่นคลอต่อไป")]
+    public string notebookBgmId = SoundIds.BgmNotebook;
+    [Tooltip("เวลาที่ใช้ไล่เพลงเก่าลงพร้อมไล่เพลงสมุดขึ้น (วินาที)\n0 = ตัดเปลี่ยนทันที, ค่าติดลบ = ใช้ค่าเริ่มต้นของ SoundManager")]
+    public float notebookBgmFadeDuration = 0.6f;
+    [Tooltip("ปิดสมุดทั้งที่ยังไม่ได้ปั๊มเลือกคนร้าย ให้กลับไปเล่นเพลงที่ค้างไว้ก่อนเปิดสมุด\n(ปั๊มแล้วไม่ต้องคืน เพราะเพลงแพ้/ชนะจะมาทับอยู่แล้ว)")]
+    public bool restoreBgmOnClose = true;
+
     [Header("แอนิเมชัน: เปิด/ปิดสมุด")]
     [Tooltip("ตัวสมุดที่จะโดนย่อ/ขยาย/เอียง ปล่อยว่าง = ใช้ Transform ของตัวเอง")]
     public Transform notebookRoot;
@@ -110,6 +118,9 @@ public class NotebookManager : MonoBehaviour
     private readonly List<NotebookEntry> clueEntries = new List<NotebookEntry>();
     private readonly List<NotebookEntry> cardEntries = new List<NotebookEntry>();
 
+    // เพลงที่เล่นค้างอยู่ก่อนสมุดจะเปิด เก็บไว้คืนตอนปิดสมุดแบบยังไม่ได้ปั๊ม
+    private string bgmIdBeforeOpen;
+
     private Coroutine openCloseRoutine;
     private Coroutine tabRoutine;
     private Coroutine clueEntryRoutine;
@@ -147,6 +158,9 @@ public class NotebookManager : MonoBehaviour
         if (isOpen) return;
         isOpen = true;
 
+        SoundManager.Instance.PlaySFX(SoundIds.UiNotebookOpen);
+        PlayNotebookBgm();
+
         gameObject.SetActive(true);
         selectedSuspect = null;
 
@@ -176,7 +190,36 @@ public class NotebookManager : MonoBehaviour
     // เคลียร์ธงตรงนี้ที่เดียว จะได้ครอบทุกทางที่สมุดถูกปิด ไม่ใช่แค่ทางที่ปั๊มเลือกคนร้ายเสร็จ
     private void OnDisable()
     {
+        // เล่นเสียงปิดเฉพาะตอนที่สมุดถูกปิดจริง ๆ ระหว่างเล่นอยู่
+        // ตอนเปลี่ยนฉาก/ปิดเกม Unity จะปิดทุกอย่างในฉากพร้อมกัน ถ้าไม่กันไว้เสียงจะดังตอนกดเปลี่ยนด่านด้วย
+        if (isOpen && SoundManager.Exists && gameObject.scene.isLoaded)
+        {
+            SoundManager.Instance.PlaySFX(SoundIds.UiNotebookClose);
+            RestoreBgmBeforeOpen();
+        }
+
         isOpen = false;
+    }
+
+    // สลับไปเพลงของช่วงเลือกคนร้าย พร้อมจำเพลงเดิมไว้เผื่อต้องคืนตอนปิด
+    // ถ้าบังเอิญเป็นเพลงเดียวกับที่เล่นอยู่ PlayBGM จะไม่ทำอะไร เพลงเลยไม่กระตุกกลับไปเริ่มใหม่
+    private void PlayNotebookBgm()
+    {
+        if (string.IsNullOrWhiteSpace(notebookBgmId)) return;
+
+        bgmIdBeforeOpen = SoundManager.Instance.CurrentBgmId;
+        SoundManager.Instance.PlayBGM(notebookBgmId, notebookBgmFadeDuration);
+    }
+
+    // ปิดสมุดโดยยังไม่ได้ปั๊ม (เช่นปุ่ม Debug หรือฉากพาไปทางอื่น) ให้เพลงกลับไปเป็นเพลงก่อนเปิดสมุด
+    // ปั๊มไปแล้วห้ามคืน เพราะ SubmitVerdict สั่งเพลงแพ้/ชนะไปก่อนหน้านี้แล้ว คืนตรงนี้จะไปทับเพลงนั้น
+    private void RestoreBgmBeforeOpen()
+    {
+        if (!restoreBgmOnClose || isClosing) return;
+        if (string.IsNullOrEmpty(bgmIdBeforeOpen)) return;
+
+        SoundManager.Instance.PlayBGM(bgmIdBeforeOpen, notebookBgmFadeDuration);
+        bgmIdBeforeOpen = null;
     }
 
     // หน้าจอจบวันเรียกตัวนี้ ตอนนี้เปิดเหมือน OpenNotebook ทุกอย่าง
@@ -298,6 +341,10 @@ public class NotebookManager : MonoBehaviour
     // ต้องเปลี่ยนเนื้อหาตอนหน้าอยู่นอกจอเท่านั้น ไม่งั้นจะเห็นรูปสลับกลางคันตอนหน้ายังไถลอยู่
     private IEnumerator ShowDetailRoutine(bool replacePrevious)
     {
+        // เล่นตรงนี้ ไม่ใช่ใน SlideDetailTabIn เพราะตอนสลับคนต้องรอหน้าเก่าไถลออกก่อน
+        // เสียงจะไปดังช้ากว่าที่ผู้เล่นกดการ์ดอยู่ 0.2 วินาที ฟังแล้วเหมือนเสียงหลุดจังหวะ
+        SoundManager.Instance.PlaySFX(SoundIds.UiPageTurn);
+
         if (replacePrevious)
         {
             yield return SlideDetailTabOut();

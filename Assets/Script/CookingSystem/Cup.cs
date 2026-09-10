@@ -39,11 +39,17 @@ public class Cup : MonoBehaviour, IDraggable
     [Header("Snap Back")]
     [SerializeField] private float snapMoveDuration = 0.2f;
 
+    [Header("Drop Area")]
+    [SerializeField] private Collider2D dropArea;
+    [SerializeField] private float dropPadding = 0.2f;
+
     private SpriteRenderer sr;
     private Vector3 startPos;
     private Sprite defaultSprite;
     private bool spawnAnimationTriggered = false;
     private Coroutine snapMoveCoroutine;
+    private Coroutine spawnAnimationCoroutine;
+    private Vector3 spawnAnimationScale;
 
     [System.Serializable]
     public struct FoodInstanceData
@@ -58,6 +64,9 @@ public class Cup : MonoBehaviour, IDraggable
     {
         sr = GetComponent<SpriteRenderer>();
         if (sr != null) defaultSprite = sr.sprite;
+
+        if (dropArea == null) dropArea = GetComponent<Collider2D>();
+        if (dropArea == null) dropArea = GetComponentInChildren<Collider2D>();
     }
 
     private void Start()
@@ -75,7 +84,7 @@ public class Cup : MonoBehaviour, IDraggable
         // ให้เล่นแบบร่วงลงมาตรงๆ ที่ตำแหน่งตัวเอง แทนที่จะไม่มี animation เลย
         if (playSpawnAnimation && !spawnAnimationTriggered)
         {
-            StartCoroutine(DropAnimation(startPos + Vector3.up * spawnDropHeight, startPos));
+            spawnAnimationCoroutine = StartCoroutine(DropAnimation(startPos + Vector3.up * spawnDropHeight, startPos));
         }
     }
 
@@ -85,13 +94,30 @@ public class Cup : MonoBehaviour, IDraggable
     {
         spawnAnimationTriggered = true;
         startPos = toPosition;
-        StartCoroutine(RiseAndDragAnimation(fromPosition, toPosition));
+        spawnAnimationCoroutine = StartCoroutine(RiseAndDragAnimation(fromPosition, toPosition));
+    }
+
+    // ตัดจบแอนิเมชันตอนเกิดกลางคัน (เช่น ผู้เล่นคว้าถ้วยตั้งแต่มันยังลอยไปไม่ถึง cupArea)
+    // ต้องคืนค่าที่แอนิเมชันแอบเปลี่ยนไว้ให้ครบเอง ทั้งขนาดที่กำลังไล่อยู่และสไปรท์ตอนลอย
+    // ไม่งั้นถ้วยจะค้างเป็นสไปรท์ตอนลอย/ขนาดผิด แถมโดนแย่งตำแหน่งกับการลากไปจนกว่าแอนิเมชันจะจบเอง
+    private void CancelSpawnAnimation()
+    {
+        if (spawnAnimationCoroutine == null) return;
+
+        StopCoroutine(spawnAnimationCoroutine);
+        spawnAnimationCoroutine = null;
+
+        transform.localScale = spawnAnimationScale;
+
+        if (sr != null && spawnFlySprite != null)
+            sr.sprite = defaultSprite;
     }
 
     // ตกลงมาจาก fromPosition แล้วเด้งเกินขนาดจริงเล็กน้อยตอนถึง toPosition (ใช้กับถ้วยที่วางไว้ในฉากเองตั้งแต่แรก ไม่ได้เกิดจาก Spawner)
     private IEnumerator DropAnimation(Vector3 fromPosition, Vector3 toPosition)
     {
         Vector3 targetScale = transform.localScale;
+        spawnAnimationScale = targetScale;
 
         transform.localScale = Vector3.zero;
         transform.position = fromPosition;
@@ -114,6 +140,8 @@ public class Cup : MonoBehaviour, IDraggable
 
         transform.localScale = targetScale;
         transform.position = toPosition;
+
+        spawnAnimationCoroutine = null;
     }
 
     // เกิดที่ fromPosition แล้วลอยขึ้นตรงๆ ก่อน (เหมือนถูกหยิบขึ้นมา) จากนั้นค่อยลากข้ามไปวางที่ toPosition (cupArea)
@@ -121,6 +149,7 @@ public class Cup : MonoBehaviour, IDraggable
     private IEnumerator RiseAndDragAnimation(Vector3 fromPosition, Vector3 toPosition)
     {
         Vector3 targetScale = transform.localScale;
+        spawnAnimationScale = targetScale;
         Vector3 risePosition = fromPosition + Vector3.up * spawnDropHeight;
 
         transform.localScale = targetScale;
@@ -163,12 +192,56 @@ public class Cup : MonoBehaviour, IDraggable
 
         if (sr != null && spawnFlySprite != null)
             sr.sprite = defaultSprite;
+
+        spawnAnimationCoroutine = null;
     }
 
     private void OnValidate()
     {
         if (sr == null) sr = GetComponent<SpriteRenderer>();
         ApplySortingSettings(defaultSortingOrder);
+    }
+
+    // ระยะเยื้องระหว่าง origin ของถ้วยกับจุดกึ่งกลางของภาพถ้วย
+    // ใช้ตอนเริ่มลาก เพื่อให้ถ้วยมาเกาะ "กลางเมาส์" พอดี ไม่ว่าจะคลิกโดนตรงขอบไหนของถ้วยก็ตาม
+    // (pivot ของ prefab มักอยู่ที่ก้นถ้วย ถ้าใช้ pivot ตรงๆ ถ้วยจะห้อยอยู่ใต้เมาส์)
+    public Vector2 VisualCenterOffset
+    {
+        get
+        {
+            if (sr == null) sr = GetComponent<SpriteRenderer>();
+            if (sr == null || sr.sprite == null) return Vector2.zero;
+
+            // ใช้ sprite.bounds (local space) แทน renderer.bounds (world space)
+            // เพราะตอนเพิ่งสลับเป็น dragSprite ค่า renderer.bounds ยังไม่อัปเดตในเฟรมนั้น
+            Vector3 localCenter = sr.sprite.bounds.center;
+            if (sr.flipX) localCenter.x = -localCenter.x;
+            if (sr.flipY) localCenter.y = -localCenter.y;
+
+            Vector3 worldCenter = sr.transform.TransformPoint(localCenter);
+            return (Vector2)(transform.position - worldCenter);
+        }
+    }
+
+    // เขตที่ถือว่า "ปล่อยอาหารลงถ้วย" ได้ กว้างกว่า collider ของถ้วยเองตามค่า dropPadding
+    // เพราะ collider ถ้วยถูกใช้คู่กับการลากถ้วย เลยขยายให้ใหญ่เกินตัวถ้วยไม่ได้
+    // ถ้าไม่มีเขตนี้ ผู้เล่นต้องเล็งให้เมาส์โดนตัวถ้วยพอดี ทั้งที่ภาพอาหารทับถ้วยอยู่แล้ว
+    public bool IsWithinDropArea(Vector2 worldPos)
+    {
+        if (dropArea == null)
+        {
+            return Vector2.Distance(worldPos, transform.position) <= 1f;
+        }
+
+        // เทียบเฉพาะระนาบ XY เท่านั้น ห้ามใช้ bounds.Contains ตรงๆ
+        // เพราะ Collider2D.bounds หนาแกน z เป็นศูนย์ และวางอยู่ที่ค่า z ของ transform
+        // ส่วนจุดที่ส่งเข้ามาถูกตัด z ทิ้งเป็น 0 เสมอ (มาจาก Vector2)
+        // ถ้วยที่ถูกดันไปที่ z อื่นเพื่อจัดเลเยอร์ภาพ จึงไม่มีวันอยู่ในเขตวางเลยสักครั้ง
+        Bounds bounds = dropArea.bounds;
+        return worldPos.x >= bounds.min.x - dropPadding
+            && worldPos.x <= bounds.max.x + dropPadding
+            && worldPos.y >= bounds.min.y - dropPadding
+            && worldPos.y <= bounds.max.y + dropPadding;
     }
 
     public void AddFood(FoodInstance food)
@@ -258,6 +331,9 @@ public class Cup : MonoBehaviour, IDraggable
         foodObj.localPosition = targetLocalPos;
         foodObj.localScale = targetScale;
         foodObj.localRotation = targetRotation;
+
+        // ดังตอนตกถึงที่แล้วเท่านั้น ถ้าไปเล่นตั้งแต่ AddFood จะได้ยินก่อนภาพตกลงถ้วยจริงประมาณ 0.4 วินาที
+        SoundManager.Instance.PlaySFX(SoundIds.FoodIntoCup, foodObj.position);
     }
 
     public void ClearCup()
@@ -269,6 +345,10 @@ public class Cup : MonoBehaviour, IDraggable
     public void OnBeginDrag()
     {
         //ApplySortingSettings(dragSortingOrder);
+
+        // คว้าถ้วยตั้งแต่มันยังลอยจากจุดเกิดไปไม่ถึงที่วาง ต้องตัดจบแอนิเมชันเกิดก่อน
+        // ไม่งั้นมันจะแย่งคุมตำแหน่งกับเมาส์ แล้วตอนจบยังสลับสไปรท์ทับ dragSprite ที่เพิ่งตั้งไว้อีก
+        CancelSpawnAnimation();
 
         // เผื่อคว้าถ้วยขึ้นมาอีกครั้งระหว่างที่มันกำลังลอยกลับตำแหน่งเดิมอยู่ ต้องหยุด animation เก่าก่อน ไม่งั้นจะแย่งกันควบคุมตำแหน่ง
         if (snapMoveCoroutine != null)

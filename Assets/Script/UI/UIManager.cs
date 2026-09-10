@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro; // �Ӥѭ: ��ͧ��������� TextMeshPro
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -171,6 +172,14 @@ public class UIManager : MonoBehaviour
     [Tooltip("เวลาที่หน้าจอแพ้ใช้เด้งขึ้นมา")]
     public float losePanelPopDuration = 0.4f;
 
+    [Header("ปุ่มบนหน้าจอแพ้")]
+    [Tooltip("ปุ่ม \"เล่นใหม่\" ที่อยู่ในแผงหน้าจอแพ้ ลากมาใส่ช่องนี้ช่องเดียว\nไม่ต้องไปผูก On Click ที่ตัวปุ่มเอง ระบบผูกให้ตอนเริ่มฉาก")]
+    public Button loseRetryButton;
+    [Tooltip("ปุ่ม \"กลับเมนูหลัก\" ที่อยู่ในแผงหน้าจอแพ้ ลากมาใส่ช่องนี้ช่องเดียว\nไม่ต้องไปผูก On Click ที่ตัวปุ่มเอง ระบบผูกให้ตอนเริ่มฉาก")]
+    public Button loseMainMenuButton;
+    [Tooltip("ชื่อฉากเมนูหลัก ต้องสะกดตรงกับชื่อฉากจริง และเพิ่มฉากนี้ใน File > Build Settings ด้วย")]
+    public string mainMenuSceneName = "MainMenu";
+
     private Coroutine losePanelRoutine;
     private CanvasGroup losePanelCanvasGroup;
     private Vector3 losePanelBaseScale = Vector3.one;
@@ -198,6 +207,56 @@ public class UIManager : MonoBehaviour
         ApplyListeningFill();
 
         if (backgroundSprite != null) backgroundSprite.color = backgroundNormalColor;
+
+        // ผูกปุ่มหน้าจอแพ้จากโค้ดแทนการผูกใน Inspector จะได้ไม่มีเคสลืมผูกแล้วปุ่มกดไม่ติด
+        // (แผงหน้าจอแพ้ปิดอยู่ตอนเริ่มฉาก แต่ผูกได้เพราะถือ reference ของปุ่มไว้ตรง ๆ)
+        if (loseRetryButton != null) loseRetryButton.onClick.AddListener(OnClickRetry);
+        if (loseMainMenuButton != null) loseMainMenuButton.onClick.AddListener(OnClickBackToMainMenu);
+    }
+
+    private void OnDestroy()
+    {
+        if (loseRetryButton != null) loseRetryButton.onClick.RemoveListener(OnClickRetry);
+        if (loseMainMenuButton != null) loseMainMenuButton.onClick.RemoveListener(OnClickBackToMainMenu);
+    }
+
+    // ปุ่ม "เล่นใหม่" บนหน้าจอแพ้: โหลดฉากเดิมซ้ำ ค่าต่าง ๆ ใน GameManager จะถูกรีเซ็ตไปเองพร้อมฉาก
+    public void OnClickRetry()
+    {
+        LeaveLoseScreen();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    // ปุ่ม "กลับเมนูหลัก" บนหน้าจอแพ้
+    public void OnClickBackToMainMenu()
+    {
+        if (string.IsNullOrWhiteSpace(mainMenuSceneName))
+        {
+            Debug.LogError("[UIManager] ยังไม่ได้ตั้ง Main Menu Scene Name ไว้ใน Inspector เลยไม่รู้ว่าต้องกลับไปฉากไหน");
+            return;
+        }
+
+        // เช็คตั้งแต่ตอนนี้เลย จะได้ไม่คืน timeScale ทิ้งไว้แล้วไปพังตอน LoadScene
+        if (!Application.CanStreamedLevelBeLoaded(mainMenuSceneName))
+        {
+            Debug.LogError($"[UIManager] โหลดฉาก '{mainMenuSceneName}' ไม่ได้! เช็คชื่อฉากให้ตรง และเพิ่มฉากนี้ใน File > Build Settings ด้วย");
+            return;
+        }
+
+        LeaveLoseScreen();
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
+
+    // งานที่ต้องเก็บกวาดเหมือนกันทั้งสองปุ่ม ก่อนจะออกจากหน้าจอแพ้ไปฉากใหม่
+    private void LeaveLoseScreen()
+    {
+        // กันเคสที่มีอะไรไปตั้ง timeScale = 0 ค้างไว้ ไม่งั้นฉากใหม่จะเปิดมาแล้วค้างนิ่งทั้งฉาก
+        Time.timeScale = 1f;
+
+        // SoundManager ข้ามฉากไปด้วย (DontDestroyOnLoad) เสียงประกอบที่ค้างอยู่เลยตามไปดังในฉากใหม่ได้
+        if (SoundManager.Instance != null) SoundManager.Instance.StopAllSFX();
+
+        HideLosePanel();
     }
 
     public void SetBackgroundDark(bool isDark)
@@ -248,6 +307,7 @@ public class UIManager : MonoBehaviour
             for (int i = seconds; i > 0; i--)
             {
                 centerWarningText.text = $"���ѹ�... {i}";
+                SoundManager.Instance.PlaySFX(SoundIds.UiCountdownTick);
                 yield return new WaitForSeconds(1f);
             }
 
@@ -272,11 +332,7 @@ public class UIManager : MonoBehaviour
 
         if (!isVisible) return;
 
-        NotebookManager notebook = notebookManager;
-        if (notebook == null)
-        {
-            notebook = FindObjectOfType<NotebookManager>(true);
-        }
+        NotebookManager notebook = ResolveNotebook();
 
         if (notebook != null)
         {
@@ -288,16 +344,36 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // หน้าจอแพ้ เรียกจาก GameManager ตอนเข้าสถานะ Lose
-    // (ทำพลาดเกิน Max Mistakes Allowed / เก็บเบาะแสไม่ถึง Required Clues To Pass / จับผิดคน)
-    public void ShowLosePanel(string reason)
+    // สมุดมักถูกปิด GameObject ไว้ตอนที่ยังไม่ได้ใช้ ต้องหาแบบรวมของที่ปิดอยู่ด้วย
+    private NotebookManager ResolveNotebook()
     {
-        // เก็บ HUD ตอนเล่นให้หมดก่อน ไม่งั้นแถบสืบสวน/กล้องส่องทางไกล/ข้อความนับถอยหลัง
-        // จะค้างทับอยู่บนหน้าจอแพ้ (แพ้กลางวันได้ เช่นทำพลาดครบโควตาระหว่างกำลังสืบสวนอยู่)
+        if (notebookManager != null) return notebookManager;
+
+        return FindObjectOfType<NotebookManager>(true);
+    }
+
+    // เก็บของที่ค้างอยู่บนจอตอนเล่นให้หมด ก่อนจะเปิดหน้าจอจบเกม (หน้าจอแพ้ หรือแผงสรุปผลตอนจบด่าน)
+    // ไม่งั้นแถบสืบสวน/กล้องส่องทางไกล/ข้อความนับถอยหลังจะค้างทับอยู่
+    // (แพ้กลางวันได้ เช่นทำพลาดครบโควตาระหว่างกำลังสืบสวนอยู่)
+    public void HideGameplayHudForEnding()
+    {
         ShowListeningBar(false);
         ShowBinocularsOverlay(false);
         ShowInvestigateTimer(false);
         if (centerWarningText != null) centerWarningText.gameObject.SetActive(false);
+
+        // หน้าประวัติที่ลอยไปโชว์กลางจอถูกย้ายออกไปแขวนบน Canvas ชั้นบนสุดตั้งแต่ก่อนสมุดหุบ
+        // มันเลยไม่ได้ถูกปิดตามสมุดไปด้วย และค้างบังหน้าจอจบเกมอยู่ ต้องสั่งเก็บเองตรงนี้
+        // เรียกทุกครั้งที่จบเกม ไม่ใช่เฉพาะทางที่มาจากการปั๊ม เพราะทางอื่นหน้านี้ถูกปิดอยู่แล้ว สั่งซ้ำก็ไม่มีผลอะไร
+        NotebookManager notebook = ResolveNotebook();
+        if (notebook != null) notebook.HideSuspectShowcase();
+    }
+
+    // หน้าจอแพ้ เรียกจาก GameManager ตอนเข้าสถานะ Lose
+    // (ทำพลาดเกิน Max Mistakes Allowed / เก็บเบาะแสไม่ถึง Required Clues To Pass / จับผิดคน)
+    public void ShowLosePanel(string reason)
+    {
+        HideGameplayHudForEnding();
 
         if (loseReasonText != null && !string.IsNullOrEmpty(reason))
         {

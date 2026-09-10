@@ -15,6 +15,10 @@ public class ChiliBottle : MonoBehaviour, IDraggable
     [Tooltip("Reset shake progress if the player stops shaking.")]
     [SerializeField] private float shakeResetDelay = 0.4f;
 
+    [Header("Pickup")]
+    [Tooltip("ระยะเวลาที่ขวดค่อย ๆ หมุนเข้าท่าเขย่าตอนเพิ่งคว้าขึ้นมา (0 = หมุนทันทีแบบเดิม)")]
+    [SerializeField] private float pickupRotationDuration = 0.15f;
+
     [Header("Shake Rotation")]
     [SerializeField] private float baseDragRotation = 165f;
     [SerializeField] private float shakeRotationAngle = 20f;
@@ -41,6 +45,9 @@ public class ChiliBottle : MonoBehaviour, IDraggable
 
     private float shakeRotationOffset;
     private float targetShakeRotationOffset;
+
+    private Quaternion grabStartRotation;
+    private float pickupRotationBlend;
 
     private Coroutine snapMoveCoroutine;
 
@@ -81,7 +88,13 @@ public class ChiliBottle : MonoBehaviour, IDraggable
                 sr.sprite = dragSprite;
         }
 
-        transform.rotation = Quaternion.Euler(0, 0, baseDragRotation);
+        // ค่อย ๆ หมุนเข้าท่าเขย่าจากมุมที่ขวดวางอยู่ แทนที่จะสะบัดเข้าท่าในเฟรมเดียวพร้อมกับที่ตัวขวดเลื่อนเข้าหาเมาส์
+        grabStartRotation = transform.rotation;
+        pickupRotationBlend = pickupRotationDuration > 0f ? 0f : 1f;
+        ApplyDragRotation();
+
+        // ดังตอนคว้าขวดขึ้นมาเท่านั้น ไม่เกี่ยวกับตอนเขย่าใส่พริก (นั่นคือ SoundIds.ChiliShake)
+        SoundManager.Instance.PlaySFX(SoundIds.ChiliBottlePickup, transform.position);
     }
 
     public void OnDrag(Vector2 mousePos)
@@ -108,10 +121,14 @@ public class ChiliBottle : MonoBehaviour, IDraggable
 
             float direction = Mathf.Sign(deltaY);
 
+            // จังหวะเขย่า 1 ครั้ง = ตอนเมาส์กลับทิศ (หรือครั้งแรกที่เริ่มขยับ) ใช้เป็นจังหวะของเสียงด้วย
+            bool shookThisFrame = false;
+
             if (lastShakeDirection != 0f && direction != lastShakeDirection)
             {
                 shakeProgress += absDeltaY;
                 targetShakeRotationOffset = direction * shakeRotationAngle;
+                shookThisFrame = true;
 
                 if (powderEffect != null)
                     powderEffect.SpawnPuff();
@@ -120,21 +137,46 @@ public class ChiliBottle : MonoBehaviour, IDraggable
             {
                 shakeProgress += absDeltaY * 0.5f;
                 targetShakeRotationOffset = direction * shakeRotationAngle;
+                shookThisFrame = true;
             }
 
             lastShakeDirection = direction;
+
+            bool seasonedThisFrame = false;
 
             if (shakeProgress >= requiredShake)
             {
                 if (TryApplySeasoning(mousePos))
                 {
                     shakeProgress = 0f;
+                    seasonedThisFrame = true;
                 }
+            }
+
+            // เขย่าเปล่า ๆ ก็ต้องได้ยินเสียงขวด ผู้เล่นจะได้รู้ว่ากำลังเขย่าอยู่จริง
+            // ยกเว้นจังหวะที่พริกลงบนอาหารสำเร็จ จังหวะนั้นปล่อยให้เป็นเสียง chili_shake ตัวเดียว ไม่ให้ทับกัน
+            if (shookThisFrame && !seasonedThisFrame)
+            {
+                SoundManager.Instance.PlaySFX(SoundIds.ChiliBottleShake, transform.position);
             }
         }
 
         shakeRotationOffset = Mathf.Lerp(shakeRotationOffset, targetShakeRotationOffset, Time.deltaTime * shakeRotationSpeed);
-        transform.rotation = Quaternion.Euler(0, 0, baseDragRotation + shakeRotationOffset);
+
+        if (pickupRotationBlend < 1f)
+            pickupRotationBlend = Mathf.Clamp01(pickupRotationBlend + Time.deltaTime / pickupRotationDuration);
+
+        ApplyDragRotation();
+    }
+
+    // ท่าเขย่าคือปลายทาง แต่ช่วงแรกหลังคว้ายังผสมกับมุมตอนวางอยู่ เพื่อให้หมุนเข้าท่าแบบไหลลื่น
+    private void ApplyDragRotation()
+    {
+        Quaternion dragRotation = Quaternion.Euler(0, 0, baseDragRotation + shakeRotationOffset);
+
+        transform.rotation = pickupRotationBlend >= 1f
+            ? dragRotation
+            : Quaternion.Slerp(grabStartRotation, dragRotation, pickupRotationBlend);
     }
 
     private bool TryApplySeasoning(Vector2 mousePos)

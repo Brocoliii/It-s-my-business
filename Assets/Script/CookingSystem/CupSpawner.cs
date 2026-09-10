@@ -31,6 +31,8 @@ public class CupSpawner : MonoBehaviour, IClickable
 
         currentCupInScene = Instantiate(cupPrefab, targetPos, Quaternion.identity);
 
+        SoundManager.Instance.PlaySFX(SoundIds.CupSpawn, targetPos);
+
         // เรียกทันทีในเฟรมเดียวกับ Instantiate เพื่อให้ทัน Start() ของ Cup เอง
         // ถ้วยจะได้โผล่ที่ spawnPoint แล้วเด้งไปตกที่ cupArea แทนที่จะร่วงลงมาตรงๆ ที่ตัวเอง
         Cup cup = currentCupInScene.GetComponent<Cup>();

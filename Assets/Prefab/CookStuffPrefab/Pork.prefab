@@ -81,12 +81,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 7
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -5427246110697564293, guid: 8e5e09ea4aa1b82419d48d6a56457801, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8e5e09ea4aa1b82419d48d6a56457801, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 0.48235294}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.56, y: 4.73}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -369,7 +369,7 @@ SpriteRenderer:
   m_Size: {x: 1.53, y: 4.69}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
 --- !u!50 &7539934567739446598
 Rigidbody2D:
@@ -414,7 +414,7 @@ MonoBehaviour:
   sideAProgress: 0
   sideBProgress: 0
   isFacingSideA: 1
-  _burnTime: 10
+  _burnTime: 20
   defaultLayer: UI
   dragLayer: Extra2
   mirrorSpriteWhenFlipped: 1
@@ -431,7 +431,14 @@ MonoBehaviour:
   shadowObject: {fileID: 2488588360096412179}
   enableGrillSmoke: 1
   smokeEffect: {fileID: 0}
+  enableDragSway: 1
+  swayAnglePerSpeed: 2.2
+  swayMaxAngle: 16
+  swayStiffness: 90
+  swayDamping: 12
   snapMoveDuration: 0.15
+  trayPopDuration: 0.2
+  trayPopOvershoot: 1.15
   startDragPos: {x: 0, y: 0, z: 0}
   currentGrill: {fileID: 0}
   currentSeasoning: {fileID: 0}

@@ -1,0 +1,751 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfac21a14f557544b8389ea74dca282d, type: 3}
+  m_Name: SoundLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::SoundLibrary
+  sfx:
+  - id: grill_sizzle
+    clips:
+    - {fileID: 8300000, guid: bbe89cdd0366559408154c09f20d1509, type: 3}
+    volume: 0.15
+    minPitch: 1
+    maxPitch: 1
+    loop: 1
+    seamlessLoop: 1
+    loopStartTrim: 0.15
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: food_pickup
+    clips:
+    - {fileID: 8300000, guid: 2ae646d734eae9d409432baa0762faf1, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_shutter
+    clips:
+    - {fileID: 8300000, guid: 98611d3d36ff4b0479dc3929bd7d3628, type: 3}
+    volume: 0.65
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: food_flip
+    clips:
+    - {fileID: 8300000, guid: 8e415efe547166a41ad5abb554e85db0, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: food_place_grill
+    clips:
+    - {fileID: 8300000, guid: d8680b22a9b8c13419d2adf249f69242, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: sauce_brush
+    clips:
+    - {fileID: 8300000, guid: 520ce113b0a802048af8acd1a73ac18a, type: 3}
+    volume: 0.55
+    minPitch: 0.55
+    maxPitch: 1.25
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: chili_shake
+    clips:
+    - {fileID: 8300000, guid: 5a4217d569f159d4aac6212ab4599753, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: cup_spawn
+    clips:
+    - {fileID: 8300000, guid: f709dcd330ee0384384e3ac086f9638b, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: seasoning_place
+    clips:
+    - {fileID: 8300000, guid: d8680b22a9b8c13419d2adf249f69242, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: customer_happy
+    clips:
+    - {fileID: 8300000, guid: d929ee3ec24992a4fa82a7dd7352606f, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: customer_angry
+    clips:
+    - {fileID: 8300000, guid: 1a19b9596bd1d2946917f6eb80a1ab0b, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: customer_order
+    clips:
+    - {fileID: 8300000, guid: 4d0b2986533a3294a8961f9233bd8a75, type: 3}
+    volume: 0.85
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: customer_leave
+    clips:
+    - {fileID: 8300000, guid: ee245a9c86b7f0343889e1f71aa5ccf7, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: customer_arrive
+    clips:
+    - {fileID: 8300000, guid: ee245a9c86b7f0343889e1f71aa5ccf7, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: dialogue_type
+    clips:
+    - {fileID: 8300000, guid: e9ea5d3c75bbd194b89d17beb273a01f, type: 3}
+    volume: 0.35
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: dialogue_arrive
+    clips:
+    - {fileID: 8300000, guid: ee245a9c86b7f0343889e1f71aa5ccf7, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: dialogue_leave
+    clips:
+    - {fileID: 8300000, guid: ee245a9c86b7f0343889e1f71aa5ccf7, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: trash_drop
+    clips:
+    - {fileID: 8300000, guid: 5acece3e2d225ff4c9c2478914d05e05, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: binoculars_on
+    clips:
+    - {fileID: 8300000, guid: b18565854df5fec4ebadc3570b3f5c45, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: binoculars_off
+    clips:
+    - {fileID: 8300000, guid: 5a31f454044d25646878e6f28d5897f5, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: investigate_correct
+    clips:
+    - {fileID: 8300000, guid: 84917dbed162ccb4e933e2209d77d836, type: 3}
+    volume: 0.55
+    minPitch: 0.75
+    maxPitch: 1.15
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: investigate_wrong
+    clips:
+    - {fileID: 8300000, guid: 8d3947da12676c444bb07b4014065531, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: investigate_success
+    clips:
+    - {fileID: 8300000, guid: 3c526d50ce5da0a4598886baf7d78d7d, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: food_burnt
+    clips:
+    - {fileID: 8300000, guid: 873ec633ef1911f4f9ed0da27858ed64, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: food_cooked
+    clips:
+    - {fileID: 8300000, guid: f8818394daa897e4cb5ad35a8b680d2a, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: stage_lose
+    clips:
+    - {fileID: 8300000, guid: fb17c7ecf4ace7d4989d5817a7765c95, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: sauce_brush_pickup
+    clips:
+    - {fileID: 8300000, guid: 2ae646d734eae9d409432baa0762faf1, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: chili_bottle_pickup
+    clips:
+    - {fileID: 8300000, guid: 2ae646d734eae9d409432baa0762faf1, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: chili_bottle_shake
+    clips:
+    - {fileID: 8300000, guid: 5a4217d569f159d4aac6212ab4599753, type: 3}
+    volume: 0.1
+    minPitch: 0.45
+    maxPitch: 1.25
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: sauce_done
+    clips:
+    - {fileID: 8300000, guid: 673ad213c89bd454cbb84fb1a2a31cbd, type: 3}
+    volume: 0.45
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: food_into_cup
+    clips:
+    - {fileID: 8300000, guid: d8680b22a9b8c13419d2adf249f69242, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_click
+    clips:
+    - {fileID: 8300000, guid: efc73529d62786541952dc07e77374be, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_hover
+    clips:
+    - {fileID: 8300000, guid: d8680b22a9b8c13419d2adf249f69242, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_ready
+    clips:
+    - {fileID: 8300000, guid: 4d0b2986533a3294a8961f9233bd8a75, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_go
+    clips:
+    - {fileID: 8300000, guid: 4d0b2986533a3294a8961f9233bd8a75, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: investigate_timeout
+    clips:
+    - {fileID: 8300000, guid: 873ec633ef1911f4f9ed0da27858ed64, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: stage_win
+    clips:
+    - {fileID: 8300000, guid: 71faddf06c8f3584fa1e96bb702dce81, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_notebook_open
+    clips:
+    - {fileID: 8300000, guid: 12cae0755fc988f49a1e1ae2c593dbfb, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_notebook_close
+    clips: []
+    volume: 0.85
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_stamp
+    clips:
+    - {fileID: 8300000, guid: 0cafc125b00a74d49a90d84fd9782245, type: 3}
+    volume: 0.75
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_day_complete
+    clips:
+    - {fileID: 8300000, guid: 74933518b0fccc547b6392e0d1af07dc, type: 3}
+    volume: 0.85
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_page_turn
+    clips:
+    - {fileID: 8300000, guid: 588bebd4f1954304c90acfddcda9a1ec, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: investigate_appear
+    clips:
+    - {fileID: 8300000, guid: 2dd43572610f7a74b92e4cd4dd7b7033, type: 3}
+    volume: 0.5
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  bgm:
+  - id: bgm_main_menu
+    clips:
+    - {fileID: 8300000, guid: 55778b3a4e22cdf419f77109823f5136, type: 3}
+    volume: 0.25
+    minPitch: 0.1
+    maxPitch: 0.1
+    loop: 1
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: bgm_stage1
+    clips:
+    - {fileID: 8300000, guid: e9f134f799ead784b93b785ff77297b8, type: 3}
+    volume: 0.25
+    minPitch: 0.1
+    maxPitch: 0.1
+    loop: 1
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: bgm_notebook
+    clips:
+    - {fileID: 8300000, guid: 075eddb48de74b345b55d8a9880170f8, type: 3}
+    volume: 0.85
+    minPitch: 0.1
+    maxPitch: 0.1
+    loop: 1
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0

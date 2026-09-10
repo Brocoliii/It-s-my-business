@@ -4,7 +4,12 @@ public class GrillStation : MonoBehaviour
 {
     [Header("จุดวางหมู (ลาก Empty Object 3 อันมาใส่)")]
     public Transform[] slots = new Transform[3];
-    public FoodInstance[] foodsOnSlots = new FoodInstance[3];
+
+    // สถานะระหว่างเล่น ไม่ใช่ค่าตั้งต้น จึงห้ามให้ Inspector เก็บค่าไว้ในซีน
+    // ตอนเป็น public ขนาดอาร์เรย์จะมาจากค่าที่ค้างอยู่ในซีน ไม่ได้ผูกกับจำนวนช่องใน slots
+    // พอสองอันยาวไม่เท่ากัน ลูปหาช่องว่างจะเด้ง IndexOutOfRange กลางจังหวะปล่อยเมาส์
+    // แล้วทั้งจังหวะวางตายยกก้อน (อาหารไม่ถูกวาง ไม่ถูกดีดกลับ และยังค้างติดมืออยู่)
+    private FoodInstance[] foodsOnSlots = new FoodInstance[3];
 
     [Header("Drop Area")]
     [SerializeField] private Collider2D dropArea;
@@ -13,10 +18,39 @@ public class GrillStation : MonoBehaviour
     [Header("ระยะการดูดเข้าช่อง (ปรับลดลงถ้ารู้สึกว่าดูดไกลไป)")]
     public float snapRadius = 0.5f;
 
+    // ให้ debug/สคริปต์ภายนอกอ่านได้ว่าตอนนี้มีอาหารอยู่ในช่องไหนบ้าง
+    public FoodInstance[] FoodsOnSlots
+    {
+        get
+        {
+            EnsureSlotArraySize();
+            return foodsOnSlots;
+        }
+    }
+
     private void Awake()
     {
         if (dropArea == null) dropArea = GetComponent<Collider2D>();
         if (dropArea == null) dropArea = GetComponentInChildren<Collider2D>();
+
+        EnsureSlotArraySize();
+    }
+
+    // ช่องจองต้องมีจำนวนเท่ากับช่องวางเสมอ ไม่งั้นการเข้าถึงคู่กันด้วย index เดียวจะหลุดขอบ
+    private void EnsureSlotArraySize()
+    {
+        if (slots == null) slots = new Transform[0];
+        if (foodsOnSlots != null && foodsOnSlots.Length == slots.Length) return;
+
+        FoodInstance[] resized = new FoodInstance[slots.Length];
+
+        if (foodsOnSlots != null)
+        {
+            int carryOver = Mathf.Min(foodsOnSlots.Length, resized.Length);
+            for (int i = 0; i < carryOver; i++) resized[i] = foodsOnSlots[i];
+        }
+
+        foodsOnSlots = resized;
     }
 
     public bool IsWithinDropArea(Vector2 worldPos)
@@ -26,52 +60,122 @@ public class GrillStation : MonoBehaviour
             return Vector2.Distance(worldPos, transform.position) <= 1f;
         }
 
+        // เทียบเฉพาะระนาบ XY เท่านั้น ห้ามใช้ bounds.Contains ตรงๆ
+        // เพราะ Collider2D.bounds หนาแกน z เป็นศูนย์ และวางอยู่ที่ค่า z ของ transform
+        // ส่วนจุดที่ส่งเข้ามาถูกตัด z ทิ้งเป็น 0 เสมอ (มาจาก Vector2)
+        // เตาที่ถูกดันไปที่ z อื่นเพื่อจัดเลเยอร์ภาพ จึงไม่มีวันอยู่ในเขตวางเลยสักครั้ง
         Bounds bounds = dropArea.bounds;
-        bounds.Expand(dropPadding * 2f);
-        return bounds.Contains(worldPos);
+        return worldPos.x >= bounds.min.x - dropPadding
+            && worldPos.x <= bounds.max.x + dropPadding
+            && worldPos.y >= bounds.min.y - dropPadding
+            && worldPos.y <= bounds.max.y + dropPadding;
     }
 
     public bool TrySnapToSlot(FoodInstance food, out Vector3 snapPos)
     {
-        return TrySnapToSlot(food, food.Position, out snapPos);
+        return TrySnapToSlot(food, food.Position, out snapPos, false);
     }
 
     // รับตำแหน่งที่จะใช้เช็คระยะแยกจาก food.Position ปัจจุบัน
     // (เคสดีดกลับ startDragPos ยังไม่ได้ขยับจริงตอนเช็ค เพราะ SnapToPosition เป็นแอนิเมชันค่อยๆ เลื่อน)
     public bool TrySnapToSlot(FoodInstance food, Vector2 checkPosition, out Vector3 snapPos)
     {
+        return TrySnapToSlot(food, checkPosition, out snapPos, false);
+    }
+
+    // ignoreSnapRadius: ผู้เล่นปล่อยมือในเขต Drop Area แล้ว = ตั้งใจวางลงเตาแน่ๆ
+    // ให้ดูดเข้าช่องว่างที่ใกล้ที่สุดไปเลย ไม่ต้องวัด snapRadius ซ้ำ
+    // ถ้ายังวัดอยู่ Drop Area จะเป็นได้แค่ "ตัวกรองให้เขตวางแคบลง" เพราะเขตที่วางสำเร็จจริง
+    // คือส่วนที่ Drop Area ทับกับวงกลมรัศมี snapRadius รอบช่องเท่านั้น ขยาย collider ยังไงก็ไม่มีผล
+    public bool TrySnapToSlot(FoodInstance food, Vector2 checkPosition, out Vector3 snapPos, bool ignoreSnapRadius)
+    {
         snapPos = Vector3.zero;
+        if (food == null) return false;
+
+        EnsureSlotArraySize();
+
         int bestSlot = -1;
         float minDistance = float.MaxValue;
 
         for (int i = 0; i < slots.Length; i++)
         {
-            if (foodsOnSlots[i] == null)
+            // ช่องที่ยังไม่ได้ลากอะไรมาใส่ใน Inspector ต้องข้าม ไม่ใช่ปล่อยให้ NullReference
+            // ระเบิดกลางจังหวะปล่อยเมาส์จนการวางทั้งครั้งนั้นตายไปทั้งยวง
+            if (slots[i] == null) continue;
+            if (foodsOnSlots[i] != null) continue;
+
+            float dist = Vector2.Distance(checkPosition, slots[i].position);
+            if (dist < minDistance)
             {
-                float dist = Vector2.Distance(checkPosition, slots[i].position);
-                if (dist < minDistance)
-                {
-                    minDistance = dist;
-                    bestSlot = i;
-                }
+                minDistance = dist;
+                bestSlot = i;
             }
         }
 
-        if (bestSlot != -1 && minDistance < snapRadius)
+        if (bestSlot == -1) return false;
+        if (!ignoreSnapRadius && minDistance >= snapRadius) return false;
+
+        foodsOnSlots[bestSlot] = food;
+
+        snapPos = new Vector3(slots[bestSlot].position.x, slots[bestSlot].position.y, food.Position.z);
+
+        food.currentGrill = this;
+
+        SoundManager.Instance.PlaySFX(SoundIds.FoodPlaceGrill, snapPos);
+
+        // SetGrilling เป็นตัวเปิดเสียงย่างที่ดังวนต่อเนื่อง ต้องเรียกหลังเสียงวางเสมอ
+        food.SetGrilling(true);
+        return true;
+    }
+
+    // หาตำแหน่งช่องที่อาหารชิ้นนี้จองไว้อยู่ ใช้ตอนต้องดึงมันกลับเข้าช่องให้ตรงเป๊ะ
+    // (เช่น ผู้เล่นแค่คลิกพลิก แล้วเมาส์ขยับนิดหน่อยจนตัวอาหารเลื่อนออกจากช่อง)
+    public bool TryGetSlotPosition(FoodInstance food, out Vector3 slotPos)
+    {
+        slotPos = Vector3.zero;
+        EnsureSlotArraySize();
+
+        for (int i = 0; i < slots.Length; i++)
         {
-            foodsOnSlots[bestSlot] = food;
-
-            snapPos = new Vector3(slots[bestSlot].position.x, slots[bestSlot].position.y, food.Position.z);
-
-            food.currentGrill = this;
-            food.SetGrilling(true);
-            return true;
+            if (foodsOnSlots[i] == food && slots[i] != null)
+            {
+                slotPos = new Vector3(slots[i].position.x, slots[i].position.y, food.Position.z);
+                return true;
+            }
         }
+
         return false;
+    }
+
+    // ล้างของที่ค้างอยู่บนเตาทั้งหมด (ใช้ตอนจบวัน) ทิ้งทั้งชิ้นเหมือนโยนลงถังขยะ
+    // ต้องปลดออกจากช่องด้วย SetGrilling(false) ก่อนทำลาย ไม่ใช่ Destroy ทิ้งเฉยๆ
+    // เพราะเสียงย่างที่ดังวนอยู่ต้องถูกสั่งหยุด และช่องต้องว่างให้ UI ดับตาม
+    // คืนจำนวนชิ้นที่เก็บไป เอาไว้ให้คนเรียกล็อกดูได้ว่าตอนจบวันมันทำงานจริงไหม
+    public int ClearAllFood()
+    {
+        int cleared = 0;
+        EnsureSlotArraySize();
+
+        for (int i = 0; i < foodsOnSlots.Length; i++)
+        {
+            FoodInstance food = foodsOnSlots[i];
+            if (food == null) continue;
+
+            foodsOnSlots[i] = null;
+            food.currentGrill = null;
+            food.SetGrilling(false);
+
+            Destroy(food.RootObject);
+            cleared++;
+        }
+
+        return cleared;
     }
 
     public void RemoveFood(FoodInstance food)
     {
+        EnsureSlotArraySize();
+
         for (int i = 0; i < slots.Length; i++)
         {
             if (foodsOnSlots[i] == food)

@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class GameOverController : MonoBehaviour
 {
-    
+
     [SerializeField] private GameObject gameOverPanel;
 
     private void Start()
@@ -14,22 +14,22 @@ public class GameOverController : MonoBehaviour
         }
     }
 
-    
+
     public void ShowGameOver()
     {
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-            Time.timeScale = 0f; 
+            Time.timeScale = 0f;
         }
     }
 
-    
+
     public void OnClickTryAgain()
     {
-        Time.timeScale = 1f; 
+        Time.timeScale = 1f;
 
-     
+
         string currentScene = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene(currentScene);
     }

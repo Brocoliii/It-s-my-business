@@ -49,6 +49,10 @@ public class FoodTray : MonoBehaviour
         // บอกให้ชัดว่าตัวแม่คือ root ที่เพิ่งเกิดมา เวลาลาก/ทิ้ง จะได้ยกไปทั้งชิ้น ไม่เหลือ root เปล่าค้างใน Hierarchy
         foodInstance.SetFoodRoot(newFoodObj.transform);
 
+        // ดังเฉพาะตอนหยิบวัตถุดิบใหม่ออกจากถาดเท่านั้น
+        // หยิบของที่วางอยู่บนเตา/โต๊ะปรุงรสขึ้นมาลากต่อ จะไม่มีเสียงนี้
+        SoundManager.Instance.PlaySFX(SoundIds.FoodPickup, worldPosition);
+
         // ให้ทั้งถาดและวัตถุดิบเด้งตอบรับพร้อมกัน ผู้เล่นจะได้รู้สึกว่าหยิบของออกมาจริงๆ
         PlayPickupAnimation();
         foodInstance.PlayTrayPickupAnimation();

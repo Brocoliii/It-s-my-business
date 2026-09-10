@@ -28,8 +28,8 @@ Transform:
   m_GameObject: {fileID: 2850507089811866249}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0059334, y: -0.016322, z: 0}
-  m_LocalScale: {x: 0.6827193, y: 0.6827193, z: 0.6827193}
+  m_LocalPosition: {x: -0.0055494, y: -0.042467, z: 0}
+  m_LocalScale: {x: 0.7611637, y: 0.7611637, z: 0.7611637}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2803011426794431383}
@@ -54,7 +54,7 @@ MonoBehaviour:
   dragSortingOrder: 20
   inCupScale: 0.8
   inCupRotationZ: -180
-  inCupRotationRandomRange: 10
+  inCupRotationRandomRange: 8
   baseHeightOffset: 0.7
   stackHeightSpacing: 0.05
   dropHeight: 3.5
@@ -68,6 +68,8 @@ MonoBehaviour:
   spawnFlySprite: {fileID: 9105557013367944754, guid: aebb9cb2fa44e924d858699d8f03efed, type: 3}
   dragSprite: {fileID: 9105557013367944754, guid: aebb9cb2fa44e924d858699d8f03efed, type: 3}
   snapMoveDuration: 0.2
+  dropArea: {fileID: 2267634404194592450}
+  dropPadding: 0.8
 --- !u!212 &7087620266697768629
 SpriteRenderer:
   serializedVersion: 2
@@ -161,7 +163,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.013457537, y: 0.2598641}
+  m_Offset: {x: 0.82108533, y: 0.5013442}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -171,7 +173,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 2.516931, y: 3.7633052}
+  m_Size: {x: 3.7476594, y: 4.374734}
   m_EdgeRadius: 0
 --- !u!1 &5128312129218593308
 GameObject:

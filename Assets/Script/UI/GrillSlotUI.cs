@@ -64,9 +64,14 @@ public class GrillSlotUI : MonoBehaviour
 
     private void Update()
     {
-        if (myGrillStation == null || myGrillStation.foodsOnSlots == null) return;
+        if (myGrillStation == null) return;
 
-        FoodInstance food = myGrillStation.foodsOnSlots[slotIndex];
+        FoodInstance[] slotFoods = myGrillStation.FoodsOnSlots;
+        // slotIndex ตั้งมือใน Inspector ถ้าชี้เกินจำนวนช่องจริงของเตา ต้องเงียบไว้
+        // ไม่ใช่โยน IndexOutOfRange รัวทุกเฟรมจนล็อกอื่นจมหายไปหมด
+        if (slotFoods == null || slotIndex < 0 || slotIndex >= slotFoods.Length) return;
+
+        FoodInstance food = slotFoods[slotIndex];
 
         if (food != subscribedFood)
         {

@@ -33,6 +33,12 @@ public class IntroDialogue : MonoBehaviour
     [Tooltip("ความเร็วในการสลับเฟรมตอนพูด (วินาทีต่อเฟรม ยิ่งน้อยยิ่งขยับปากถี่)")]
     public float talkFrameInterval = 0.12f;
 
+    [Header("🔊 เสียงตอนพูด")]
+    [Tooltip("เล่นเสียงพิมพ์ตัวอักษร (SoundIds.DialogueType) ตอน NPC กำลังพูด\nยังไม่ได้ใส่ไฟล์เสียงในคลังก็ไม่พัง แค่เงียบไปเฉย ๆ")]
+    public bool playTypingSound = true;
+    [Tooltip("ให้เสียงดัง 1 ครั้งต่อกี่ตัวอักษร (ใส่ 1 = ดังทุกตัว) ตั้งสูงขึ้นถ้าฟังแล้วรัวเกินไป")]
+    [Min(1)] public int typeSoundEveryNChars = 2;
+
     [Header("Debug")]
     [Tooltip("ปุ่มสำหรับข้าม Intro ทั้งหมดทันที (ใช้ตอนทดสอบเกม)")]
     public Button skipIntroButton;
@@ -176,8 +182,8 @@ public class IntroDialogue : MonoBehaviour
 
     private void Update()
     {
-        // ระบบรับการคลิกเมาส์
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        // ระบบรับการคลิกเมาส์ / กด Space
+        if (WasAdvancePressedThisFrame())
         {
             if (isTyping)
             {
@@ -192,6 +198,15 @@ public class IntroDialogue : MonoBehaviour
         }
     }
 
+    // คลิกซ้าย หรือกด Space ก็ได้ ทำงานเหมือนกันทุกอย่าง (ข้ามการพิมพ์ / ไปหน้าถัดไป)
+    private static bool WasAdvancePressedThisFrame()
+    {
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) return true;
+        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) return true;
+
+        return false;
+    }
+
     private IEnumerator IntroSequence()
     {
         // 1. หน่วงเวลาก่อนเริ่มเดิน (ถ้าตั้งค่าไว้) แล้วเดินเข้ามาจากนอกจอ (เดินช้าลงตอนใกล้ถึงจุดหมาย)
@@ -199,6 +214,11 @@ public class IntroDialogue : MonoBehaviour
         {
             yield return new WaitForSeconds(preWalkDelay);
         }
+
+        // เล่นตอนเริ่มก้าวเท้า (ไม่ใช่ตอนเดินถึง) จะได้ดังพร้อมกับที่ผู้เล่นเห็น NPC โผล่เข้ามาในจอ
+        // ยิงที่ stopPoint เพราะถ้าเสียงตั้ง Is 3D ไว้ จุดเกิดอยู่นอกจอจะไกลจนแทบไม่ได้ยิน
+        SoundManager.Instance.PlaySFX(SoundIds.DialogueArrive, stopPoint.position);
+
         yield return StartCoroutine(WalkTo(stopPoint.position));
 
         // 2. เด้งกรอบข้อความ (ตอนแรกจะยังไม่มีข้อความ)
@@ -224,6 +244,8 @@ public class IntroDialogue : MonoBehaviour
             SetIndicatorVisible(false);
             StartTalkingAnimation(); // ✨ เริ่มขยับปาก NPC ตอนกำลังพิมพ์ข้อความ
 
+            int charsSinceBlip = 0;
+
             foreach (char letter in sentence.ToCharArray())
             {
                 if (skipTyping) // ถ้าผู้เล่นกดคลิกข้าม
@@ -233,6 +255,7 @@ public class IntroDialogue : MonoBehaviour
                 }
 
                 dialogText.text += letter;
+                PlayTypingBlip(letter, ref charsSinceBlip);
                 yield return new WaitForSeconds(typeSpeed); // รอเวลาตามความเร็วที่ตั้งไว้
             }
 
@@ -254,6 +277,7 @@ public class IntroDialogue : MonoBehaviour
         yield return StartCoroutine(PopOutAnimation(dialogBubble));
 
         // 5. เดินกลับออกไปนอกจอ
+        SoundManager.Instance.PlaySFX(SoundIds.DialogueLeave, transform.position);
         yield return StartCoroutine(WalkTo(startPoint.position));
 
         // 5.5 โชว์ Ready? แล้วตามด้วย Go!!! เป็นการนับถอยหลังก่อนเริ่มเกมจริง
@@ -336,6 +360,34 @@ public class IntroDialogue : MonoBehaviour
         if (dialogCanvasGroup != null) dialogCanvasGroup.alpha = 0f;
     }
 
+    // เล่นเสียงพิมพ์ 1 ครั้งต่อทุก typeSoundEveryNChars ตัวอักษรที่ "มองเห็นได้จริง"
+    // charsSinceBlip ส่งเป็น ref เพราะต้องนับต่อเนื่องตลอดทั้งหน้าข้อความ ไม่ใช่รีเซ็ตทุกตัวอักษร
+    private void PlayTypingBlip(char letter, ref int charsSinceBlip)
+    {
+        if (!playTypingSound) return;
+
+        // เว้นวรรค/ขึ้นบรรทัด กับสระ-วรรณยุกต์ไทยที่ลอยอยู่บน-ล่างพยัญชนะ ไม่ต้องมีเสียง
+        // เพราะผู้เล่นไม่เห็นข้อความยาวขึ้น ถ้าให้ดังด้วยจะฟังเหมือนเสียงรัวไม่ตรงกับตัวหนังสือที่โผล่มา
+        if (char.IsWhiteSpace(letter) || IsThaiCombiningMark(letter)) return;
+
+        charsSinceBlip++;
+        if (charsSinceBlip < Mathf.Max(1, typeSoundEveryNChars)) return;
+
+        charsSinceBlip = 0;
+        SoundManager.Instance.PlaySFX(SoundIds.DialogueType, transform.position);
+    }
+
+    // สระบน/สระล่าง/ไม้ไต่คู้/วรรณยุกต์/การันต์ ที่เขียนซ้อนกับพยัญชนะตัวหน้า ไม่กินความกว้างเพิ่ม
+    private static bool IsThaiCombiningMark(char c)
+    {
+        // เทียบด้วยรหัสยูนิโค้ดแทนตัวอักษรตรง ๆ เผื่อไฟล์โดนบันทึกทับด้วยการเข้ารหัสอื่นแล้วตัวอักษรเพี้ยน
+        int code = c;
+
+        return code == 0x0E31                        // ไม้หันอากาศ
+            || (code >= 0x0E34 && code <= 0x0E3A)    // สระอิ-อื, สระอุ-อู, พินทุ
+            || (code >= 0x0E47 && code <= 0x0E4E);   // ไม้ไต่คู้, วรรณยุกต์, การันต์
+    }
+
     // เริ่มวนสลับสไปรท์ตอนพูด (ปากขยับ) ระหว่างที่ข้อความกำลังพิมพ์อยู่
     private void StartTalkingAnimation()
     {
@@ -397,11 +449,14 @@ public class IntroDialogue : MonoBehaviour
         readyGoRoot.gameObject.SetActive(true);
 
         if (readyGoImage != null) readyGoImage.sprite = readySprite;
+        // ยิงเสียงพร้อมกับที่ไอคอนเริ่มเด้งเข้ามา จะได้ดังตรงกับที่ผู้เล่นเห็น
+        SoundManager.Instance.PlaySFX(SoundIds.UiReady);
         yield return StartCoroutine(ScalePopIn(readyGoRoot, savedReadyGoScale, readyGoCanvasGroup));
         yield return new WaitForSeconds(readyHoldDuration);
         yield return StartCoroutine(ScalePopOut(readyGoRoot, readyGoCanvasGroup));
 
         if (readyGoImage != null) readyGoImage.sprite = goSprite;
+        SoundManager.Instance.PlaySFX(SoundIds.UiGo);
         yield return StartCoroutine(ScalePopIn(readyGoRoot, savedReadyGoScale, readyGoCanvasGroup));
         yield return new WaitForSeconds(goHoldDuration);
         yield return StartCoroutine(ScalePopOut(readyGoRoot, readyGoCanvasGroup));

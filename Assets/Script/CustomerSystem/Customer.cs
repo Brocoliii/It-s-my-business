@@ -80,6 +80,8 @@ public class Customer : MonoBehaviour
 
     [Header("ฐานข้อมูลรูปภาพ (ลากรูปจาก Project มาใส่)")]
     public Sprite[] spicySprites;
+    [Tooltip("สปริทตอนลูกค้าสั่งแบบไม่เผ็ด (ถ้าไม่ใส่ จะซ่อนไอคอนความเผ็ดไปเลยเหมือนเดิม)")]
+    public Sprite noSpicySprite;
     public Sprite sauceSprite;
     public Sprite noSauceSprite;
 
@@ -108,6 +110,8 @@ public class Customer : MonoBehaviour
 
         if (customerRenderer != null) normalRendererColor = customerRenderer.color;
         if (customerCanvas != null) customerCanvas.SetActive(false);
+
+        SoundManager.Instance.PlaySFX(SoundIds.CustomerArrive, standPosition);
 
         string sauceText = order.wantedSauce ? "ทาซอสด้วย" : "ไม่เอาซอส";
 
@@ -138,13 +142,16 @@ public class Customer : MonoBehaviour
             }
         }
 
-        if (spicyIcon != null && spicySprites.Length > 0)
+        if (spicyIcon != null)
         {
             if (order.wantedSpicyLevel == 0)
             {
-                spicyIcon.gameObject.SetActive(false);
+                // ไม่เผ็ด: ถ้ามีสปริท "ไม่เอาเผ็ด" ให้โชว์เหมือนฝั่งซอส ลูกค้าจะได้รู้ว่าสั่งไม่เผ็ดจริงๆ
+                // ไม่ใช่แค่ลืมใส่ไอคอน ถ้าไม่ได้ใส่สปริทไว้ก็ซ่อนไอคอนไปเลยเหมือนเดิม
+                spicyIcon.gameObject.SetActive(noSpicySprite != null);
+                if (noSpicySprite != null) spicyIcon.sprite = noSpicySprite;
             }
-            else
+            else if (spicySprites.Length > 0)
             {
                 spicyIcon.gameObject.SetActive(true);
                 int spriteIndex = Mathf.Clamp(order.wantedSpicyLevel - 1, 0, spicySprites.Length - 1);
@@ -280,7 +287,11 @@ public class Customer : MonoBehaviour
 
     public void ReceiveCup(Cup cup)
     {
-        if (isLeaving || isWalkingIn || cup.contents.Count == 0) return;
+        // isShowingReaction คือช่วงที่ลูกค้าค้างสปริทตอบสนอง (ถูก/ผิด/หมดความอดทน) รอเวลาก่อนเดินจากไป
+        // ช่วงนี้ isLeaving ยังเป็น false อยู่ ถ้าไม่กันไว้ ผู้เล่นจะยัดถ้วยซ้ำได้อีกใบ
+        // แล้วจะได้ ShowReactionAndLeave ซ้อนกันสองตัว สุดท้าย Leave() ถูกเรียกสองรอบ
+        // (นับพลาดสองครั้ง / คืนช่องสองครั้ง จนเกิดลูกค้าซ้อนช่องเดียวกัน)
+        if (isLeaving || isWalkingIn || isShowingReaction || cup.contents.Count == 0) return;
 
         if (cup.contents.Count != myOrder.wantedFoods.Count)
         {
@@ -359,6 +370,8 @@ public class Customer : MonoBehaviour
         isShowingReaction = true;
         Sprite reactionSprite = isSatisfied ? correctReactionSprite : wrongReactionSprite;
 
+        SoundManager.Instance.PlaySFX(isSatisfied ? SoundIds.CustomerHappy : SoundIds.CustomerAngry, transform.position);
+
         if (customerRenderer != null && reactionSprite != null)
         {
             customerRenderer.sprite = reactionSprite;
@@ -375,6 +388,9 @@ public class Customer : MonoBehaviour
         ApplyCustomerSprite(true);
         isShowingReaction = true;
 
+        // ความอดทนหมดก็นับเป็นการทำพลาดเหมือนกัน เลยใช้เสียงหงุดหงิดชุดเดียวกับตอนส่งอาหารผิด
+        SoundManager.Instance.PlaySFX(SoundIds.CustomerAngry, transform.position);
+
         yield return new WaitForSeconds(reactionDuration);
         isShowingReaction = false;
         Leave(false);
@@ -382,9 +398,24 @@ public class Customer : MonoBehaviour
 
     private void Leave(bool isSatisfied)
     {
+        // กันเรียกซ้ำจากทางอื่นที่อาจโผล่มาทีหลัง เพราะเรียกซ้ำหมายถึง
+        // AddMistake() ซ้ำ และ OnCustomerLeft() ซ้ำ (ช่องเดียวถูกคืนสองรอบ)
+        if (isLeaving) return;
+
         isLeaving = true;
-        if (!isSatisfied) GameManager.Instance.AddMistake();
-        else Debug.Log("ลูกค้าพอใจ จ่ายเงิน!");
+
+        SoundManager.Instance.PlaySFX(SoundIds.CustomerLeave, transform.position);
+
+        if (!isSatisfied)
+        {
+            GameManager.Instance.AddMistake();
+        }
+        else
+        {
+            // นับเป็นออเดอร์ที่ทำสำเร็จ ไว้โชว์บนแผงสรุปผลตอนจบด่าน
+            GameManager.Instance.AddCompletedOrder();
+            Debug.Log("ลูกค้าพอใจ จ่ายเงิน!");
+        }
 
         manager.OnCustomerLeft(mySlotIndex);
         StartCoroutine(WalkOutAnimation());
@@ -400,7 +431,13 @@ public class Customer : MonoBehaviour
 
         // ถ้าผู้เล่นกำลังสืบสวนอยู่พอดีตอนเดินมาถึง ห้ามโชว์ Canvas ออกมา
         // ต้องรอให้ SetCustomerVisible(true) จาก CustomerManager สั่งแสดงตอนเลิกสืบสวนแทน
-        if (customerCanvas != null && !isHiddenForInvestigation) StartCoroutine(ShowOrderCanvasAnimation());
+        if (customerCanvas != null && !isHiddenForInvestigation)
+        {
+            // เสียงสั่งอาหารดังตรงนี้เท่านั้น (ตอนป้ายออเดอร์เด้งขึ้นครั้งแรก)
+            // ห้ามไปใส่ใน ShowOrderCanvasAnimation เพราะตอนเลิกสืบสวนป้ายจะถูกเรียกโชว์ใหม่พร้อมกันทุกคน
+            SoundManager.Instance.PlaySFX(SoundIds.CustomerOrder, transform.position);
+            StartCoroutine(ShowOrderCanvasAnimation());
+        }
     }
 
     // หลังจากลูกค้าถือสปริทตอบสนอง (ถูก/ผิด) ค้างไว้ครบ reactionDuration แล้ว

@@ -225,6 +225,10 @@ public class DebugMenu : MonoBehaviour
             yield return shutter.PlayCloseSequence();
         }
 
+        // ปุ่ม Debug ข้ามมาที่สมุดตรง ๆ โดยไม่ผ่าน EndOfDayCoroutine ถ้าไม่เก็บของบนเตาตรงนี้ด้วย
+        // หมูจะค้างอยู่บนเตา (พร้อมเสียงย่าง) ทั้งที่จอเปลี่ยนไปหน้าเลือกคนร้ายแล้ว
+        if (GameManager.Instance != null) GameManager.Instance.ClearGrillsForEndOfDay();
+
         NotebookManager notebook = Object.FindAnyObjectByType<NotebookManager>(FindObjectsInactive.Include);
         if (notebook != null)
         {

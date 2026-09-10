@@ -13,6 +13,8 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
     [SerializeField] private float correctFlashDuration = 0.15f;
     [Tooltip("เวลารอหลังต่อชุดปุ่มครบ ก่อนชุดใหม่จะเด้งขึ้น เผื่อให้คลื่นไอคอนวิ่งจบก่อน")]
     [SerializeField] private float sequenceClearedDelay = 0.28f;
+    [Tooltip("เวลาห้ามกดเพิ่ม หลังชุดใหม่เด้งขึ้นมาแล้ว กันผู้เล่นรัวปุ่มค้างจากชุดก่อนแล้วกินปุ่มตัวแรกของชุดใหม่ไป")]
+    [SerializeField] private float postSequenceInputLockExtra = 0.12f;
     [Tooltip("เวลาค้างให้ผู้เล่นเห็นหลอดเต็มหลังเก็บเบาะแสได้ ก่อนแถบจะถูกซ่อนและกลุ่มจะหายไป")]
     [SerializeField] private float clueCompleteHoldDuration = 0.45f;
     [Tooltip("เวลารอสูงสุดให้หลอดวิ่งไปจนเต็ม กันค้างถ้าหลอดไม่ได้ถูกผูกไว้ใน Inspector")]
@@ -73,6 +75,20 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
     private Coroutine reactionCoroutine;
     private bool isHoldingCompleteBar = false;
     private bool skipRemainingCompleteHold = false;
+    private float stratagemInputUnlockTime = 0f;
+    private int stratagemGenerationToken = 0;
+
+    // ช่วงห้ามกดหลังต่อชุดปุ่มครบ ใช้เวลาแทนคอรูทีน จะได้ไม่ต้องคอยไล่เคลียร์ธงตามทางออกทุกทาง
+    private bool IsStratagemInputLocked => Time.time < stratagemInputUnlockTime;
+
+    private void LockStratagemInput(float duration)
+    {
+        if (duration <= 0f)
+            return;
+
+        // ต่อเวลาเท่านั้น ไม่ตัดให้สั้นลง เผื่อมีตัวล็อกอื่นที่ยาวกว่าค้างอยู่
+        stratagemInputUnlockTime = Mathf.Max(stratagemInputUnlockTime, Time.time + duration);
+    }
 
     // สำหรับ Debug/Skip เท่านั้น: บังคับให้กลุ่มออกจากฉากทันที ผ่านเส้นทางเดิม (RemoveGroup)
     // เพื่อให้ manager.OnGroupLeft ถูกเรียกด้วย ไม่งั้น activeGroups/occupiedPoints ใน InvestigationManager จะค้าง
@@ -105,6 +121,10 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
             UIManager.Instance.ShowInvestigateTimer(true);
             UIManager.Instance.UpdateInvestigateTimer(lifeTimer);
         }
+
+        // ยิงที่ตำแหน่งของกลุ่ม เผื่อเสียงตั้ง Is 3D ไว้ จะได้ดังมาจากมุมที่กลุ่มโผล่จริง
+        // ดังพร้อมกับที่แอนิเมชันเริ่มเด้งขึ้นพอดี ผู้เล่นจะได้หันไปมองทัน
+        SoundManager.Instance.PlaySFX(SoundIds.InvestigateAppear, transform.position);
 
         StartCoroutine(PlayAppearAnimation());
     }
@@ -217,6 +237,10 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         }
         else if (!isClueCollected)
         {
+            // หมดเวลาแล้วยังฟังไม่จบ = เบาะแสหลุด ดังเสียงเตือนตรงนี้ที่เดียว
+            // ไม่ไปใส่ใน RemoveGroup เพราะทางนั้นถูกเรียกตอนเก็บเบาะแสสำเร็จ
+            // และตอน Debug/Skip ด้วย จะกลายเป็นดังผิดจังหวะ
+            SoundManager.Instance.PlaySFX(SoundIds.InvestigateTimeout);
             RemoveGroup();
             return;
         }
@@ -261,6 +285,10 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
             // เล่นแอนิเมชันไอคอนเด้งขึ้นใหม่ทุกครั้งที่เริ่มฟัง แม้จะเป็นชุดเดิมที่ค้างไว้
             // ไม่งั้นไอคอนจะโผล่มาเฉย ๆ ตอนกดฟังซ้ำ
             pendingSequenceIntro = true;
+
+            SoundManager.Instance.PlaySFX(SoundIds.BinocularsOn);
+            SoundManager.Instance.PlaySFX(SoundIds.InvestigateStart);
+
             UIManager.Instance.ShowListeningBar(true);
             UIManager.Instance.ShowBinocularsOverlay(true);
             UIManager.Instance.ShowInvestigateSequence(true);
@@ -279,7 +307,10 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
 
     public void OnStratagemInput(StratagemDirection direction)
     {
-        if (!isBeingListened || isClueCollected || isResettingAfterMistake || isRemoving)
+        // IsStratagemInputLocked = ยังอยู่ในจังหวะฉลองต่อชุดครบ ปุ่มที่กดช่วงนี้ต้องทิ้งทั้งหมด
+        // ห้ามปล่อยให้หลุดไปถึง EnsureStratagemExists เพราะตอนนั้น index เลยท้ายชุดไปแล้ว
+        // มันจะสุ่มชุดใหม่ให้ทันทีตั้งแต่ปุ่มแรกที่กด = ข้ามคลื่นไอคอนฉลอง แล้วชุดใหม่ก็โดนกินไปหนึ่งปุ่มโดยที่ผู้เล่นยังไม่ทันเห็น
+        if (!isBeingListened || isClueCollected || isResettingAfterMistake || isRemoving || IsStratagemInputLocked)
             return;
 
         EnsureStratagemExists();
@@ -289,10 +320,12 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
 
         if (direction == currentStratagem[currentStratagemIndex])
         {
+            SoundManager.Instance.PlaySFX(SoundIds.InvestigateCorrect);
             HandleCorrectInputFeedback();
         }
         else
         {
+            SoundManager.Instance.PlaySFX(SoundIds.InvestigateWrong);
             StartCoroutine(HandleWrongInputFeedback());
         }
     }
@@ -302,6 +335,9 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         if (isBeingListened)
         {
             isBeingListened = false;
+
+            SoundManager.Instance.PlaySFX(SoundIds.BinocularsOff);
+
             UIManager.Instance.ShowListeningBar(false);
             UIManager.Instance.ShowBinocularsOverlay(false);
             UIManager.Instance.ShowInvestigateSequence(false);
@@ -333,6 +369,8 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
 
     private void GenerateNewStratagem()
     {
+        // ทุกครั้งที่สุ่มชุดใหม่ถือเป็นการยกเลิกคิวสุ่มชุดใหม่ที่ค้างอยู่
+        stratagemGenerationToken++;
         currentStratagem.Clear();
 
         for (int i = 0; i < stratagemLength; i++)
@@ -344,9 +382,11 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         pendingSequenceIntro = true;
     }
 
-    private void RefreshInvestigationUI()
+    // force = true ใช้เฉพาะตอนต้องล้างสีแฟลชหลังติดธง isClueCollected แล้ว
+    // (ระหว่างค้างหลอดเต็มก่อนซ่อนแถบ) ไอคอนยังอยู่บนจอและผู้เล่นยังเห็นอยู่
+    private void RefreshInvestigationUI(bool force = false)
     {
-        if (UIManager.Instance == null || isClueCollected)
+        if (UIManager.Instance == null || (isClueCollected && !force))
             return;
 
         float progress = requiredListenTime <= 0f ? 0f : currentListenTime / requiredListenTime;
@@ -407,6 +447,10 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
                 return;
             }
 
+            // ล็อกปุ่มคลุมทั้งช่วงรอ + เผื่ออีกนิดหลังชุดใหม่เด้งขึ้น
+            // ผู้เล่นจะได้เห็นชุดใหม่ก่อนเสมอ ไม่ใช่กดรัวข้ามมาจากชุดเดิม
+            LockStratagemInput(sequenceClearedDelay + postSequenceInputLockExtra);
+
             StartCoroutine(AdvanceToNextStratagemAfterFlash(sequenceClearedDelay));
             return;
         }
@@ -436,6 +480,7 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         // ถ้าผู้เล่นปล่อยเมาส์ไปแล้ว (skip) ก็ไม่ต้องฉลอง เพราะกล้องซูมออกไปแล้วมองไม่เห็นอยู่ดี
         if (!skipRemainingCompleteHold && UIManager.Instance != null)
         {
+            SoundManager.Instance.PlaySFX(SoundIds.InvestigateSuccess);
             UIManager.Instance.PlayInvestigateSuccess();
             holdTarget = Mathf.Max(holdTarget, UIManager.Instance.InvestigateSuccessDuration);
         }
@@ -464,9 +509,13 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
 
     private System.Collections.IEnumerator AdvanceToNextStratagemAfterFlash(float delay)
     {
+        int token = stratagemGenerationToken;
+
         yield return new WaitForSeconds(delay);
 
-        if (!isBeingListened || isClueCollected)
+        // token ไม่ตรง = มีการสุ่มชุดใหม่ไปแล้วระหว่างรอ (เช่นผู้เล่นปล่อยเมาส์แล้วกดฟังใหม่
+        // ซึ่ง OnListenStart จะสุ่มให้ทันที) ถ้าสุ่มซ้ำตรงนี้ ปุ่มที่ผู้เล่นเพิ่งกดไปจะโดนล้างทิ้ง
+        if (!isBeingListened || isClueCollected || token != stratagemGenerationToken)
         {
             yield break;
         }
@@ -521,7 +570,12 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
 
         feedbackFlashIndex = -1;
         feedbackFlashColor = null;
-        RefreshInvestigationUI();
+
+        // ต้อง force เพราะปุ่มตัวสุดท้ายของชุดสุดท้ายจะติดธง isClueCollected ไปแล้ว
+        // ตั้งแต่ก่อนแฟลชจะหมดเวลา ถ้าไม่ force ไอคอนตัวนั้นจะค้างเป็นสีแฟลช
+        // ไม่ยอมไล่กลับไปเป็นสี "กดผ่านแล้ว" เหมือนตัวอื่นตลอดช่วงฉลอง
+        // force เฉพาะตอนยังค้างหลอดเต็มอยู่ (แถบยังโชว์) ถ้าแถบถูกซ่อนไปแล้วอย่าไปปลุกไอคอนกลับมา
+        RefreshInvestigationUI(isHoldingCompleteBar);
     }
 
     private void RemoveGroup(bool discardClue = true)
@@ -569,6 +623,11 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         // ถ้าทิ้งทีหลังกลุ่มใหม่อาจหยิบเบาะแสเดิมไปใช้ซ้ำ
         if (discardClue && !isClueCollected)
         {
+            // ปล่อยกลุ่มเดินจากไปทั้งที่ยังฟังไม่จบ ถือเป็นความผิดพลาดของผู้เล่น 1 ครั้ง
+            // นับก่อนเรียก DiscardClue เพราะข้างในนั้นอาจตัดจบเกม (เบาะแสเหลือไม่พอถึงโควตา)
+            // ถ้านับทีหลัง AddMistake จะโดนกันไว้ตอนเกมจบแล้ว หลอดพลาดบน HUD จะไม่ขยับให้เห็น
+            GameManager.Instance.AddMistake();
+
             manager.DiscardClue(clueDetail);
         }
 

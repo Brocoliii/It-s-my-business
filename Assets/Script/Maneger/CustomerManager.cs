@@ -25,9 +25,13 @@ public class CustomerManager : MonoBehaviour
     public int minFoodPerOrder = 1;
     [Tooltip("สั่งเยอะสุดกี่ไม้")]
     public int maxFoodPerOrder = 3;
+    [Tooltip("โควตาอาหารรวมของลูกค้าทุกคนที่อยู่บนจอพร้อมกัน เช่นตั้ง 3 ถ้าคนแรกสั่ง 2 คนถัดไปจะสั่งได้แค่ 1 / ถ้าคนแรกสั่ง 1 คนถัดไปสั่งได้ถึง 2 (ใส่ 0 หรือติดลบ = ไม่จำกัด)")]
+    public int maxTotalFoodOnScreen = 3;
 
     private Customer[] activeCustomers;
     private int[] activeCustomerPrefabIndex;
+    private int[] activeCustomerFoodCount;
+    private int currentTotalFoodOrdered = 0;
     private bool customersHiddenForInvestigation = false;
 
     private void Awake()
@@ -40,6 +44,7 @@ public class CustomerManager : MonoBehaviour
     {
         activeCustomers = new Customer[customerSlots.Length];
         activeCustomerPrefabIndex = new int[customerSlots.Length];
+        activeCustomerFoodCount = new int[customerSlots.Length];
         for (int i = 0; i < activeCustomerPrefabIndex.Length; i++) activeCustomerPrefabIndex[i] = -1;
     }
 
@@ -72,6 +77,16 @@ public class CustomerManager : MonoBehaviour
         StageConfig currentStage = GameManager.Instance.GetCurrentStage();
         if (currentStage == null || currentStage.availableMenu.Count == 0 || customerPrefabs.Length == 0) return;
 
+        // โควตาอาหารรวมบนจอ: ลูกค้าใหม่สั่งได้เท่าที่เหลือจากที่ลูกค้าคนอื่นสั่งไปแล้วเท่านั้น
+        // ถ้าโควตาที่เหลือยังไม่พอสั่งขั้นต่ำ ให้รอแล้วค่อยลองใหม่ ยังไม่เกิดลูกค้าในช่องนี้
+        int minThisOrder = GetMinFoodThisOrder();
+        int remainingFoodBudget = GetRemainingFoodBudget();
+        if (remainingFoodBudget < minThisOrder)
+        {
+            StartCoroutine(SpawnCooldownRoutine(slotIndex));
+            return;
+        }
+
         int randomCustomerIndex = PickUnusedCustomerPrefabIndex(slotIndex);
 
         Vector3 standPosition = customerSlots[slotIndex].position;
@@ -85,7 +100,10 @@ public class CustomerManager : MonoBehaviour
         OrderData randomOrder = new OrderData();
         randomOrder.wantedFoods = new List<FoodData>();
 
-        int orderAmount = Random.Range(minFoodPerOrder, maxFoodPerOrder + 1);
+        int maxThisOrder = Mathf.Min(maxFoodPerOrder, remainingFoodBudget);
+        if (maxThisOrder < minThisOrder) maxThisOrder = minThisOrder;
+
+        int orderAmount = Random.Range(minThisOrder, maxThisOrder + 1);
         for (int i = 0; i < orderAmount; i++)
         {
             randomOrder.wantedFoods.Add(currentStage.availableMenu[Random.Range(0, currentStage.availableMenu.Count)]);
@@ -102,7 +120,25 @@ public class CustomerManager : MonoBehaviour
         if (customersHiddenForInvestigation) newCustomer.SetCustomerVisible(false, animate: false);
 
         activeCustomers[slotIndex] = newCustomer;
+        activeCustomerFoodCount[slotIndex] = orderAmount;
+        currentTotalFoodOrdered += orderAmount;
         currentActiveCustomerCount++;
+    }
+
+    // จำนวนไม้ที่ยังสั่งเพิ่มได้ตอนนี้ = โควตารวม ลบด้วยของที่ลูกค้าบนจอสั่งค้างไว้
+    // ตั้ง maxTotalFoodOnScreen เป็น 0 หรือติดลบ = ปิดระบบโควตา (ใช้ maxFoodPerOrder ตามเดิม)
+    private int GetRemainingFoodBudget()
+    {
+        if (maxTotalFoodOnScreen <= 0) return maxFoodPerOrder;
+        return Mathf.Max(0, maxTotalFoodOnScreen - currentTotalFoodOrdered);
+    }
+
+    // กันกรณีตั้งโควตารวมไว้น้อยกว่าจำนวนสั่งขั้นต่ำ ซึ่งจะทำให้ไม่มีลูกค้าเกิดเลยตลอดกาล
+    private int GetMinFoodThisOrder()
+    {
+        int min = Mathf.Max(1, minFoodPerOrder);
+        if (maxTotalFoodOnScreen > 0) min = Mathf.Min(min, maxTotalFoodOnScreen);
+        return min;
     }
 
     // สุ่มพรีแฟบลูกค้าโดยเลี่ยงหน้าตาที่กำลังนั่งอยู่ในช่องอื่นตอนนี้ กันลูกค้าหน้าเดิมโผล่ซ้ำพร้อมกัน
@@ -133,6 +169,9 @@ public class CustomerManager : MonoBehaviour
     {
         activeCustomers[slotIndex] = null;
         activeCustomerPrefabIndex[slotIndex] = -1;
+        // คืนโควตาอาหารที่ลูกค้าคนนี้จองไว้ ให้ลูกค้าคนต่อไปสั่งได้
+        currentTotalFoodOrdered = Mathf.Max(0, currentTotalFoodOrdered - activeCustomerFoodCount[slotIndex]);
+        activeCustomerFoodCount[slotIndex] = 0;
         currentActiveCustomerCount--;
 
         if (GameManager.Instance.stopSpawningCustomers && currentActiveCustomerCount <= 0)

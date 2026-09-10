@@ -4,6 +4,16 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+/// <summary>Where the ink mark lands once the stamp hits the paper.</summary>
+public enum ImprintPlacement
+{
+    /// <summary>Under the stamp, at the spot the player pressed.</summary>
+    WhereStamped,
+
+    /// <summary>Always the position the imprint was placed at in the scene.</summary>
+    FixedPosition,
+}
+
 /// <summary>
 /// Drag-and-drop stamp used to confirm a choice instead of a plain button.
 /// Hold left mouse on the stamp, drag it over the stamping area and release:
@@ -37,6 +47,16 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public Color zoneIdleColor = new Color(1f, 1f, 1f, 0.25f);
     public Color zoneReadyColor = new Color(1f, 0.25f, 0.25f, 0.75f);
 
+    [Header("Drag Grip")]
+    [Tooltip("Keep the spot the player actually grabbed under the cursor instead of using Cursor Anchor.")]
+    public bool keepGrabOffset;
+
+    [Tooltip("Which point of the stamp sits under the cursor while dragging. (0,0) = bottom left, (0.5,0.5) = middle, (1,1) = top right.")]
+    public Vector2 cursorAnchor = new Vector2(0.5f, 0.5f);
+
+    [Tooltip("Extra nudge of that grip point, in the stamp's own pixels.")]
+    public Vector2 cursorOffset;
+
     [Header("Feel")]
     [Tooltip("Scale of the stamp while it is held in the air.")]
     public float dragScale = 1.15f;
@@ -48,9 +68,26 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [Tooltip("How fast the stamp flies back home when released outside the area.")]
     public float returnSpeed = 14f;
 
+    [Header("Imprint Placement")]
+    [Tooltip("Where the ink mark shows up. Where Stamped = under the stamp, wherever the player pressed. Fixed Position = always the spot the imprint sits at in the scene.")]
+    public ImprintPlacement imprintPlacement = ImprintPlacement.WhereStamped;
+
+    [Tooltip("Nudge of the ink mark, in the imprint parent's pixels. Works with both placement modes.")]
+    public Vector2 imprintOffset;
+
     [Header("Appear Animation")]
     [Tooltip("Duration of the pop-in when the stamp first appears (e.g. when the notebook opens).")]
     public float appearDuration = 0.35f;
+
+    [Header("Disappear Animation")]
+    [Tooltip("Duration of the lift-away once the stamp has already been pressed. 0 = disappear instantly.")]
+    public float disappearDuration = 0.3f;
+
+    [Tooltip("How far the stamp slides while it leaves, in its parent's pixels. Positive Y = up, away from the paper.")]
+    public Vector2 disappearOffset = new Vector2(0f, 160f);
+
+    [Tooltip("Scale the stamp shrinks to while it leaves.")]
+    public float disappearScale = 0.7f;
 
     [Header("Events")]
     public UnityEvent onStampConfirmed;
@@ -66,6 +103,8 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private Vector3 homeScale;
     private Vector2 homeImprintPosition;
 
+    private Vector2 grabAnchor = new Vector2(0.5f, 0.5f);
+
     private bool isInitialized;
     private bool isDragging;
     private bool isLocked;
@@ -79,6 +118,23 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         ApplyZoneHighlight(false);
         ShowImprint(false);
+    }
+
+    // ปิดสมุดทั้งที่ยังคว้าตราปั๊มค้างอยู่ OnEndDrag จะไม่ถูกเรียกเลย
+    // ถ้าไม่เก็บกวาดตรงนี้ เมาส์จะค้างเป็นรูปมือกำทั้งที่ในมือไม่มีอะไรแล้ว
+    private void OnDisable()
+    {
+        NotifyCursorHeld(false);
+    }
+
+    // บอกตัวจัดการรูปเมาส์ว่าตอนนี้ตราปั๊มอยู่ในมือผู้เล่นหรือเปล่า
+    // ไม่มี CursorManager ในเกมก็ไม่เป็นไร ตราปั๊มยังลากได้เหมือนเดิมทุกอย่าง
+    private void NotifyCursorHeld(bool isHeld)
+    {
+        if (CursorManager.Instance == null) return;
+
+        if (isHeld) CursorManager.Instance.BeginUiDrag(this);
+        else CursorManager.Instance.EndUiDrag(this);
     }
 
     // the stamp usually sits inside a tab that starts disabled, so Awake may not have run yet
@@ -117,6 +173,7 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         isDragging = false;
         isLocked = false;
+        NotifyCursorHeld(false);
 
         ReturnToHomeParent(false);
         rectTransform.SetSiblingIndex(homeSiblingIndex);
@@ -146,6 +203,7 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         isDragging = false;
         isLocked = false;
+        NotifyCursorHeld(false);
 
         ReturnToHomeParent(false);
         rectTransform.SetSiblingIndex(homeSiblingIndex);
@@ -190,6 +248,46 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         activeRoutine = null;
     }
 
+    // ยกตราปั๊มออกจากกระดาษหลังปั๊มเสร็จ ย่อ-เลื่อนออก-จางหาย ให้เห็นรอยหมึกที่เพิ่งลงไป
+    private IEnumerator DisappearRoutine()
+    {
+        if (disappearDuration <= 0f)
+        {
+            HideStamp();
+            yield break;
+        }
+
+        // ผู้เล่นคว้าตราปั๊มระหว่างที่มันกำลังลอยออกไม่ได้
+        canvasGroup.blocksRaycasts = false;
+
+        Vector2 fromPosition = rectTransform.anchoredPosition;
+        Vector2 toPosition = fromPosition + disappearOffset;
+        Vector3 fromScale = rectTransform.localScale;
+        Vector3 toScale = homeScale * disappearScale;
+
+        float time = 0f;
+
+        while (time < disappearDuration)
+        {
+            // unscaledDeltaTime เหมือนจังหวะอื่นของตราปั๊ม เผื่อสมุดหยุดเวลาเกมไว้
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / disappearDuration);
+
+            // ease-in back ทำให้ตราปั๊มย่อลงนิดหนึ่งก่อนดีดออก เป็นภาพกลับด้านของตอนเด้งเข้ามา
+            float eased = EaseInBack(t);
+
+            rectTransform.anchoredPosition = Vector2.LerpUnclamped(fromPosition, toPosition, eased);
+            rectTransform.localScale = Vector3.LerpUnclamped(fromScale, toScale, eased);
+
+            // จางช้าตอนต้นเพื่อให้ทันเห็นว่ามันเคลื่อนออกไป ไม่ใช่หายไปเฉยๆ
+            canvasGroup.alpha = 1f - t * t;
+
+            yield return null;
+        }
+
+        HideStamp();
+    }
+
     // ease-out back: พุ่งเลยเป้าไปนิดหนึ่งแล้วค่อยดีดกลับ ค่าเดียวกับที่ NotebookManager ใช้กับรายการในสมุด
     private static float EaseOutBack(float t)
     {
@@ -199,9 +297,20 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         return 1f + (overshoot + 1f) * Mathf.Pow(easedT, 3f) + overshoot * Mathf.Pow(easedT, 2f);
     }
 
+    // ease-in back: ถอยหลังนิดหนึ่งก่อนพุ่งออก เป็นด้านกลับของ EaseOutBack
+    private static float EaseInBack(float t)
+    {
+        float overshoot = 1.70158f;
+
+        return t * t * ((overshoot + 1f) * t - overshoot);
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (isLocked || eventData.button != PointerEventData.InputButton.Left) return;
+
+        // read the grab point before the reparent and the drag scale move the rect around
+        CaptureGrabAnchor(eventData);
 
         if (activeRoutine != null)
         {
@@ -210,6 +319,7 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
 
         isDragging = true;
+        NotifyCursorHeld(true);
 
         RectTransform layer = ResolveDragLayer();
         if (layer != null && rectTransform.parent != layer)
@@ -240,6 +350,7 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (!isDragging) return;
 
         isDragging = false;
+        NotifyCursorHeld(false);
         canvasGroup.blocksRaycasts = true;
         ApplyZoneHighlight(false);
 
@@ -283,8 +394,11 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         yield return ScaleTo(liftedScale, pressedScale, pressDuration);
 
         // read the center after the squash, so the mark sits under the stamp as it looks on the paper
-        PlaceImprintCenterAt(rectTransform.position + GetPivotToCenterOffset());
+        PlaceImprint();
         ShowImprint(true);
+
+        // เสียงปั๊มดังตอนหมึกลงกระดาษพอดี ไม่ใช่ตอนเริ่มกดลงมา
+        SoundManager.Instance.PlaySFX(SoundIds.UiStamp);
 
         // let the player read the hit for a beat, then lift the stamp away to reveal the ink mark
         if (holdOnPaperDuration > 0f)
@@ -292,7 +406,7 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             yield return new WaitForSecondsRealtime(holdOnPaperDuration);
         }
 
-        HideStamp();
+        yield return DisappearRoutine();
 
         activeRoutine = null;
         onStampConfirmed.Invoke();
@@ -355,24 +469,55 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         return null;
     }
 
-    // the stamp rides centered on the cursor, so what the player sees is what the zone test reads
+    // the stamp hangs off the cursor by its grip point, so what the player sees is what the zone test reads
     private void CenterOnPointer(PointerEventData eventData)
     {
         Vector3 pointerWorld;
         if (!TryGetPointerWorldPoint(eventData, rectTransform.parent as RectTransform, out pointerWorld)) return;
 
-        rectTransform.position = pointerWorld - GetPivotToCenterOffset();
+        rectTransform.position = pointerWorld - GetPivotToGripOffset();
     }
 
-    // a stamp whose pivot is not in the middle would hang off the cursor without this
+    // where on the stamp the player closed their hand, kept as 0..1 of the rect so the drag scale cannot skew it
+    private void CaptureGrabAnchor(PointerEventData eventData)
+    {
+        grabAnchor = cursorAnchor;
+        if (!keepGrabOffset) return;
+
+        Vector2 local;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.pressPosition, GetEventCamera(), out local)) return;
+
+        Vector2 normalized = Rect.PointToNormalized(rectTransform.rect, local);
+
+        // a press just outside the rect (a soft sprite edge) would otherwise fling the stamp off the cursor
+        grabAnchor = new Vector2(Mathf.Clamp01(normalized.x), Mathf.Clamp01(normalized.y));
+    }
+
+    // a stamp whose pivot is not on the grip point would hang off the cursor without this
+    private Vector3 GetPivotToGripOffset()
+    {
+        Vector2 grip = keepGrabOffset ? grabAnchor : cursorAnchor;
+
+        return GetPivotToPointOffset(rectTransform, grip, cursorOffset);
+    }
+
     private Vector3 GetPivotToCenterOffset()
     {
-        Rect rect = rectTransform.rect;
-        Vector2 pivot = rectTransform.pivot;
+        return GetPivotToPointOffset(rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero);
+    }
 
-        Vector3 centerLocal = new Vector3((0.5f - pivot.x) * rect.width, (0.5f - pivot.y) * rect.height, 0f);
+    // distance from a rect's pivot to some normalized point on it, in world units at its current scale
+    private static Vector3 GetPivotToPointOffset(RectTransform target, Vector2 normalizedPoint, Vector2 extraOffset)
+    {
+        Rect rect = target.rect;
+        Vector2 pivot = target.pivot;
 
-        return rectTransform.TransformPoint(centerLocal) - rectTransform.position;
+        Vector3 pointLocal = new Vector3(
+            (normalizedPoint.x - pivot.x) * rect.width + extraOffset.x,
+            (normalizedPoint.y - pivot.y) * rect.height + extraOffset.y,
+            0f);
+
+        return target.TransformPoint(pointLocal) - target.position;
     }
 
     private bool TryGetPointerWorldPoint(PointerEventData eventData, RectTransform space, out Vector3 worldPoint)
@@ -423,18 +568,30 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         stampImprint.gameObject.SetActive(isVisible);
     }
 
-    // the ink mark belongs under the stamp, so it lands wherever the player pressed
+    private void PlaceImprint()
+    {
+        if (stampImprint == null) return;
+
+        RectTransform imprintRect = stampImprint.rectTransform;
+
+        if (imprintPlacement == ImprintPlacement.FixedPosition)
+        {
+            // the spot the imprint was authored at in the scene, so the mark always lands on the same line of the paper
+            imprintRect.anchoredPosition = homeImprintPosition + imprintOffset;
+            return;
+        }
+
+        // the ink mark belongs under the stamp, so it lands wherever the player pressed
+        PlaceImprintCenterAt(rectTransform.position + GetPivotToCenterOffset());
+        imprintRect.anchoredPosition += imprintOffset;
+    }
+
     private void PlaceImprintCenterAt(Vector3 worldCenter)
     {
         if (stampImprint == null) return;
 
         RectTransform imprintRect = stampImprint.rectTransform;
-        Rect rect = imprintRect.rect;
-        Vector2 pivot = imprintRect.pivot;
 
-        Vector3 centerLocal = new Vector3((0.5f - pivot.x) * rect.width, (0.5f - pivot.y) * rect.height, 0f);
-        Vector3 pivotToCenter = imprintRect.TransformPoint(centerLocal) - imprintRect.position;
-
-        imprintRect.position = worldCenter - pivotToCenter;
+        imprintRect.position = worldCenter - GetPivotToPointOffset(imprintRect, new Vector2(0.5f, 0.5f), Vector2.zero);
     }
 }

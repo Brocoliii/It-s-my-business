@@ -19,6 +19,16 @@ public class SauceBrush : MonoBehaviour, IDraggable
     [Tooltip("Extra height the brush hops up before dropping back down onto its holder")]
     [SerializeField] private float snapArcHeight = 0.3f;
 
+    [Header("Pickup")]
+    [Tooltip("ระยะเวลาที่แปรงค่อย ๆ หมุนเข้าท่าจับตอนเพิ่งคว้าขึ้นมา (0 = หมุนทันทีแบบเดิม)")]
+    [SerializeField] private float pickupRotationDuration = 0.15f;
+
+    [Header("Preview Hold")]
+    [Tooltip("แปรงหลุดออกนอกอาหารได้นานแค่ไหน ก่อนที่ซอสจาง ๆ กับจังหวะที่ปาดค้างไว้จะถูกล้างทิ้ง")]
+    [SerializeField] private float previewHoldDuration = 1f;
+    [Tooltip("ระยะเวลาที่ซอส preview ค่อย ๆ จางหายหลังหมดเวลาค้าง (0 = หายวับทันที)")]
+    [SerializeField] private float previewFadeOutDuration = 0.25f;
+
     [Header("Brushing Shake")]
     [Tooltip("How many degrees the brush tilts up/down while actively brushing food")]
     [SerializeField] private float shakeAngle = 8f;
@@ -32,8 +42,17 @@ public class SauceBrush : MonoBehaviour, IDraggable
     private float segmentDistance = 0f;
     private int lastDirection = 0;
     private int strokeCount = 0;
+    // จังหวะปาดล่าสุดที่เล่นเสียงไปแล้ว กันไม่ให้เสียงดังรัวทุกเฟรมที่แปรงทาบอยู่บนอาหาร
+    private int soundedStrokeCount = 0;
     private FoodInstance previewFood;
+    // แปรงทาบอยู่บนอาหารจริง ๆ ในเฟรมล่าสุดไหม (previewFood ยังค้างอยู่ได้แม้แปรงจะหลุดออกไปแล้ว)
+    private bool brushTouchingFood = false;
+    private float offFoodTime = 0f;
+    // ความเข้มซอส preview ล่าสุดตอนที่แปรงยังทาบอยู่ ใช้ค้างภาพไว้ตอนแปรงหลุดออกนอกอาหาร
+    private float heldPreviewProgress = 0f;
     private float currentRockAngle = 0f;
+    private Quaternion grabStartRotation;
+    private float pickupRotationBlend;
     private SpriteRenderer sr;
     private Collider2D brushCollider;
     private Coroutine snapMoveCoroutine;
@@ -55,14 +74,18 @@ public class SauceBrush : MonoBehaviour, IDraggable
             snapMoveCoroutine = null;
         }
 
-        segmentDistance = 0f;
-        lastDirection = 0;
-        strokeCount = 0;
-        previewFood = null;
+        ClearPreviewState();
         currentRockAngle = 0f;
 
         if (sr != null) sr.sortingLayerName = dragLayer;
-        transform.rotation = Quaternion.Euler(0, 0, -15f);
+
+        // ค่อย ๆ หมุนเข้าท่าจับจากมุมที่แปรงวางอยู่ แทนที่จะสะบัดเข้าท่าในเฟรมเดียวพร้อมกับที่ตัวแปรงเลื่อนเข้าหาเมาส์
+        grabStartRotation = transform.rotation;
+        pickupRotationBlend = pickupRotationDuration > 0f ? 0f : 1f;
+        ApplyDragRotation();
+
+        // ดังตอนคว้าแปรงขึ้นมาเท่านั้น ไม่เกี่ยวกับตอนทาซอสติด (นั่นคือ SoundIds.SauceBrush)
+        SoundManager.Instance.PlaySFX(SoundIds.SauceBrushPickup, transform.position);
     }
 
     public void OnDrag(Vector2 mousePos)
@@ -72,7 +95,9 @@ public class SauceBrush : MonoBehaviour, IDraggable
         float deltaY = Mouse.current.delta.ReadValue().y;
         int direction = deltaY > 0.01f ? 1 : (deltaY < -0.01f ? -1 : 0);
 
-        if (direction != 0)
+        // นับเฉพาะตอนแปรงทาบอยู่บนอาหาร ระหว่างช่วงค้าง preview ที่แปรงหลุดออกไปให้แช่ความคืบหน้าไว้เฉย ๆ
+        // ไม่งั้นสะบัดแปรงกลางอากาศแล้ววกกลับเข้ามาจะทำให้ซอสติดทันที
+        if (direction != 0 && brushTouchingFood)
         {
             if (lastDirection != 0 && direction != lastDirection)
             {
@@ -92,14 +117,28 @@ public class SauceBrush : MonoBehaviour, IDraggable
 
         // Tilt the brush toward the direction it's currently being dragged while brushing food, easing back to neutral otherwise
         float targetRockAngle = 0f;
-        if (previewFood != null)
+        if (brushTouchingFood)
         {
             if (direction == 1) targetRockAngle = shakeAngle;
             else if (direction == -1) targetRockAngle = -shakeAngle;
             else targetRockAngle = currentRockAngle;
         }
         currentRockAngle = Mathf.Lerp(currentRockAngle, targetRockAngle, Time.deltaTime * shakeSpeed);
-        transform.rotation = Quaternion.Euler(0, 0, -15f + currentRockAngle);
+
+        if (pickupRotationBlend < 1f)
+            pickupRotationBlend = Mathf.Clamp01(pickupRotationBlend + Time.deltaTime / pickupRotationDuration);
+
+        ApplyDragRotation();
+    }
+
+    // ท่าจับตอนลากคือปลายทาง แต่ช่วงแรกหลังคว้ายังผสมกับมุมตอนวางอยู่ เพื่อให้หมุนเข้าท่าแบบไหลลื่น
+    private void ApplyDragRotation()
+    {
+        Quaternion dragRotation = Quaternion.Euler(0, 0, -15f + currentRockAngle);
+
+        transform.rotation = pickupRotationBlend >= 1f
+            ? dragRotation
+            : Quaternion.Slerp(grabStartRotation, dragRotation, pickupRotationBlend);
     }
 
     public void OnEndDrag()
@@ -118,11 +157,13 @@ public class SauceBrush : MonoBehaviour, IDraggable
             snapMoveCoroutine = StartCoroutine(SmoothSnapBack());
         }
 
+        // วางแปรงลงคือตั้งใจเลิกทา ต้องล้าง preview ทันที ไม่ใช้ช่วงค้างเหมือนตอนแปรงหลุดออกนอกอาหาร
+        // (OnDrag หยุดเรียกแล้ว ถ้าปล่อยค้างไว้ซอสจาง ๆ จะติดอยู่บนอาหารตลอดไป)
         if (previewFood != null)
         {
             previewFood.SetSaucePreview(0f);
-            previewFood = null;
         }
+        ClearPreviewState();
     }
 
     // ลอยนุ่มๆ กลับไปตำแหน่งตั้งต้น แทนที่จะกระโดดวาร์ปทันที แล้วค่อยสลับ layer กลับตอนถึงที่แล้ว
@@ -158,6 +199,15 @@ public class SauceBrush : MonoBehaviour, IDraggable
     private void UpdateBrushTarget()
     {
         FoodInstance food = FindSeasonableFoodUnderBrush();
+        brushTouchingFood = food != null;
+
+        if (food == null)
+        {
+            HoldPreviewOffFood();
+            return;
+        }
+
+        offFoodTime = 0f;
 
         if (food != previewFood)
         {
@@ -166,25 +216,67 @@ public class SauceBrush : MonoBehaviour, IDraggable
 
             // Strokes done on the old food must not carry over and instantly apply to the new one
             strokeCount = 0;
+            soundedStrokeCount = 0;
             segmentDistance = 0f;
             lastDirection = 0;
+            heldPreviewProgress = 0f;
         }
 
-        if (previewFood == null) return;
-
+        // จังหวะสุดท้ายต้องเช็คก่อนเสียงปาด แล้ว return ออกไปเลย
+        // เพราะจังหวะนั้นเป็นของเสียง sauce_done ที่ ApplySauce เล่นให้ ถ้าปล่อยผ่านจะได้ยินสองเสียงทับกันในเฟรมเดียว
         if (strokeCount >= requiredStrokes)
         {
             previewFood.ApplySauce();
-            previewFood = null;
-            strokeCount = 0;
-            segmentDistance = 0f;
-            lastDirection = 0;
+            ClearPreviewState();
             return;
         }
 
+        // ดังทีละครั้งต่อ 1 จังหวะปาด (นับตอนเมาส์กลับทิศหลังลากไปไกลพอ) ไม่ใช่ดังรัวทุกเฟรม
+        if (strokeCount > soundedStrokeCount)
+        {
+            soundedStrokeCount = strokeCount;
+            SoundManager.Instance.PlaySFX(SoundIds.SauceBrush, previewFood.FoodRoot.position);
+        }
+
         float segmentProgress = Mathf.Clamp01(segmentDistance / requiredDrag);
-        float progress = (strokeCount + segmentProgress) / requiredStrokes;
-        previewFood.SetSaucePreview(progress);
+        heldPreviewProgress = (strokeCount + segmentProgress) / requiredStrokes;
+        previewFood.SetSaucePreview(heldPreviewProgress);
+    }
+
+    // ปาดเลยขอบอาหารออกไปนิดเดียวไม่ควรล้างทุกอย่างทิ้งทันที
+    // ค้างซอสจาง ๆ ไว้ครู่หนึ่งแล้วค่อยเฟดหาย ถ้าผู้เล่นวกกลับเข้ามาทันก็ปาดต่อจากความคืบหน้าเดิมได้เลย
+    private void HoldPreviewOffFood()
+    {
+        if (previewFood == null) return;
+
+        offFoodTime += Time.deltaTime;
+
+        if (offFoodTime <= previewHoldDuration) return;
+
+        float fade = previewFadeOutDuration > 0f
+            ? 1f - Mathf.Clamp01((offFoodTime - previewHoldDuration) / previewFadeOutDuration)
+            : 0f;
+
+        if (fade <= 0f)
+        {
+            previewFood.SetSaucePreview(0f);
+            ClearPreviewState();
+            return;
+        }
+
+        previewFood.SetSaucePreview(heldPreviewProgress * fade);
+    }
+
+    private void ClearPreviewState()
+    {
+        previewFood = null;
+        brushTouchingFood = false;
+        offFoodTime = 0f;
+        heldPreviewProgress = 0f;
+        strokeCount = 0;
+        soundedStrokeCount = 0;
+        segmentDistance = 0f;
+        lastDirection = 0;
     }
 
     // ใช้ collider ของหัวแปรงเองเช็คว่าทาบโดนวัตถุดิบชิ้นไหนอยู่ (แทนการยิง raycast จากจุดเมาส์จุดเดียว)
