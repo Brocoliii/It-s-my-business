@@ -1,10 +1,11 @@
-It's My Business
-p align="center">
-  <img src="[images/CoverGame_FullUI.png]" alt="Game Banner" width="100%">
+# It's My Business
+
+<p align="center">
+  <img src="images/CoverGame_FullUI.png" alt="Game Banner" width="100%">
 </p>
 
 <p align="center">
-  <img src="[images/Logo_full_2.png]" alt="Game Logo" width="200">
+  <img src="images/Logo_full_2.png" alt="Game Logo" width="200">
 </p>
 
 <p align="center">
@@ -13,7 +14,7 @@ p align="center">
 </p>
 
 <p align="center">
-  <img src="[images/LogoTeam_Full_718x236.png]" alt="Studio Logo" width="120">
+  <img src="images/LogoTeam_Full_718x236.png" alt="Studio Logo" width="120">
 </p>
 
 ---
@@ -21,9 +22,7 @@ p align="center">
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="[images/gamep1.png]" width="45%" alt="Screenshot 1">
-  <img src="[images/gamep2.png]" width="45%" alt="Screenshot 2">
-  <img src="[images/gamep3.png]" width="45%" alt="Screenshot 2">
+  <img src="images/gamep1.png" width="45%" alt="Screenshot 1">
+  <img src="images/gamep2.png" width="45%" alt="Screenshot 2">
+  <img src="images/gamep3.png" width="45%" alt="Screenshot 3">
 </p>
-
----
