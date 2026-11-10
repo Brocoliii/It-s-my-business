@@ -20,6 +20,8 @@ public class InvestigationManager : MonoBehaviour
     [Tooltip("เบาะแสในลิสต์นี้จะไม่ถูกสุ่มมาเกิดอีกตลอดด่าน ถือว่าเสียไปเลย")]
     public List<string> lostClues = new List<string>();
 
+    [HideInInspector] public bool tutorialControlled;
+
     private List<InvestigateGroup> activeGroups = new List<InvestigateGroup>();
 
     private List<Transform> occupiedPoints = new List<Transform>();
@@ -31,6 +33,8 @@ public class InvestigationManager : MonoBehaviour
 
     private void Update()
     {
+        if (tutorialControlled) return;
+
         if (GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
 
         StageConfig currentStage = GameManager.Instance.GetCurrentStage();
@@ -115,6 +119,12 @@ public class InvestigationManager : MonoBehaviour
         }
     }
 
+    public void SpawnTutorialGroup()
+    {
+        StageConfig currentStage = GameManager.Instance != null ? GameManager.Instance.GetCurrentStage() : null;
+        if (currentStage != null) SpawnGroup(currentStage);
+    }
+
     private bool IsClueBeingDiscussed(string text)
     {
         foreach (var g in activeGroups) if (g.clueDetail == text) return true;
@@ -138,6 +148,8 @@ public class InvestigationManager : MonoBehaviour
     // สั่งปิดร้านทันที ไม่งั้นลูกค้าจะเกิดวนไปเรื่อยๆ ทั้งที่ผู้เล่นทำอะไรต่อไม่ได้แล้ว
     private void CheckInvestigationExhausted()
     {
+        if (tutorialControlled) return;
+
         if (activeGroups.Count > 0) return;
 
         StageConfig currentStage = GameManager.Instance.GetCurrentStage();

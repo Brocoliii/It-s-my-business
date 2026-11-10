@@ -1,0 +1,3601 @@
+fileFormatVersion: 2
+guid: 488af9140a0ba5f4299448dca695435f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5905467831897472961
+    second: StampAreaCircle_0
+  - first:
+      213: -2281292794118561155
+    second: StampAreaCircle_1
+  - first:
+      213: 4381157034887976285
+    second: StampAreaCircle_2
+  - first:
+      213: 9139922354760418108
+    second: StampAreaCircle_3
+  - first:
+      213: 634173452932283723
+    second: StampAreaCircle_4
+  - first:
+      213: -1129636514686950431
+    second: StampAreaCircle_5
+  - first:
+      213: -2702743726778351882
+    second: StampAreaCircle_6
+  - first:
+      213: -4928302479692263136
+    second: StampAreaCircle_7
+  - first:
+      213: 4006435902016837521
+    second: StampAreaCircle_8
+  - first:
+      213: -5161071022600894224
+    second: StampAreaCircle_9
+  - first:
+      213: -1247829134823484355
+    second: StampAreaCircle_10
+  - first:
+      213: 1965328035508527913
+    second: StampAreaCircle_11
+  - first:
+      213: 409005625494264876
+    second: StampAreaCircle_12
+  - first:
+      213: -5459111382088261506
+    second: StampAreaCircle_13
+  - first:
+      213: 544577029091692517
+    second: StampAreaCircle_14
+  - first:
+      213: 2168598816192762058
+    second: StampAreaCircle_15
+  - first:
+      213: -2416647849506432569
+    second: StampAreaCircle_16
+  - first:
+      213: 687966420919394625
+    second: StampAreaCircle_17
+  - first:
+      213: 3375920090450148624
+    second: StampAreaCircle_18
+  - first:
+      213: 7356300693578103338
+    second: StampAreaCircle_19
+  - first:
+      213: 3572472404888956566
+    second: StampAreaCircle_20
+  - first:
+      213: 2620309321626827746
+    second: StampAreaCircle_21
+  - first:
+      213: 2941862067893487087
+    second: StampAreaCircle_22
+  - first:
+      213: -774698409768359762
+    second: StampAreaCircle_23
+  - first:
+      213: -7824980555234219619
+    second: StampAreaCircle_24
+  - first:
+      213: -8375444525162726478
+    second: StampAreaCircle_25
+  - first:
+      213: 6374784943040834983
+    second: StampAreaCircle_26
+  - first:
+      213: 3867303041605252649
+    second: StampAreaCircle_27
+  - first:
+      213: -9072746472644660247
+    second: StampAreaCircle_28
+  - first:
+      213: 5936317895601787025
+    second: StampAreaCircle_29
+  - first:
+      213: 3047529433598657158
+    second: StampAreaCircle_30
+  - first:
+      213: 6685503379415177401
+    second: StampAreaCircle_31
+  - first:
+      213: -5886122326918703398
+    second: StampAreaCircle_32
+  - first:
+      213: -5971687910899026573
+    second: StampAreaCircle_33
+  - first:
+      213: -8640713373031173152
+    second: StampAreaCircle_34
+  - first:
+      213: -5603340999304392812
+    second: StampAreaCircle_35
+  - first:
+      213: -6608703809791646693
+    second: StampAreaCircle_36
+  - first:
+      213: 861546863488598051
+    second: StampAreaCircle_37
+  - first:
+      213: -2713098525510036409
+    second: StampAreaCircle_38
+  - first:
+      213: -5945219688997965832
+    second: StampAreaCircle_39
+  - first:
+      213: -7823324345999577268
+    second: StampAreaCircle_40
+  - first:
+      213: 1832950147620506793
+    second: StampAreaCircle_41
+  - first:
+      213: 8429245773428731748
+    second: StampAreaCircle_42
+  - first:
+      213: -4677548151050967879
+    second: StampAreaCircle_43
+  - first:
+      213: -1222579588966574587
+    second: StampAreaCircle_44
+  - first:
+      213: -4443436919186392580
+    second: StampAreaCircle_45
+  - first:
+      213: 1310994923273093236
+    second: StampAreaCircle_46
+  - first:
+      213: -4296596914209720558
+    second: StampAreaCircle_47
+  - first:
+      213: 7602295529883078430
+    second: StampAreaCircle_48
+  - first:
+      213: -1783292247195511986
+    second: StampAreaCircle_49
+  - first:
+      213: 8946983210116729562
+    second: StampAreaCircle_50
+  - first:
+      213: 5303231344287761252
+    second: StampAreaCircle_51
+  - first:
+      213: 1356895239695439206
+    second: StampAreaCircle_52
+  - first:
+      213: 7173653881319695745
+    second: StampAreaCircle_53
+  - first:
+      213: -3344870896295827372
+    second: StampAreaCircle_54
+  - first:
+      213: 3887415007828376441
+    second: StampAreaCircle_55
+  - first:
+      213: 7811737034330614475
+    second: StampAreaCircle_56
+  - first:
+      213: -4536081555753180588
+    second: StampAreaCircle_57
+  - first:
+      213: -559679140346065645
+    second: StampAreaCircle_58
+  - first:
+      213: -5683908615199292456
+    second: StampAreaCircle_59
+  - first:
+      213: -7125903377658695802
+    second: StampAreaCircle_60
+  - first:
+      213: -5970651230211011420
+    second: StampAreaCircle_61
+  - first:
+      213: 1000437095955756919
+    second: StampAreaCircle_62
+  - first:
+      213: 1822133396638395695
+    second: StampAreaCircle_63
+  - first:
+      213: -614405555669520656
+    second: StampAreaCircle_64
+  - first:
+      213: 5656623608308217164
+    second: StampAreaCircle_65
+  - first:
+      213: 7243281635064104636
+    second: StampAreaCircle_66
+  - first:
+      213: 9036030888927685915
+    second: StampAreaCircle_67
+  - first:
+      213: 8535314052664859744
+    second: StampAreaCircle_68
+  - first:
+      213: 325283492455912550
+    second: StampAreaCircle_69
+  - first:
+      213: 1939464173172507694
+    second: StampAreaCircle_70
+  - first:
+      213: 8641059807476272310
+    second: StampAreaCircle_71
+  - first:
+      213: 6797159273565012499
+    second: StampAreaCircle_72
+  - first:
+      213: 5458693379178320532
+    second: StampAreaCircle_73
+  - first:
+      213: -7991769825456508916
+    second: StampAreaCircle_74
+  - first:
+      213: 6354807813375979954
+    second: StampAreaCircle_75
+  - first:
+      213: -6894885022404646726
+    second: StampAreaCircle_76
+  - first:
+      213: -5558420825506387067
+    second: StampAreaCircle_77
+  - first:
+      213: 8763672893115146045
+    second: StampAreaCircle_78
+  - first:
+      213: 319873958757814935
+    second: StampAreaCircle_79
+  - first:
+      213: -7434334242703880512
+    second: StampAreaCircle_80
+  - first:
+      213: 7704428879936842023
+    second: StampAreaCircle_81
+  - first:
+      213: -7925634822248276016
+    second: StampAreaCircle_82
+  - first:
+      213: 6682506750556231098
+    second: StampAreaCircle_83
+  - first:
+      213: 3974792075235510637
+    second: StampAreaCircle_84
+  - first:
+      213: 1356459051183173619
+    second: StampAreaCircle_85
+  - first:
+      213: -86417998940063176
+    second: StampAreaCircle_86
+  - first:
+      213: 3561776820022563890
+    second: StampAreaCircle_87
+  - first:
+      213: -7520052160661137749
+    second: StampAreaCircle_88
+  - first:
+      213: 3921730861117881094
+    second: StampAreaCircle_89
+  - first:
+      213: -5143713943879668861
+    second: StampAreaCircle_90
+  - first:
+      213: 8513008522721871486
+    second: StampAreaCircle_91
+  - first:
+      213: -5260717850214703914
+    second: StampAreaCircle_92
+  - first:
+      213: 1370275197038625630
+    second: StampAreaCircle_93
+  - first:
+      213: -8241539313242929329
+    second: StampAreaCircle_94
+  - first:
+      213: 2828320222220983968
+    second: StampAreaCircle_95
+  - first:
+      213: 861268818375230423
+    second: StampAreaCircle_96
+  - first:
+      213: -9144652899806918991
+    second: StampAreaCircle_97
+  - first:
+      213: -7535459489051237881
+    second: StampAreaCircle_98
+  - first:
+      213: 3645944832212985810
+    second: StampAreaCircle_99
+  - first:
+      213: 64245090105172127
+    second: StampAreaCircle_100
+  - first:
+      213: 3827371793791336418
+    second: StampAreaCircle_101
+  - first:
+      213: -894023645468755379
+    second: StampAreaCircle_102
+  - first:
+      213: 3175525548775811470
+    second: StampAreaCircle_103
+  - first:
+      213: 1768774236028852394
+    second: StampAreaCircle_104
+  - first:
+      213: -822057094591778374
+    second: StampAreaCircle_105
+  - first:
+      213: -8023216511166750240
+    second: StampAreaCircle_106
+  - first:
+      213: -1293364546835195679
+    second: StampAreaCircle_107
+  - first:
+      213: -445584637103123875
+    second: StampAreaCircle_108
+  - first:
+      213: -2758313158052044376
+    second: StampAreaCircle_109
+  - first:
+      213: 7306854703969740497
+    second: StampAreaCircle_110
+  - first:
+      213: -4566263957865405226
+    second: StampAreaCircle_111
+  - first:
+      213: 3523853941620074374
+    second: StampAreaCircle_112
+  - first:
+      213: 1935682235821140489
+    second: StampAreaCircle_113
+  - first:
+      213: -3217896006497376411
+    second: StampAreaCircle_114
+  - first:
+      213: 2188727598231913424
+    second: StampAreaCircle_115
+  - first:
+      213: 7047275818573304695
+    second: StampAreaCircle_116
+  - first:
+      213: -4065891210197080039
+    second: StampAreaCircle_117
+  - first:
+      213: 8332626363413032100
+    second: StampAreaCircle_118
+  - first:
+      213: -6474008013795826806
+    second: StampAreaCircle_119
+  - first:
+      213: -5660130981718253262
+    second: StampAreaCircle_120
+  - first:
+      213: -2165218557334285398
+    second: StampAreaCircle_121
+  - first:
+      213: -5865016820508113479
+    second: StampAreaCircle_122
+  - first:
+      213: 5688071786015803698
+    second: StampAreaCircle_123
+  - first:
+      213: -6036819905444847926
+    second: StampAreaCircle_124
+  - first:
+      213: 3547357929286219693
+    second: StampAreaCircle_125
+  - first:
+      213: -4513648230823041973
+    second: StampAreaCircle_126
+  - first:
+      213: 4870756168366207798
+    second: StampAreaCircle_127
+  - first:
+      213: 1579917685411752062
+    second: StampAreaCircle_128
+  - first:
+      213: -8792253848477872535
+    second: StampAreaCircle_129
+  - first:
+      213: -3144215769955994619
+    second: StampAreaCircle_130
+  - first:
+      213: 346149862962738178
+    second: StampAreaCircle_131
+  - first:
+      213: -540616015043663381
+    second: StampAreaCircle_132
+  - first:
+      213: -4296963240986768258
+    second: StampAreaCircle_133
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: StampAreaCircle_0
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 867
+        width: 28
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f30414f9b409b0ea0800000000000000
+      internalID: -5905467831897472961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_1
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 901
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d72a7e16a483750e0800000000000000
+      internalID: -2281292794118561155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_2
+      rect:
+        serializedVersion: 2
+        x: 310
+        y: 881
+        width: 45
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5593b16c1ffccc30800000000000000
+      internalID: 4381157034887976285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_3
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 873
+        width: 55
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c33852ec4f687de70800000000000000
+      internalID: 9139922354760418108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_4
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 905
+        width: 28
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4df20c35690dc800800000000000000
+      internalID: 634173452932283723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_5
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 896
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e326c03399b250f0800000000000000
+      internalID: -1129636514686950431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_6
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 914
+        width: 13
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fef57676eced7ad0800000000000000
+      internalID: -2702743726778351882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_7
+      rect:
+        serializedVersion: 2
+        x: 418
+        y: 882
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 021144881072b9bb0800000000000000
+      internalID: -4928302479692263136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_8
+      rect:
+        serializedVersion: 2
+        x: 426
+        y: 916
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 197d513d938b99730800000000000000
+      internalID: 4006435902016837521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_9
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 894
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f8cf4ddf313068b0800000000000000
+      internalID: -5161071022600894224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_10
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 888
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d34967e5302deaee0800000000000000
+      internalID: -1247829134823484355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_11
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 879
+        width: 23
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9232a9f7f6f364b10800000000000000
+      internalID: 1965328035508527913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_12
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 915
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2cd8ba03741da500800000000000000
+      internalID: 409005625494264876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_13
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 895
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7066512f175d34b0800000000000000
+      internalID: -5459111382088261506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_14
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 903
+        width: 61
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ef09d33ce9be8700800000000000000
+      internalID: 544577029091692517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_15
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 876
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac090833229681e10800000000000000
+      internalID: 2168598816192762058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_16
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 879
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c915f6b597567ed0800000000000000
+      internalID: -2416647849506432569
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_17
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 873
+        width: 21
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1412c4890d52c8900800000000000000
+      internalID: 687966420919394625
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_18
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 877
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01db2659f6da9de20800000000000000
+      internalID: 3375920090450148624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_19
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 869
+        width: 35
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2abea56184d61660800000000000000
+      internalID: 7356300693578103338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_20
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 873
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69eaa4779b8f39130800000000000000
+      internalID: 3572472404888956566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_21
+      rect:
+        serializedVersion: 2
+        x: 348
+        y: 869
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2eb363de1753d5420800000000000000
+      internalID: 2620309321626827746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_22
+      rect:
+        serializedVersion: 2
+        x: 409
+        y: 867
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe5ccfec6f793d820800000000000000
+      internalID: 2941862067893487087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_23
+      rect:
+        serializedVersion: 2
+        x: 427
+        y: 866
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea862bd96e7bf35f0800000000000000
+      internalID: -774698409768359762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_24
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 847
+        width: 16
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d99eceeb4a5186390800000000000000
+      internalID: -7824980555234219619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_25
+      rect:
+        serializedVersion: 2
+        x: 453
+        y: 858
+        width: 23
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bb7fa1549174cb80800000000000000
+      internalID: -8375444525162726478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_26
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 934
+        height: 868
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ad25717129c77850800000000000000
+      internalID: 6374784943040834983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_27
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 846
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9263ba160ab6ba530800000000000000
+      internalID: 3867303041605252649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_28
+      rect:
+        serializedVersion: 2
+        x: 367
+        y: 849
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e336d01721271280800000000000000
+      internalID: -9072746472644660247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_29
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 849
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19093219ca9026250800000000000000
+      internalID: 5936317895601787025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_30
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 848
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68202349fdffa4a20800000000000000
+      internalID: 3047529433598657158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_31
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 852
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b817baf6eda7cc50800000000000000
+      internalID: 6685503379415177401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_32
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 843
+        width: 11
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad6d38ffdea405ea0800000000000000
+      internalID: -5886122326918703398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_33
+      rect:
+        serializedVersion: 2
+        x: 669
+        y: 851
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3757e510c7d402da0800000000000000
+      internalID: -5971687910899026573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_34
+      rect:
+        serializedVersion: 2
+        x: 745
+        y: 843
+        width: 23
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e3728ab7f4061880800000000000000
+      internalID: -8640713373031173152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_35
+      rect:
+        serializedVersion: 2
+        x: 779
+        y: 855
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49f44158c0fec32b0800000000000000
+      internalID: -5603340999304392812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_36
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 845
+        width: 7
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b14299f36ea2944a0800000000000000
+      internalID: -6608703809791646693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_37
+      rect:
+        serializedVersion: 2
+        x: 316
+        y: 839
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3200793ce44d4fb00800000000000000
+      internalID: 861546863488598051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_38
+      rect:
+        serializedVersion: 2
+        x: 683
+        y: 832
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74496520443295ad0800000000000000
+      internalID: -2713098525510036409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_39
+      rect:
+        serializedVersion: 2
+        x: 956
+        y: 651
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ff2e9521365e7da0800000000000000
+      internalID: -5945219688997965832
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_40
+      rect:
+        serializedVersion: 2
+        x: 898
+        y: 613
+        width: 21
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4fa70205f7fd6390800000000000000
+      internalID: -7823324345999577268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_41
+      rect:
+        serializedVersion: 2
+        x: 921
+        y: 592
+        width: 46
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ac8be7a272ff6910800000000000000
+      internalID: 1832950147620506793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_42
+      rect:
+        serializedVersion: 2
+        x: 921
+        y: 628
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46faea1fe52baf470800000000000000
+      internalID: 8429245773428731748
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_43
+      rect:
+        serializedVersion: 2
+        x: 933
+        y: 624
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b462d44db2061fb0800000000000000
+      internalID: -4677548151050967879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_44
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 602
+        width: 17
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50611026756880fe0800000000000000
+      internalID: -1222579588966574587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_45
+      rect:
+        serializedVersion: 2
+        x: 900
+        y: 597
+        width: 9
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf9f9021aadb552c0800000000000000
+      internalID: -4443436919186392580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_46
+      rect:
+        serializedVersion: 2
+        x: 924
+        y: 610
+        width: 10
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4708800dfe6913210800000000000000
+      internalID: 1310994923273093236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_47
+      rect:
+        serializedVersion: 2
+        x: 22
+        y: 585
+        width: 7
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2177d71fedb6f54c0800000000000000
+      internalID: -4296596914209720558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_48
+      rect:
+        serializedVersion: 2
+        x: 55
+        y: 592
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1f88387187c08960800000000000000
+      internalID: 7602295529883078430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_49
+      rect:
+        serializedVersion: 2
+        x: 957
+        y: 566
+        width: 18
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e43143346297047e0800000000000000
+      internalID: -1783292247195511986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_50
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 570
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ada446293d11a2c70800000000000000
+      internalID: 8946983210116729562
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_51
+      rect:
+        serializedVersion: 2
+        x: 885
+        y: 580
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4634df55fccd89940800000000000000
+      internalID: 5303231344287761252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_52
+      rect:
+        serializedVersion: 2
+        x: 897
+        y: 575
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66517770809a4d210800000000000000
+      internalID: 1356895239695439206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_53
+      rect:
+        serializedVersion: 2
+        x: 916
+        y: 569
+        width: 21
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 185a9a98230fd8360800000000000000
+      internalID: 7173653881319695745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_54
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 560
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 458aeb644a1a491d0800000000000000
+      internalID: -3344870896295827372
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_55
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 565
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97bf12c6a5fd2f530800000000000000
+      internalID: 3887415007828376441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_56
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 567
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bca2a02c17dd86c60800000000000000
+      internalID: 7811737034330614475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_57
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 559
+        width: 23
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4526125bbd99c01c0800000000000000
+      internalID: -4536081555753180588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_58
+      rect:
+        serializedVersion: 2
+        x: 888
+        y: 548
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31d0a7389ce9b38f0800000000000000
+      internalID: -559679140346065645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_59
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 557
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d38347aa33be11b0800000000000000
+      internalID: -5683908615199292456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_60
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 543
+        width: 16
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68fa5e6f1a4bb1d90800000000000000
+      internalID: -7125903377658695802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_61
+      rect:
+        serializedVersion: 2
+        x: 901
+        y: 532
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ac0689075cf32da0800000000000000
+      internalID: -5970651230211011420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_62
+      rect:
+        serializedVersion: 2
+        x: 915
+        y: 521
+        width: 18
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 777f09cfc3442ed00800000000000000
+      internalID: 1000437095955756919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_63
+      rect:
+        serializedVersion: 2
+        x: 55
+        y: 531
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2de1009ba4894910800000000000000
+      internalID: 1822133396638395695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_64
+      rect:
+        serializedVersion: 2
+        x: 879
+        y: 525
+        width: 18
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0feaa4207613977f0800000000000000
+      internalID: -614405555669520656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_65
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 513
+        width: 31
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c45bc41a33d508e40800000000000000
+      internalID: 5656623608308217164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_66
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 509
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb64b12454e458460800000000000000
+      internalID: 7243281635064104636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_67
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 518
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1dedf1f73e666d70800000000000000
+      internalID: 9036030888927685915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_68
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 521
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06c1d7ba8e6837670800000000000000
+      internalID: 8535314052664859744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_69
+      rect:
+        serializedVersion: 2
+        x: 903
+        y: 516
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 664122bec93a38400800000000000000
+      internalID: 325283492455912550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_70
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 493
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e244b88c36c5aea10800000000000000
+      internalID: 1939464173172507694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_71
+      rect:
+        serializedVersion: 2
+        x: 914
+        y: 509
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bc4783dc163be770800000000000000
+      internalID: 8641059807476272310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_72
+      rect:
+        serializedVersion: 2
+        x: 965
+        y: 511
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 312489ea85c545e50800000000000000
+      internalID: 6797159273565012499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_73
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 497
+        width: 22
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49253bbf4bc21cb40800000000000000
+      internalID: 5458693379178320532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_74
+      rect:
+        serializedVersion: 2
+        x: 907
+        y: 500
+        width: 16
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c00bafa9fa7871190800000000000000
+      internalID: -7991769825456508916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_75
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 482
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b1f62c7900d03850800000000000000
+      internalID: 6354807813375979954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_76
+      rect:
+        serializedVersion: 2
+        x: 897
+        y: 476
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab8e8605a927050a0800000000000000
+      internalID: -6894885022404646726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_77
+      rect:
+        serializedVersion: 2
+        x: 907
+        y: 478
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58bee8f75b58cd2b0800000000000000
+      internalID: -5558420825506387067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_78
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 485
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3f19d97012de9970800000000000000
+      internalID: 8763672893115146045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_79
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 441
+        width: 12
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79258a4bbab607400800000000000000
+      internalID: 319873958757814935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_80
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 461
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cecc122560f3d890800000000000000
+      internalID: -7434334242703880512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_81
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 462
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72965e91f31abea60800000000000000
+      internalID: 7704428879936842023
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_82
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 458
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0dfdc68fe1d720290800000000000000
+      internalID: -7925634822248276016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_83
+      rect:
+        serializedVersion: 2
+        x: 897
+        y: 467
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab5dd04fb780dbc50800000000000000
+      internalID: 6682506750556231098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_84
+      rect:
+        serializedVersion: 2
+        x: 900
+        y: 458
+        width: 16
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d694374455c492730800000000000000
+      internalID: 3974792075235510637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_85
+      rect:
+        serializedVersion: 2
+        x: 909
+        y: 461
+        width: 18
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ffe22af15c13d210800000000000000
+      internalID: 1356459051183173619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_86
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 452
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83a3afea94bfccef0800000000000000
+      internalID: -86417998940063176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_87
+      rect:
+        serializedVersion: 2
+        x: 903
+        y: 445
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2345aae8529fd6130800000000000000
+      internalID: 3561776820022563890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_88
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 438
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba6526f176863a790800000000000000
+      internalID: -7520052160661137749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_89
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 422
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60b3e91a079cc6630800000000000000
+      internalID: 3921730861117881094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_90
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 430
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38b24dcab6bdd98b0800000000000000
+      internalID: -5143713943879668861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_91
+      rect:
+        serializedVersion: 2
+        x: 911
+        y: 413
+        width: 38
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e76c5b6c528442670800000000000000
+      internalID: 8513008522721871486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_92
+      rect:
+        serializedVersion: 2
+        x: 901
+        y: 413
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6dc556adcfc2ef6b0800000000000000
+      internalID: -5260717850214703914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_93
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 400
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e53040c1802340310800000000000000
+      internalID: 1370275197038625630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_94
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 405
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f470dbff8ab20ad80800000000000000
+      internalID: -8241539313242929329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_95
+      rect:
+        serializedVersion: 2
+        x: 880
+        y: 393
+        width: 23
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ae198cc146304720800000000000000
+      internalID: 2828320222220983968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_96
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 390
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d340675d67d3fb00800000000000000
+      internalID: 861268818375230423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_97
+      rect:
+        serializedVersion: 2
+        x: 908
+        y: 395
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b643c853aaa71180800000000000000
+      internalID: -9144652899806918991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_98
+      rect:
+        serializedVersion: 2
+        x: 895
+        y: 377
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70221cfe48bac6790800000000000000
+      internalID: -7535459489051237881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_99
+      rect:
+        serializedVersion: 2
+        x: 907
+        y: 371
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d7e9b2028ff89230800000000000000
+      internalID: 3645944832212985810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_100
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 361
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f90284ea19e34e000800000000000000
+      internalID: 64245090105172127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_101
+      rect:
+        serializedVersion: 2
+        x: 891
+        y: 352
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ef38404e5e8d1530800000000000000
+      internalID: 3827371793791336418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_102
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 352
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4af80f2b3ac793f0800000000000000
+      internalID: -894023645468755379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_103
+      rect:
+        serializedVersion: 2
+        x: 879
+        y: 338
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e89a5f579abb11c20800000000000000
+      internalID: 3175525548775811470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_104
+      rect:
+        serializedVersion: 2
+        x: 890
+        y: 322
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa8dc5adbc2fb8810800000000000000
+      internalID: 1768774236028852394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_105
+      rect:
+        serializedVersion: 2
+        x: 897
+        y: 329
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab174cb8d677794f0800000000000000
+      internalID: -822057094591778374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_106
+      rect:
+        serializedVersion: 2
+        x: 58
+        y: 321
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e16bd7871fc7a090800000000000000
+      internalID: -8023216511166750240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_107
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 287
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e8ddc41ccb0d0ee0800000000000000
+      internalID: -1293364546835195679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_108
+      rect:
+        serializedVersion: 2
+        x: 890
+        y: 260
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d52d8142227f0d9f0800000000000000
+      internalID: -445584637103123875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_109
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 229
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a1a5030cc088b9d0800000000000000
+      internalID: -2758313158052044376
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_110
+      rect:
+        serializedVersion: 2
+        x: 923
+        y: 228
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d6228fc3a9276560800000000000000
+      internalID: 7306854703969740497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_111
+      rect:
+        serializedVersion: 2
+        x: 927
+        y: 202
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d463c89f1f51a0c0800000000000000
+      internalID: -4566263957865405226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_112
+      rect:
+        serializedVersion: 2
+        x: 912
+        y: 187
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 687ef9e5d7e37e030800000000000000
+      internalID: 3523853941620074374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_113
+      rect:
+        serializedVersion: 2
+        x: 272
+        y: 84
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90a2720ecbcecda10800000000000000
+      internalID: 1935682235821140489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_114
+      rect:
+        serializedVersion: 2
+        x: 355
+        y: 77
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 567639891acb753d0800000000000000
+      internalID: -3217896006497376411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_115
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 82
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d305ba772cef5e10800000000000000
+      internalID: 2188727598231913424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_116
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 81
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7731348d404fcc160800000000000000
+      internalID: 7047275818573304695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_117
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 78
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 918e1d08c7d0397c0800000000000000
+      internalID: -4065891210197080039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_118
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 80
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ace945878f63a370800000000000000
+      internalID: 8332626363413032100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_119
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 80
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a83eaa02304b726a0800000000000000
+      internalID: -6474008013795826806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_120
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 84
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 231208c5cdc2371b0800000000000000
+      internalID: -5660130981718253262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_121
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 60
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa39105a13993f1e0800000000000000
+      internalID: -2165218557334285398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_122
+      rect:
+        serializedVersion: 2
+        x: 427
+        y: 61
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b54ce3a6464b9ea0800000000000000
+      internalID: -5865016820508113479
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_123
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 69
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 239c466172710fe40800000000000000
+      internalID: 5688071786015803698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_124
+      rect:
+        serializedVersion: 2
+        x: 408
+        y: 55
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aced3fac748e83ca0800000000000000
+      internalID: -6036819905444847926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_125
+      rect:
+        serializedVersion: 2
+        x: 417
+        y: 48
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da73542fd3fba3130800000000000000
+      internalID: 3547357929286219693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_126
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 55
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b44e8b039dc4c51c0800000000000000
+      internalID: -4513648230823041973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_127
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 42
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 633b203cde6689340800000000000000
+      internalID: 4870756168366207798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_128
+      rect:
+        serializedVersion: 2
+        x: 506
+        y: 46
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e78235d93cefce510800000000000000
+      internalID: 1579917685411752062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_129
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 22
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96e4a6a45b3abf580800000000000000
+      internalID: -8792253848477872535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_130
+      rect:
+        serializedVersion: 2
+        x: 672
+        y: 32
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 504779e7a608d54d0800000000000000
+      internalID: -3144215769955994619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_131
+      rect:
+        serializedVersion: 2
+        x: 618
+        y: 20
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 204b1f46775cdc400800000000000000
+      internalID: 346149862962738178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_132
+      rect:
+        serializedVersion: 2
+        x: 706
+        y: 20
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be96f6f39985f78f0800000000000000
+      internalID: -540616015043663381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StampAreaCircle_133
+      rect:
+        serializedVersion: 2
+        x: 558
+        y: 4
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7c8218d2be1e54c0800000000000000
+      internalID: -4296963240986768258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      StampAreaCircle_0: -5905467831897472961
+      StampAreaCircle_1: -2281292794118561155
+      StampAreaCircle_10: -1247829134823484355
+      StampAreaCircle_100: 64245090105172127
+      StampAreaCircle_101: 3827371793791336418
+      StampAreaCircle_102: -894023645468755379
+      StampAreaCircle_103: 3175525548775811470
+      StampAreaCircle_104: 1768774236028852394
+      StampAreaCircle_105: -822057094591778374
+      StampAreaCircle_106: -8023216511166750240
+      StampAreaCircle_107: -1293364546835195679
+      StampAreaCircle_108: -445584637103123875
+      StampAreaCircle_109: -2758313158052044376
+      StampAreaCircle_11: 1965328035508527913
+      StampAreaCircle_110: 7306854703969740497
+      StampAreaCircle_111: -4566263957865405226
+      StampAreaCircle_112: 3523853941620074374
+      StampAreaCircle_113: 1935682235821140489
+      StampAreaCircle_114: -3217896006497376411
+      StampAreaCircle_115: 2188727598231913424
+      StampAreaCircle_116: 7047275818573304695
+      StampAreaCircle_117: -4065891210197080039
+      StampAreaCircle_118: 8332626363413032100
+      StampAreaCircle_119: -6474008013795826806
+      StampAreaCircle_12: 409005625494264876
+      StampAreaCircle_120: -5660130981718253262
+      StampAreaCircle_121: -2165218557334285398
+      StampAreaCircle_122: -5865016820508113479
+      StampAreaCircle_123: 5688071786015803698
+      StampAreaCircle_124: -6036819905444847926
+      StampAreaCircle_125: 3547357929286219693
+      StampAreaCircle_126: -4513648230823041973
+      StampAreaCircle_127: 4870756168366207798
+      StampAreaCircle_128: 1579917685411752062
+      StampAreaCircle_129: -8792253848477872535
+      StampAreaCircle_13: -5459111382088261506
+      StampAreaCircle_130: -3144215769955994619
+      StampAreaCircle_131: 346149862962738178
+      StampAreaCircle_132: -540616015043663381
+      StampAreaCircle_133: -4296963240986768258
+      StampAreaCircle_14: 544577029091692517
+      StampAreaCircle_15: 2168598816192762058
+      StampAreaCircle_16: -2416647849506432569
+      StampAreaCircle_17: 687966420919394625
+      StampAreaCircle_18: 3375920090450148624
+      StampAreaCircle_19: 7356300693578103338
+      StampAreaCircle_2: 4381157034887976285
+      StampAreaCircle_20: 3572472404888956566
+      StampAreaCircle_21: 2620309321626827746
+      StampAreaCircle_22: 2941862067893487087
+      StampAreaCircle_23: -774698409768359762
+      StampAreaCircle_24: -7824980555234219619
+      StampAreaCircle_25: -8375444525162726478
+      StampAreaCircle_26: 6374784943040834983
+      StampAreaCircle_27: 3867303041605252649
+      StampAreaCircle_28: -9072746472644660247
+      StampAreaCircle_29: 5936317895601787025
+      StampAreaCircle_3: 9139922354760418108
+      StampAreaCircle_30: 3047529433598657158
+      StampAreaCircle_31: 6685503379415177401
+      StampAreaCircle_32: -5886122326918703398
+      StampAreaCircle_33: -5971687910899026573
+      StampAreaCircle_34: -8640713373031173152
+      StampAreaCircle_35: -5603340999304392812
+      StampAreaCircle_36: -6608703809791646693
+      StampAreaCircle_37: 861546863488598051
+      StampAreaCircle_38: -2713098525510036409
+      StampAreaCircle_39: -5945219688997965832
+      StampAreaCircle_4: 634173452932283723
+      StampAreaCircle_40: -7823324345999577268
+      StampAreaCircle_41: 1832950147620506793
+      StampAreaCircle_42: 8429245773428731748
+      StampAreaCircle_43: -4677548151050967879
+      StampAreaCircle_44: -1222579588966574587
+      StampAreaCircle_45: -4443436919186392580
+      StampAreaCircle_46: 1310994923273093236
+      StampAreaCircle_47: -4296596914209720558
+      StampAreaCircle_48: 7602295529883078430
+      StampAreaCircle_49: -1783292247195511986
+      StampAreaCircle_5: -1129636514686950431
+      StampAreaCircle_50: 8946983210116729562
+      StampAreaCircle_51: 5303231344287761252
+      StampAreaCircle_52: 1356895239695439206
+      StampAreaCircle_53: 7173653881319695745
+      StampAreaCircle_54: -3344870896295827372
+      StampAreaCircle_55: 3887415007828376441
+      StampAreaCircle_56: 7811737034330614475
+      StampAreaCircle_57: -4536081555753180588
+      StampAreaCircle_58: -559679140346065645
+      StampAreaCircle_59: -5683908615199292456
+      StampAreaCircle_6: -2702743726778351882
+      StampAreaCircle_60: -7125903377658695802
+      StampAreaCircle_61: -5970651230211011420
+      StampAreaCircle_62: 1000437095955756919
+      StampAreaCircle_63: 1822133396638395695
+      StampAreaCircle_64: -614405555669520656
+      StampAreaCircle_65: 5656623608308217164
+      StampAreaCircle_66: 7243281635064104636
+      StampAreaCircle_67: 9036030888927685915
+      StampAreaCircle_68: 8535314052664859744
+      StampAreaCircle_69: 325283492455912550
+      StampAreaCircle_7: -4928302479692263136
+      StampAreaCircle_70: 1939464173172507694
+      StampAreaCircle_71: 8641059807476272310
+      StampAreaCircle_72: 6797159273565012499
+      StampAreaCircle_73: 5458693379178320532
+      StampAreaCircle_74: -7991769825456508916
+      StampAreaCircle_75: 6354807813375979954
+      StampAreaCircle_76: -6894885022404646726
+      StampAreaCircle_77: -5558420825506387067
+      StampAreaCircle_78: 8763672893115146045
+      StampAreaCircle_79: 319873958757814935
+      StampAreaCircle_8: 4006435902016837521
+      StampAreaCircle_80: -7434334242703880512
+      StampAreaCircle_81: 7704428879936842023
+      StampAreaCircle_82: -7925634822248276016
+      StampAreaCircle_83: 6682506750556231098
+      StampAreaCircle_84: 3974792075235510637
+      StampAreaCircle_85: 1356459051183173619
+      StampAreaCircle_86: -86417998940063176
+      StampAreaCircle_87: 3561776820022563890
+      StampAreaCircle_88: -7520052160661137749
+      StampAreaCircle_89: 3921730861117881094
+      StampAreaCircle_9: -5161071022600894224
+      StampAreaCircle_90: -5143713943879668861
+      StampAreaCircle_91: 8513008522721871486
+      StampAreaCircle_92: -5260717850214703914
+      StampAreaCircle_93: 1370275197038625630
+      StampAreaCircle_94: -8241539313242929329
+      StampAreaCircle_95: 2828320222220983968
+      StampAreaCircle_96: 861268818375230423
+      StampAreaCircle_97: -9144652899806918991
+      StampAreaCircle_98: -7535459489051237881
+      StampAreaCircle_99: 3645944832212985810
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

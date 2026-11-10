@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Video;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -24,6 +25,7 @@ public class SoundManager : MonoBehaviour
     private const string MasterVolumeKey = "Sound.MasterVolume";
     private const string BgmVolumeKey = "Sound.BgmVolume";
     private const string SfxVolumeKey = "Sound.SfxVolume";
+    private const string CutsceneVolumeKey = "Sound.CutsceneVolume";
     private const string MutedKey = "Sound.Muted";
 
     private static SoundManager instance;
@@ -81,6 +83,7 @@ public class SoundManager : MonoBehaviour
     [Range(0f, 1f)] public float defaultMasterVolume = 1f;
     [Range(0f, 1f)] public float defaultBgmVolume = 0.7f;
     [Range(0f, 1f)] public float defaultSfxVolume = 1f;
+    [Range(0f, 1f)] public float defaultCutsceneVolume = 1f;
 
     [Header("Debug")]
     [Tooltip("ขึ้น log ทุกครั้งที่เรียกเสียงที่ไม่มีในคลัง เปิดไว้ตอนทำเกมจะได้รู้ว่าพิมพ์ชื่อผิดตรงไหน")]
@@ -92,7 +95,9 @@ public class SoundManager : MonoBehaviour
     private float masterVolume = 1f;
     private float bgmVolume = 0.7f;
     private float sfxVolume = 1f;
+    private float cutsceneVolume = 1f;
     private bool isMuted = false;
+    private readonly List<VideoPlayer> registeredVideoPlayers = new List<VideoPlayer>();
 
     // ช่องเสียง 1 ช่อง = AudioSource 1 ตัวที่หมุนเวียนใช้ซ้ำ
     // ทำแบบนี้แทนการสร้าง AudioSource ใหม่ทุกครั้ง เพราะการสร้าง/ทำลาย GameObject รัว ๆ กินแรงเครื่องมาก
@@ -227,6 +232,7 @@ public class SoundManager : MonoBehaviour
     public float MasterVolume => masterVolume;
     public float BgmVolume => bgmVolume;
     public float SfxVolume => sfxVolume;
+    public float CutsceneVolume => cutsceneVolume;
     public bool IsMuted => isMuted;
 
     private void LoadVolumeSettings()
@@ -234,6 +240,7 @@ public class SoundManager : MonoBehaviour
         masterVolume = PlayerPrefs.GetFloat(MasterVolumeKey, defaultMasterVolume);
         bgmVolume = PlayerPrefs.GetFloat(BgmVolumeKey, defaultBgmVolume);
         sfxVolume = PlayerPrefs.GetFloat(SfxVolumeKey, defaultSfxVolume);
+        cutsceneVolume = PlayerPrefs.GetFloat(CutsceneVolumeKey, defaultCutsceneVolume);
         isMuted = PlayerPrefs.GetInt(MutedKey, 0) == 1;
 
         ApplyVolumes();
@@ -260,6 +267,13 @@ public class SoundManager : MonoBehaviour
         ApplyVolumes();
     }
 
+    public void SetCutsceneVolume(float value)
+    {
+        cutsceneVolume = Mathf.Clamp01(value);
+        PlayerPrefs.SetFloat(CutsceneVolumeKey, cutsceneVolume);
+        ApplyVolumes();
+    }
+
     public void SetMuted(bool muted)
     {
         isMuted = muted;
@@ -281,6 +295,7 @@ public class SoundManager : MonoBehaviour
 
     private float EffectiveBgmVolume => isMuted ? 0f : masterVolume * bgmVolume;
     private float EffectiveSfxVolume => isMuted ? 0f : masterVolume * sfxVolume;
+    private float EffectiveCutsceneVolume => isMuted ? 0f : masterVolume * cutsceneVolume;
 
     private void ApplyVolumes()
     {
@@ -304,6 +319,55 @@ public class SoundManager : MonoBehaviour
         }
 
         ApplyBgmVolume();
+        ApplyRegisteredVideoVolumes();
+    }
+
+    public void RegisterVideoPlayer(VideoPlayer videoPlayer)
+    {
+        if (videoPlayer == null) return;
+
+        if (!registeredVideoPlayers.Contains(videoPlayer))
+        {
+            registeredVideoPlayers.Add(videoPlayer);
+        }
+
+        ApplyVideoVolume(videoPlayer);
+    }
+
+    public void UnregisterVideoPlayer(VideoPlayer videoPlayer)
+    {
+        if (videoPlayer == null) return;
+
+        registeredVideoPlayers.Remove(videoPlayer);
+    }
+
+    private void ApplyRegisteredVideoVolumes()
+    {
+        for (int i = registeredVideoPlayers.Count - 1; i >= 0; i--)
+        {
+            VideoPlayer videoPlayer = registeredVideoPlayers[i];
+
+            if (videoPlayer == null)
+            {
+                registeredVideoPlayers.RemoveAt(i);
+                continue;
+            }
+
+            ApplyVideoVolume(videoPlayer);
+        }
+    }
+
+    private void ApplyVideoVolume(VideoPlayer videoPlayer)
+    {
+        if (videoPlayer.audioOutputMode != VideoAudioOutputMode.Direct) return;
+
+        ushort trackCount = videoPlayer.audioTrackCount;
+        float volume = EffectiveCutsceneVolume;
+
+        for (ushort track = 0; track < trackCount; track++)
+        {
+            videoPlayer.SetDirectAudioVolume(track, volume);
+        }
     }
 
     private void SetMixerVolume(string parameterName, float linearValue)
@@ -453,6 +517,7 @@ public class SoundManager : MonoBehaviour
         AudioSource source = voice.source;
         source.clip = clip;
         source.loop = loop;
+        source.ignoreListenerPause = IsPauseExemptSound(entry.id);
         source.pitch = pitch;
         source.volume = ResolveSfxVoiceVolume(entry.volume);
         source.outputAudioMixerGroup = sfxMixerGroup;
@@ -488,6 +553,14 @@ public class SoundManager : MonoBehaviour
         source.Play();
 
         return new SoundHandle(this, voice, voice.generation);
+    }
+
+    private static bool IsPauseExemptSound(string soundId)
+    {
+        return soundId == SoundIds.UiClick ||
+               soundId == SoundIds.UiSpaceContinue ||
+               soundId == SoundIds.UiHover ||
+               soundId == SoundIds.PauseAppear;
     }
 
     private bool CanPlayNow(SoundEntry entry)

@@ -36,6 +36,13 @@ public class Cup : MonoBehaviour, IDraggable
     [Header("Drag Sprite")]
     [SerializeField] private Sprite dragSprite;
 
+    [Header("Drag Sway")]
+    [SerializeField] private bool enableDragSway = true;
+    [SerializeField] private float swayAnglePerSpeed = 2.2f;
+    [SerializeField] private float swayMaxAngle = 16f;
+    [SerializeField] private float swayStiffness = 90f;
+    [SerializeField] private float swayDamping = 12f;
+
     [Header("Snap Back")]
     [SerializeField] private float snapMoveDuration = 0.2f;
 
@@ -50,6 +57,12 @@ public class Cup : MonoBehaviour, IDraggable
     private Coroutine snapMoveCoroutine;
     private Coroutine spawnAnimationCoroutine;
     private Vector3 spawnAnimationScale;
+    private Quaternion baseLocalRotation;
+    private float swayDegrees;
+    private float swayAngularVelocity;
+    private Vector2 lastDragPos;
+    private bool hasDragSwaySample;
+    private bool isBeingDragged;
 
     [System.Serializable]
     public struct FoodInstanceData
@@ -64,6 +77,7 @@ public class Cup : MonoBehaviour, IDraggable
     {
         sr = GetComponent<SpriteRenderer>();
         if (sr != null) defaultSprite = sr.sprite;
+        baseLocalRotation = transform.localRotation;
 
         if (dropArea == null) dropArea = GetComponent<Collider2D>();
         if (dropArea == null) dropArea = GetComponentInChildren<Collider2D>();
@@ -357,6 +371,12 @@ public class Cup : MonoBehaviour, IDraggable
             snapMoveCoroutine = null;
         }
 
+        hasDragSwaySample = false;
+        swayDegrees = 0f;
+        swayAngularVelocity = 0f;
+        isBeingDragged = true;
+        ApplySwayRotation();
+
         if (sr != null && dragSprite != null)
             sr.sprite = dragSprite;
     }
@@ -366,8 +386,30 @@ public class Cup : MonoBehaviour, IDraggable
         transform.position = mousePos;
     }
 
+    public void UpdateDragSway(Vector2 pointerWorldPos)
+    {
+        if (!enableDragSway) return;
+
+        if (!hasDragSwaySample)
+        {
+            lastDragPos = pointerWorldPos;
+            hasDragSwaySample = true;
+            return;
+        }
+
+        float dt = Mathf.Min(Time.deltaTime, 0.05f);
+        if (dt <= 0f) return;
+
+        float horizontalSpeed = (pointerWorldPos.x - lastDragPos.x) / dt;
+        lastDragPos = pointerWorldPos;
+        float targetAngle = Mathf.Clamp(-horizontalSpeed * swayAnglePerSpeed, -swayMaxAngle, swayMaxAngle);
+        StepSwaySpring(targetAngle, dt);
+    }
+
     public void OnEndDrag()
     {
+        isBeingDragged = false;
+
         if (snapMoveCoroutine != null)
             StopCoroutine(snapMoveCoroutine);
 
@@ -380,6 +422,40 @@ public class Cup : MonoBehaviour, IDraggable
         }
 
         snapMoveCoroutine = StartCoroutine(SmoothSnapBack());
+    }
+
+    private void Update()
+    {
+        SettleDragSway();
+    }
+
+    private void StepSwaySpring(float targetAngle, float dt)
+    {
+        swayAngularVelocity += (-swayStiffness * (swayDegrees - targetAngle) - swayDamping * swayAngularVelocity) * dt;
+        swayDegrees += swayAngularVelocity * dt;
+        ApplySwayRotation();
+    }
+
+    private void ApplySwayRotation()
+    {
+        transform.localRotation = baseLocalRotation * Quaternion.Euler(0f, 0f, swayDegrees);
+    }
+
+    private void SettleDragSway()
+    {
+        if (isBeingDragged) return;
+        if (swayDegrees == 0f && swayAngularVelocity == 0f) return;
+
+        float dt = Mathf.Min(Time.deltaTime, 0.05f);
+        if (dt <= 0f) return;
+
+        StepSwaySpring(0f, dt);
+        if (Mathf.Abs(swayDegrees) < 0.01f && Mathf.Abs(swayAngularVelocity) < 0.01f)
+        {
+            swayDegrees = 0f;
+            swayAngularVelocity = 0f;
+            ApplySwayRotation();
+        }
     }
 
     // ลอยนุ่มๆ กลับไปตำแหน่งตั้งต้น แทนที่จะกระโดดวาร์ปทันที แล้วค่อยสลับ sprite กลับตอนถึงที่แล้ว

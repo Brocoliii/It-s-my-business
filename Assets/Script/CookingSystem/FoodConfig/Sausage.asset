@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75d2635783c640944a4b1028a1d283d4, type: 3}
+  m_Name: Sausage
+  m_EditorClassIdentifier: Assembly-CSharp::FoodData
+  foodName: Sausage
+  foodIcon: {fileID: 21300000, guid: baf562960c2da2d48bfed0c1719a041a, type: 3}
+  rawSprite: {fileID: 21300000, guid: a18f9095b9f632a4eafc93a7a8ad8484, type: 3}
+  mediumSprite: {fileID: 21300000, guid: a18f9095b9f632a4eafc93a7a8ad8484, type: 3}
+  cookedSprite: {fileID: 21300000, guid: feca18929966b09488dd60c302867819, type: 3}
+  burntSprite: {fileID: 21300000, guid: 99ba1927aea21ee4c8fa30e8dd5187c1, type: 3}
+  mediumTime: 5
+  cookTime: 8
+  burnTime: 20
+  sauceSprite: {fileID: 21300000, guid: 36ec855548ba6b14e9b97c78089ff342, type: 3}
+  spicyLevel1Sprite: {fileID: 21300000, guid: d532ad3c35190ab4ebc45ea17eaf6b79, type: 3}
+  spicyLevel2Sprite: {fileID: 21300000, guid: 5511d96dea1c3954cb7fcb86b90565c2, type: 3}
+  spicyLevel3Sprite: {fileID: 21300000, guid: 0031f3d4f9c48bd4e8612e84294ffd5a, type: 3}
+  sauceSpicyLevel1Sprite: {fileID: 21300000, guid: 50470833577f432458cea13d98f79872, type: 3}
+  sauceSpicyLevel2Sprite: {fileID: 21300000, guid: 9ab0c9668dd6d7b4f9857d3eeeac519a, type: 3}
+  sauceSpicyLevel3Sprite: {fileID: 21300000, guid: 79918d64a23effc4da4780037bc379ff, type: 3}

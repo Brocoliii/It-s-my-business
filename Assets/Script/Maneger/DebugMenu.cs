@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class DebugMenu : MonoBehaviour
 {
@@ -12,10 +13,47 @@ public class DebugMenu : MonoBehaviour
     public Vector2 forceCookSeasoningButtonPosition = new Vector2(20f, 140f);
     public bool showSkipIntroDebugButton = true;
     public Vector2 skipIntroButtonPosition = new Vector2(20f, 200f);
+    public bool showFirstCutsceneDebugButton = true;
+    public Vector2 firstCutsceneButtonPosition = new Vector2(20f, 440f);
     public bool showLoseDebugButton = true;
     public Vector2 loseButtonPosition = new Vector2(20f, 260f);
     public bool showDiscardCluesDebugButton = true;
     public Vector2 discardCluesButtonPosition = new Vector2(20f, 320f);
+
+    [SerializeField] private float debugToggleHoldDuration = 1.5f;
+
+    private bool debugButtonsVisible = false;
+    private float debugToggleHoldStartTime = -1f;
+    private bool debugToggleTriggered;
+
+    private void Update()
+    {
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard == null)
+        {
+            debugToggleHoldStartTime = -1f;
+            debugToggleTriggered = false;
+            return;
+        }
+
+        if (!keyboard.hKey.isPressed)
+        {
+            debugToggleHoldStartTime = -1f;
+            debugToggleTriggered = false;
+            return;
+        }
+
+        if (debugToggleHoldStartTime < 0f)
+        {
+            debugToggleHoldStartTime = Time.unscaledTime;
+        }
+        else if (!debugToggleTriggered &&
+                 Time.unscaledTime - debugToggleHoldStartTime >= debugToggleHoldDuration)
+        {
+            debugButtonsVisible = !debugButtonsVisible;
+            debugToggleTriggered = true;
+        }
+    }
 
     [ContextMenu("บังคับเสกลูกค้า")]
     public void ForceSpawnCustomer()
@@ -256,9 +294,24 @@ public class DebugMenu : MonoBehaviour
         }
     }
 
+    [ContextMenu("Skip Cutscene (Debug)")]
+    public void SkipFirstCutscene()
+    {
+        GameplayCutsceneController cutscene = Object.FindAnyObjectByType<GameplayCutsceneController>(FindObjectsInactive.Include);
+        if (cutscene != null)
+        {
+            cutscene.SkipCutsceneForDebug();
+            Debug.Log("<color=cyan>[Debug]</color> ข้าม Cutscene แล้ว");
+        }
+        else
+        {
+            Debug.LogWarning("<color=cyan>[Debug]</color> ไม่พบ GameplayCutsceneController เพื่อข้าม Cutscene");
+        }
+    }
+
     private void OnGUI()
     {
-        if (!Application.isPlaying) return;
+        if (!Application.isPlaying || !debugButtonsVisible) return;
 
         if (showWinDebugButton && GUI.Button(new Rect(winButtonPosition.x, winButtonPosition.y, winButtonSize.x, winButtonSize.y), "Debug:Skip to Win"))
         {
@@ -278,6 +331,11 @@ public class DebugMenu : MonoBehaviour
         if (showSkipIntroDebugButton && GUI.Button(new Rect(skipIntroButtonPosition.x, skipIntroButtonPosition.y, winButtonSize.x, winButtonSize.y), "Debug:Skip Intro"))
         {
             SkipIntroDialogue();
+        }
+
+        if (showFirstCutsceneDebugButton && GUI.Button(new Rect(firstCutsceneButtonPosition.x, firstCutsceneButtonPosition.y, winButtonSize.x, winButtonSize.y), "Debug:Skip Cutscene"))
+        {
+            SkipFirstCutscene();
         }
 
         if (showLoseDebugButton && GUI.Button(new Rect(loseButtonPosition.x, loseButtonPosition.y, winButtonSize.x, winButtonSize.y), "Debug:Skip to Lose"))

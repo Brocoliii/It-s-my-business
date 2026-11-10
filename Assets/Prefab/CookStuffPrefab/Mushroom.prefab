@@ -116,7 +116,7 @@ MonoBehaviour:
   isFacingSideA: 1
   _burnTime: 10
   defaultLayer: UI
-  dragLayer: Extra3
+  dragLayer: Extra2
   mirrorSpriteWhenFlipped: 1
   flipDuration: 0.4
   flipHopHeight: 0.25
@@ -131,7 +131,14 @@ MonoBehaviour:
   shadowObject: {fileID: 6104327242741772455}
   enableGrillSmoke: 1
   smokeEffect: {fileID: 0}
+  enableDragSway: 1
+  swayAnglePerSpeed: 2.2
+  swayMaxAngle: 16
+  swayStiffness: 90
+  swayDamping: 12
   snapMoveDuration: 0.15
+  trayPopDuration: 0.2
+  trayPopOvershoot: 1.15
   startDragPos: {x: 0, y: 0, z: 0}
   currentGrill: {fileID: 0}
   currentSeasoning: {fileID: 0}
@@ -371,7 +378,7 @@ MonoBehaviour:
   food: {fileID: 1417074508337642404}
   smokePrefab: {fileID: 2748906455114698958, guid: 2db7228fdaf220743a3f29c00634399b, type: 3}
   smokeOffset: {x: 0, y: -1, z: 0}
-  sortingLayerName: UI
+  sortingLayerName: Extra3
   sortingOrder: 99
   rawRate: 5
   mediumRate: 9

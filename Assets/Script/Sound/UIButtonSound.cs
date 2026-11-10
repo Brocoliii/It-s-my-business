@@ -46,8 +46,12 @@ public class UIButtonSound : MonoBehaviour
 
     private void Bind(Button button)
     {
+        BindButton(button, clickSoundId, hoverSoundId);
+    }
+
+    public static void BindButton(Button button, string clickSoundId = SoundIds.UiClick, string hoverSoundId = SoundIds.UiHover)
+    {
         if (button == null) return;
-        if (IsIgnored(button)) return;
 
         // ตัวส่งเสียงจริงติดอยู่กับปุ่มแต่ละตัว เพราะเสียงตอนเลื่อนเมาส์ผ่าน
         // ต้องมีตัวรับ event อยู่บน GameObject ของปุ่มนั้นเอง จะฝากไว้ที่แผงแม่ไม่ได้

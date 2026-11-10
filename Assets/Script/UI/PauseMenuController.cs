@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 // แผงหยุดเกม กด ESC ระหว่างเล่นแล้วเกมจะหยุดนิ่ง พร้อมปุ่ม เล่นต่อ / ตั้งค่า / กลับเมนูหลัก
 //
@@ -11,12 +13,14 @@ using UnityEngine.UI;
 //      ข้างในมีปุ่ม 3 ปุ่ม: เล่นต่อ / ตั้งค่า / กลับเมนูหลัก
 //   3. ลากแผงกับปุ่มทั้งหมดมาใส่ช่องด้านล่าง
 //      ไม่ต้องไปผูก On Click ที่ตัวปุ่มเอง ระบบผูกให้ตอนเริ่มฉาก
-//   4. แผงตั้งค่า (ตัวเดียวกับที่มี AudioSettingsUI / CameraSettingsUI) ไม่มีก็ได้
-//      ถ้าใส่ไว้ ปุ่มตั้งค่าจะสลับไปเปิดแผงนั้นให้ แล้วปุ่มย้อนกลับจะพากลับมาที่แผงหยุดเกม
+//   4. แผงตั้งค่า (ตัวเดียวหรือหลายแผงย่อยที่มี AudioSettingsUI / CameraSettingsUI) ไม่มีก็ได้
+//      ถ้าใช้หลายแผง ให้ใส่ SettingsPanelCarousel ไว้ที่ตัวแม่ แล้วผูกแผงย่อยกับปุ่มลูกศร
+//      หรือใส่ปุ่มเลือกแผงโดยตรงใน panelButtons เพื่อให้หน้า Audio มีปุ่ม Camera/Resolution
+//      ปุ่มตั้งค่าจะสลับไปเปิดแผงนั้นให้ แล้วปุ่มย้อนกลับจะพากลับมาที่แผงหยุดเกม
 //      สำคัญ: แผงตั้งค่าต้องเป็น "แผงพี่น้อง" ของแผงหยุดเกม ห้ามเอาไปเป็นลูกของแผงหยุดเกม
 //      เพราะตอนกดปุ่มตั้งค่า แผงหยุดเกมจะถูกปิด ถ้าแผงตั้งค่าเป็นลูกมันจะถูกปิดตามไปด้วย
 //
-// แผงทั้งสองจะถูกปิดให้เองตอนเริ่มฉาก ไม่ต้องไปปิดค้างไว้ใน Inspector เอง
+// แผงเมนูทั้งหมดจะถูกปิดให้เองตอนเริ่มฉาก ไม่ต้องไปปิดค้างไว้ใน Inspector เอง
 public class PauseMenuController : MonoBehaviour
 {
     // ให้ระบบอื่นเช็คได้ว่าตอนนี้หยุดเกมอยู่ไหม (InputManager กับ CameraController ใช้ตัวนี้)
@@ -26,6 +30,12 @@ public class PauseMenuController : MonoBehaviour
     [Header("แผงหยุดเกม")]
     [Tooltip("แผงที่จะเด้งขึ้นมาตอนกด ESC ปล่อยว่าง = ไม่มีแผงให้โชว์ (เกมยังหยุดได้ แต่ผู้เล่นจะไม่เห็นปุ่มอะไรเลย)")]
     [SerializeField] private GameObject pausePanel;
+
+    [Header("แอนิเมชันแผงหยุดเกม")]
+    [Tooltip("ระยะเวลาเปิด/ปิดแผงหยุดเกม หน่วยเป็นวินาที")]
+    [SerializeField] private float pausePanelAnimationDuration = 0.2f;
+    [Tooltip("ขนาดเริ่มต้นของแผงตอนเปิด ถ้าเป็น 0 จะเริ่มจากขนาด 92%")]
+    [SerializeField] private float pausePanelStartScale = 0.92f;
 
     [Header("แผงตั้งค่า (ไม่มีก็ได้)")]
     [Tooltip("แผงตั้งค่าตัวเดียวกับที่มี AudioSettingsUI / CameraSettingsUI อยู่\nปล่อยว่าง = ปุ่มตั้งค่าจะไม่ทำอะไร")]
@@ -43,12 +53,16 @@ public class PauseMenuController : MonoBehaviour
     [Tooltip("ปุ่ม \"ย้อนกลับ\" ที่อยู่ในแผง Settings ลากมาใส่ช่องนี้ช่องเดียว\nกดแล้วจะกลับมาที่แผงหยุดเกม ไม่ใช่เล่นต่อทันที")]
     [SerializeField] private Button settingsBackButton;
 
+    [Header("หลายแผงตั้งค่า (ทางเลือก)")]
+    [Tooltip("ถ้าใช้หลายแผง ให้ลากแผงแม่ที่มี SettingsPanelCarousel ไว้ในช่องนี้\nถ้าเว้นว่าง ระบบจะใช้ settingsPanel เดิม")]
+    [SerializeField] private GameObject settingsPanelsRoot;
+
     [Header("ฉากเมนูหลัก")]
     [Tooltip("ชื่อฉากเมนูหลัก ต้องสะกดตรงกับชื่อฉากจริง และเพิ่มฉากนี้ใน File > Build Settings ด้วย")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     [Header("เงื่อนไขการกดหยุด")]
-    [Tooltip("ติ๊กถูก = กด ESC หยุดเกมได้เฉพาะตอนกำลังเล่นอยู่ (สถานะ Playing)\nติ๊กออก = หยุดได้ทุกสถานะ ยกเว้นตอนแพ้/ชนะ ซึ่งกันไว้เสมอ")]
+    [Tooltip("ติ๊กถูก = กด ESC หยุดเกมได้เฉพาะตอนกำลังเล่นอยู่ (สถานะ Playing) แต่ยังหยุดได้ตอนเปิดสมุดหรือแผงสรุปผล\nติ๊กออก = หยุดได้ทุกสถานะ ยกเว้นตอนแพ้/ชนะที่ไม่มีแผงสรุปผล")]
     [SerializeField] private bool onlyPauseWhilePlaying = true;
     [Tooltip("ติ๊กถูก = ห้ามกดหยุดเกมระหว่างแอบฟัง (กดค้างอยู่บนตัวคนให้สืบ) ต้องปล่อยเมาส์ก่อนถึงกด ESC ได้\nกันเคสกดหยุดกลางคันเพื่อหนีมินิเกมกดปุ่ม หรือเอาไปคิดคำตอบต่อตอนเกมหยุดนิ่ง")]
     [SerializeField] private bool blockPauseWhileInvestigating = true;
@@ -61,6 +75,10 @@ public class PauseMenuController : MonoBehaviour
     private float timeScaleBeforePause = 1f;
 
     private InputManager inputManager;
+    private CanvasGroup pausePanelCanvasGroup;
+    private Coroutine pausePanelAnimation;
+    private Coroutine pointerHoverRefresh;
+    private Vector3 pausePanelOriginalScale = Vector3.one;
 
     private void Awake()
     {
@@ -74,6 +92,21 @@ public class PauseMenuController : MonoBehaviour
         if (settingsButton != null) settingsButton.onClick.AddListener(OnClickSettings);
         if (mainMenuButton != null) mainMenuButton.onClick.AddListener(OnClickMainMenu);
         if (settingsBackButton != null) settingsBackButton.onClick.AddListener(OnClickSettingsBack);
+        UIButtonSound.BindButton(resumeButton);
+        UIButtonSound.BindButton(settingsButton);
+        UIButtonSound.BindButton(mainMenuButton);
+        UIButtonSound.BindButton(settingsBackButton);
+
+        if (pausePanel != null)
+        {
+            pausePanelCanvasGroup = pausePanel.GetComponent<CanvasGroup>();
+            if (pausePanelCanvasGroup == null) pausePanelCanvasGroup = pausePanel.AddComponent<CanvasGroup>();
+
+            pausePanelOriginalScale = pausePanel.transform.localScale;
+            pausePanelCanvasGroup.alpha = 0f;
+            pausePanelCanvasGroup.interactable = false;
+            pausePanelCanvasGroup.blocksRaycasts = false;
+        }
 
         HideAllPanels();
     }
@@ -96,7 +129,7 @@ public class PauseMenuController : MonoBehaviour
         }
 
         // อยู่ในหน้าตั้งค่า: ESC = ถอยกลับมาหน้าหยุดเกมก่อน ไม่ใช่กระโดดกลับไปเล่นต่อเลย
-        if (settingsPanel != null && settingsPanel.activeSelf)
+        if (IsSettingsVisible())
         {
             ShowPausePanel();
             return;
@@ -105,7 +138,7 @@ public class PauseMenuController : MonoBehaviour
         ResumeGame();
     }
 
-    // แพ้/ชนะไปแล้วห้ามหยุดเกม ไม่งั้นแผงหยุดเกมจะเด้งมาทับหน้าจอแพ้ แล้วกดเล่นต่อได้ทั้งที่จบไปแล้ว
+    // อนุญาตให้หยุดทับสมุดหรือแผงสรุปผลได้ โดยซ่อนแผงเดิมไว้ชั่วคราวเพื่อกันการรับคลิกซ้อนกัน
     private bool CanPause()
     {
         // กำลังแอบฟังอยู่: ห้ามหยุดเกม ไม่งั้นจะกดหยุดหนีมินิเกมกดปุ่มได้
@@ -117,7 +150,16 @@ public class PauseMenuController : MonoBehaviour
 
         GameManager.GameState state = GameManager.Instance.CurrentState;
 
-        if (state == GameManager.GameState.Win || state == GameManager.GameState.Lose) return false;
+        if (state == GameManager.GameState.Win || state == GameManager.GameState.Lose)
+        {
+            return StageResultPanel.Instance != null && StageResultPanel.Instance.IsShown;
+        }
+
+        if (state == GameManager.GameState.CulpritSelection)
+        {
+            NotebookManager notebook = FindObjectOfType<NotebookManager>(true);
+            return notebook != null && notebook.IsOpen;
+        }
 
         return !onlyPauseWhilePlaying || state == GameManager.GameState.Playing;
     }
@@ -128,7 +170,7 @@ public class PauseMenuController : MonoBehaviour
 
         IsPaused = true;
 
-        timeScaleBeforePause = Time.timeScale > 0f ? Time.timeScale : 1f;
+        timeScaleBeforePause = Time.timeScale;
         Time.timeScale = 0f;
 
         // ปล่อยของที่ค้างอยู่ในมือก่อนหยุด ไม่งั้นถ้าผู้เล่นปล่อยเมาส์ตอนกดปุ่มในแผงหยุดเกม
@@ -150,7 +192,17 @@ public class PauseMenuController : MonoBehaviour
 
         if (muteGameAudioWhilePaused && SoundManager.Exists) SoundManager.Instance.SetPaused(false);
 
-        HideAllPanels();
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (settingsPanelsRoot != null) settingsPanelsRoot.SetActive(false);
+        SetSettingsNavigationVisible(false);
+        if (pausePanel != null)
+        {
+            ClearPausePanelSelection();
+            if (pausePanelAnimation != null) StopCoroutine(pausePanelAnimation);
+            pausePanelAnimation = StartCoroutine(AnimatePausePanel(false));
+        }
+
+        StopPointerHoverRefresh();
     }
 
     public void TogglePause()
@@ -166,14 +218,15 @@ public class PauseMenuController : MonoBehaviour
 
     public void OnClickSettings()
     {
-        if (settingsPanel == null)
+        GameObject panelToShow = GetSettingsPanel();
+        if (panelToShow == null)
         {
             Debug.LogWarning("[PauseMenu] ยังไม่ได้ผูก Settings Panel ไว้ใน Inspector เลยไม่มีแผงตั้งค่าให้เปิด");
             return;
         }
 
-        if (pausePanel != null) pausePanel.SetActive(false);
-        settingsPanel.SetActive(true);
+        if (pausePanelAnimation != null) StopCoroutine(pausePanelAnimation);
+        pausePanelAnimation = StartCoroutine(SwitchToSettingsPanel(panelToShow));
     }
 
     // กลับจากแผงตั้งค่ามาที่แผงหยุดเกม (เกมยังหยุดอยู่)
@@ -199,6 +252,7 @@ public class PauseMenuController : MonoBehaviour
 
         // คืนเวลา/เสียงให้เรียบร้อยก่อนออกจากฉาก ไม่งั้นฉากเมนูจะเปิดมาแล้วค้างนิ่งและเงียบสนิท
         ResumeGame();
+        Time.timeScale = 1f;
 
         // SoundManager ข้ามฉากไปด้วย (DontDestroyOnLoad) เสียงประกอบที่ค้างอยู่เลยตามไปดังในฉากใหม่ได้
         if (SoundManager.Exists) SoundManager.Instance.StopAllSFX();
@@ -208,14 +262,183 @@ public class PauseMenuController : MonoBehaviour
 
     private void ShowPausePanel()
     {
-        if (pausePanel != null) pausePanel.SetActive(true);
+        ClearPausePanelSelection();
+
         if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (settingsPanelsRoot != null) settingsPanelsRoot.SetActive(false);
+        SetSettingsNavigationVisible(false);
+
+        if (pausePanel == null) return;
+
+        SoundManager.Instance.PlaySFX(SoundIds.PauseAppear);
+
+        // Keep the underlying modal UI alive and put pause controls above it.
+        pausePanel.transform.SetAsLastSibling();
+
+        if (pausePanelAnimation != null) StopCoroutine(pausePanelAnimation);
+        StopPointerHoverRefresh();
+        pausePanelAnimation = StartCoroutine(AnimatePausePanel(true));
     }
+
 
     private void HideAllPanels()
     {
-        if (pausePanel != null) pausePanel.SetActive(false);
+        if (pausePanelAnimation != null) StopCoroutine(pausePanelAnimation);
+        if (pausePanel != null)
+        {
+            pausePanel.SetActive(false);
+            pausePanelCanvasGroup.alpha = 0f;
+            pausePanelCanvasGroup.interactable = false;
+            pausePanelCanvasGroup.blocksRaycasts = false;
+            pausePanel.transform.localScale = pausePanelOriginalScale;
+        }
         if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (settingsPanelsRoot != null) settingsPanelsRoot.SetActive(false);
+    }
+
+    private IEnumerator SwitchToSettingsPanel(GameObject panelToShow)
+    {
+        yield return AnimatePausePanel(false);
+
+        panelToShow.SetActive(true);
+        SetSettingsNavigationVisible(true);
+        pausePanelAnimation = null;
+    }
+
+    private IEnumerator AnimatePausePanel(bool show)
+    {
+        if (pausePanel == null || pausePanelCanvasGroup == null) yield break;
+
+        if (show)
+        {
+            pausePanel.SetActive(true);
+            pausePanelCanvasGroup.interactable = false;
+            pausePanelCanvasGroup.blocksRaycasts = false;
+        }
+
+        float duration = Mathf.Max(0f, pausePanelAnimationDuration);
+        float elapsed = 0f;
+        float startAlpha = show ? 0f : pausePanelCanvasGroup.alpha;
+        float endAlpha = show ? 1f : 0f;
+        Vector3 startScale = show
+            ? pausePanelOriginalScale * Mathf.Clamp(pausePanelStartScale, 0.01f, 1f)
+            : pausePanel.transform.localScale;
+        Vector3 endScale = show ? pausePanelOriginalScale : pausePanelOriginalScale * Mathf.Clamp(pausePanelStartScale, 0.01f, 1f);
+
+        pausePanelCanvasGroup.alpha = startAlpha;
+        pausePanel.transform.localScale = startScale;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float progress = duration <= 0f ? 1f : Mathf.Clamp01(elapsed / duration);
+            float easedProgress = Mathf.SmoothStep(0f, 1f, progress);
+            pausePanelCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, easedProgress);
+            pausePanel.transform.localScale = Vector3.Lerp(startScale, endScale, easedProgress);
+            yield return null;
+        }
+
+        pausePanelCanvasGroup.alpha = endAlpha;
+        pausePanel.transform.localScale = endScale;
+        pausePanelCanvasGroup.interactable = show;
+        pausePanelCanvasGroup.blocksRaycasts = show;
+
+        if (!show)
+        {
+            pausePanel.SetActive(false);
+        }
+        else
+        {
+            pointerHoverRefresh = StartCoroutine(RefreshPointerHover());
+        }
+
+        pausePanelAnimation = null;
+    }
+
+    private IEnumerator RefreshPointerHover()
+    {
+        yield return null;
+
+        if (EventSystem.current == null || Mouse.current == null || pausePanel == null || !pausePanel.activeInHierarchy)
+        {
+            pointerHoverRefresh = null;
+            yield break;
+        }
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current)
+        {
+            position = Mouse.current.position.ReadValue()
+        };
+        var raycastResults = new System.Collections.Generic.List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, raycastResults);
+
+        for (int i = 0; i < raycastResults.Count; i++)
+        {
+            GameObject target = raycastResults[i].gameObject;
+            if (target != null && target.transform.IsChildOf(pausePanel.transform))
+            {
+                Button button = target.GetComponentInParent<Button>();
+                if (button != null && button.IsInteractable())
+                {
+                    pointerData.pointerEnter = button.gameObject;
+                    ExecuteEvents.Execute(button.gameObject, pointerData, ExecuteEvents.pointerExitHandler);
+                    ExecuteEvents.Execute(button.gameObject, pointerData, ExecuteEvents.pointerEnterHandler);
+                }
+
+                break;
+            }
+        }
+
+        pointerHoverRefresh = null;
+    }
+
+    private void ClearPausePanelSelection()
+    {
+        if (EventSystem.current == null)
+        {
+            return;
+        }
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current);
+        Button[] buttons = pausePanel != null ? pausePanel.GetComponentsInChildren<Button>(true) : new Button[0];
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            if (buttons[i] != null)
+            {
+                ExecuteEvents.Execute(buttons[i].gameObject, pointerData, ExecuteEvents.pointerExitHandler);
+            }
+        }
+
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    private void StopPointerHoverRefresh()
+    {
+        if (pointerHoverRefresh != null)
+        {
+            StopCoroutine(pointerHoverRefresh);
+            pointerHoverRefresh = null;
+        }
+    }
+
+    private GameObject GetSettingsPanel()
+    {
+        return settingsPanelsRoot != null ? settingsPanelsRoot : settingsPanel;
+    }
+
+    private bool IsSettingsVisible()
+    {
+        GameObject panel = GetSettingsPanel();
+        return panel != null && panel.activeSelf;
+    }
+
+    private void SetSettingsNavigationVisible(bool isVisible)
+    {
+        GameObject panel = GetSettingsPanel();
+        if (panel == null) return;
+
+        SettingsPanelCarousel carousel = panel.GetComponent<SettingsPanelCarousel>();
+        if (carousel != null) carousel.SetNavigationVisible(isVisible);
     }
 
     private void OnDestroy()
@@ -224,6 +447,7 @@ public class PauseMenuController : MonoBehaviour
         if (settingsButton != null) settingsButton.onClick.RemoveListener(OnClickSettings);
         if (mainMenuButton != null) mainMenuButton.onClick.RemoveListener(OnClickMainMenu);
         if (settingsBackButton != null) settingsBackButton.onClick.RemoveListener(OnClickSettingsBack);
+        StopPointerHoverRefresh();
 
         // กันเคสฉากถูกเปลี่ยนทิ้งตอนยังหยุดค้างอยู่ (เช่นชนะด่านระหว่างเปิดแผงหยุดเกม)
         // ไม่คืนค่าตรงนี้ ฉากใหม่จะเปิดมาแล้วค้างนิ่งทั้งฉาก

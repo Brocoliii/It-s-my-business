@@ -12,6 +12,14 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float investigationZoomSize = 3.5f;
     [SerializeField] private float investigationTransitionSpeed = 10f;
 
+    [Header("Intro Cinematic")]
+    [Tooltip("ตัวคูณขนาดกล้องตอนติดตาม NPC ใน Intro (น้อยกว่า 1 จะซูมเข้า)")]
+    [SerializeField, Range(0.1f, 1f)] private float introZoomScale = 0.8f;
+    [Tooltip("ความเร็วที่กล้องเลื่อนและซูมตาม NPC ใน Intro")]
+    [SerializeField] private float introTransitionSpeed = 6f;
+    [Tooltip("เลื่อนจุดโฟกัสของกล้องใน Intro ตามแกน X/Y")]
+    [SerializeField] private Vector2 introCameraOffset;
+
     [Header("Pan Smoothing (ความหนืดตอนแพนกล้อง)")]
     [Tooltip("เวลาที่กล้องใช้ไล่ตามตำแหน่งเป้าหมาย (วินาที)\nยิ่งมากยิ่งนุ่มแต่หน่วง, 0 = ตามทันทีแบบเดิม")]
     [SerializeField] private float panSmoothTime = 0.08f;
@@ -45,6 +53,11 @@ public class CameraController : MonoBehaviour
     private Transform investigationTarget;
     private Vector3 restorePosition;
     private float restoreZoom;
+    private bool isIntroFocused = false;
+    private bool isReturningFromIntro = false;
+    private Transform introTarget;
+    private Vector3 introRestorePosition;
+    private float introRestoreZoom;
     private Camera cam;
 
     // ตำแหน่งเป้าหมายของกล้อง อินพุตทุกทางจะไปบวกที่ตัวนี้ แล้วค่อยให้กล้องไล่ตามแบบนุ่ม ๆ
@@ -66,6 +79,13 @@ public class CameraController : MonoBehaviour
         // แล้วกล้องจะไถลออกไปเอง (การซูมเข้า/ออกตอนสืบสวนก็ต้องหยุดค้างไว้เหมือนกัน)
         if (PauseMenuController.IsPaused)
         {
+            StopPanMotion();
+            return;
+        }
+
+        if (isIntroFocused || isReturningFromIntro)
+        {
+            UpdateIntroFocus();
             StopPanMotion();
             return;
         }
@@ -258,6 +278,30 @@ public class CameraController : MonoBehaviour
         isInvestigationBlocked = state;
     }
 
+    public void BeginIntroFocus(Transform target)
+    {
+        if (target == null || cam == null) return;
+
+        if (!isIntroFocused)
+        {
+            introRestorePosition = transform.position;
+            introRestoreZoom = cam.orthographicSize;
+        }
+
+        introTarget = target;
+        isIntroFocused = true;
+        isReturningFromIntro = false;
+    }
+
+    public void EndIntroFocus()
+    {
+        if (cam == null || !isIntroFocused) return;
+
+        isIntroFocused = false;
+        isReturningFromIntro = true;
+        introTarget = null;
+    }
+
     public void BeginInvestigationFocus(Transform target)
     {
         if (target == null || cam == null) return;
@@ -282,6 +326,53 @@ public class CameraController : MonoBehaviour
         isInvestigationFocused = false;
         isReturningFromInvestigation = true;
         investigationTarget = null;
+    }
+
+    private void UpdateIntroFocus()
+    {
+        if (cam == null) return;
+
+        if (!isIntroFocused)
+        {
+            Vector3 restoreTarget = introRestorePosition;
+            float restoreSmoothing = GetIntroSmoothingFactor();
+            transform.position = Vector3.Lerp(transform.position, restoreTarget, restoreSmoothing);
+            cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, introRestoreZoom, restoreSmoothing);
+
+            if (Vector3.Distance(transform.position, restoreTarget) < 0.01f &&
+                Mathf.Abs(cam.orthographicSize - introRestoreZoom) < 0.01f)
+            {
+                transform.position = restoreTarget;
+                cam.orthographicSize = introRestoreZoom;
+                isReturningFromIntro = false;
+                panTarget = transform.position;
+                panSmoothVelocity = Vector3.zero;
+                panInertia = Vector3.zero;
+            }
+            return;
+        }
+
+        if (introTarget == null)
+        {
+            isIntroFocused = false;
+            isReturningFromIntro = true;
+            return;
+        }
+
+        Vector3 targetPosition = new Vector3(
+            introTarget.position.x + introCameraOffset.x,
+            introTarget.position.y + introCameraOffset.y,
+            transform.position.z);
+        float targetZoom = introRestoreZoom * introZoomScale;
+        float smoothing = GetIntroSmoothingFactor();
+
+        transform.position = Vector3.Lerp(transform.position, targetPosition, smoothing);
+        cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, smoothing);
+    }
+
+    private float GetIntroSmoothingFactor()
+    {
+        return 1f - Mathf.Exp(-Mathf.Max(0f, introTransitionSpeed) * Time.deltaTime);
     }
 
     private void UpdateInvestigationFocus()

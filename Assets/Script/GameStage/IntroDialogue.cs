@@ -3,9 +3,13 @@ using TMPro;
 using System.Collections;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class IntroDialogue : MonoBehaviour
 {
+    public static event System.Action DialogueFinished;
+
     [Header("การเดินของ NPC")]
     public Transform startPoint;
     public Transform stopPoint;
@@ -16,12 +20,28 @@ public class IntroDialogue : MonoBehaviour
     public float walkBobHeight = 0.15f;
     [Tooltip("ความเร็วของการเด้งขึ้นลงตอนเดิน (ยิ่งมากยิ่งเดินถี่)")]
     public float walkBobSpeed = 10f;
+    [Tooltip("เวลาที่ NPC เดินก่อนกล้องจะเริ่มซูมและติดตาม (วินาที)")]
+    public float introCameraFollowDelay = 0.35f;
+    [Tooltip("เวลาที่ NPC เดินออกก่อนกล้องจะเริ่มซูมออก (วินาที)")]
+    public float introCameraReturnDelay = 0.35f;
 
     [Header("UI กรอบข้อความ")]
     public Transform dialogBubble;
     public TMP_Text dialogText;
     [Tooltip("ความเร็วในการพิมพ์ตัวอักษร (ยิ่งน้อยยิ่งพิมพ์เร็ว)")]
     public float typeSpeed = 0.05f; // ✨ เพิ่มช่องปรับความเร็วการพิมพ์
+
+    [Header("Cinematic Black Bars")]
+    [Tooltip("แถบดำด้านบนของจอ (ปล่อยว่างได้ถ้าไม่ใช้)")]
+    public RectTransform upperBlackBar;
+    [Tooltip("แถบดำด้านล่างของจอ (ปล่อยว่างได้ถ้าไม่ใช้)")]
+    public RectTransform lowerBlackBar;
+    [Tooltip("ระยะที่แถบดำเลื่อนออกนอกจอก่อนเริ่มบทสนทนา")]
+    public float blackBarMoveDistance = 250f;
+    [Tooltip("เวลาหน่วงก่อนแถบดำเริ่มเลื่อนเข้ามา")]
+    public float blackBarStartDelay = 0.15f;
+    [Tooltip("ระยะเวลาแถบดำเลื่อนเข้า/ออก")]
+    public float blackBarAnimationDuration = 0.35f;
 
     [Header("🗣️ สไปรท์ตอนพูด")]
     [Tooltip("SpriteRenderer ของตัว NPC ที่จะสลับสไปรท์ตอนพูด (ถ้าไม่ใส่จะหาให้อัตโนมัติจาก GetComponent)")]
@@ -36,12 +56,30 @@ public class IntroDialogue : MonoBehaviour
     [Header("🔊 เสียงตอนพูด")]
     [Tooltip("เล่นเสียงพิมพ์ตัวอักษร (SoundIds.DialogueType) ตอน NPC กำลังพูด\nยังไม่ได้ใส่ไฟล์เสียงในคลังก็ไม่พัง แค่เงียบไปเฉย ๆ")]
     public bool playTypingSound = true;
+    [Tooltip("รหัสเสียงพิมพ์ตัวอักษรที่ใช้กับบทสนทนานี้ เปลี่ยนเป็น SoundIds.DialogueTypeGameplay สำหรับเสียงของฉาก Gameplay")]
+    public string typingSoundId = SoundIds.DialogueType;
     [Tooltip("ให้เสียงดัง 1 ครั้งต่อกี่ตัวอักษร (ใส่ 1 = ดังทุกตัว) ตั้งสูงขึ้นถ้าฟังแล้วรัวเกินไป")]
     [Min(1)] public int typeSoundEveryNChars = 2;
+    [Tooltip("รหัสเสียงตอน NPC เดินเข้าฉาก เปลี่ยนได้ถ้าแต่ละฉากต้องการเสียงเปิดตัวคนละแบบ")]
+    public string arriveSoundId = SoundIds.DialogueArrive;
+    [Tooltip("รหัสเสียงตอน NPC เดินออกจากฉาก เปลี่ยนได้ถ้าแต่ละฉากต้องการเสียงจบคนละแบบ")]
+    public string leaveSoundId = SoundIds.DialogueLeave;
 
     [Header("Debug")]
     [Tooltip("ปุ่มสำหรับข้าม Intro ทั้งหมดทันที (ใช้ตอนทดสอบเกม)")]
     public Button skipIntroButton;
+
+    [Header("Cat Theft Tutorial")]
+    [Tooltip("เปิดใช้แผงอธิบายระบบแมวขโมยสำหรับเลเวลนี้หรือไม่")]
+    public bool enableCatTheftTutorial = true;
+    [Tooltip("แผงอธิบายระบบแมวขโมยที่จะเปิดครั้งแรกก่อน Intro dialogue")]
+    public GameObject catTheftTutorialPanel;
+    [Tooltip("ปุ่ม OK ของแผงอธิบายระบบแมวขโมย")]
+    public Button catTheftTutorialOkButton;
+    [Tooltip("ระยะเวลาที่ใช้ตอนแสดง/ซ่อนแผงอธิบายระบบแมวขโมย")]
+    public float catTheftTutorialAnimationDuration = 0.25f;
+    [Tooltip("ขนาดเริ่มต้นของแผงก่อนเด้งเข้ามา")]
+    [Range(0.5f, 1f)] public float catTheftTutorialAnimationStartScale = 0.9f;
 
     [Header("✨ Visual Polish")]
     [Tooltip("ไอคอน/ลูกศรเตือนให้คลิกไปหน้าถัดไป (ไม่บังคับ) จะเด้งขึ้นลงเฉพาะตอนรอผู้เล่นคลิก")]
@@ -58,10 +96,14 @@ public class IntroDialogue : MonoBehaviour
     public bool enableReadyGoSequence = false;
     [Tooltip("Root object ของไอคอน Ready?/Go!!! (จะถูกซ่อนไว้จนกว่า Intro dialogue จะจบ)")]
     public Transform readyGoRoot;
-    [Tooltip("Image ที่จะสลับ sprite ระหว่าง Ready กับ Go")]
+    [Tooltip("Image เดิมที่ใช้สลับ sprite ระหว่าง Ready กับ Go (ใช้เป็น fallback ถ้าไม่ได้ใส่ Ready Image และ Go Image)")]
     public Image readyGoImage;
     public Sprite readySprite;
     public Sprite goSprite;
+    [Tooltip("Image ของ Ready ที่ลากมาใส่โดยตรงได้ เหมือน Day Complete Banner")]
+    public RectTransform readyBanner;
+    [Tooltip("Image ของ Go ที่ลากมาใส่โดยตรงได้ เหมือน Day Complete Banner")]
+    public RectTransform goBanner;
     [Tooltip("เวลาที่ค้างไอคอน Ready? ไว้บนจอ ก่อนเปลี่ยนเป็น Go!!!")]
     public float readyHoldDuration = 0.7f;
     [Tooltip("เวลาที่ค้างไอคอน Go!!! ไว้บนจอ ก่อนเริ่มเกม")]
@@ -83,26 +125,26 @@ public class IntroDialogue : MonoBehaviour
     private Vector3 savedReadyGoScale;
     private CanvasGroup readyGoCanvasGroup;
     private Coroutine talkingRoutine;
+    private SceneShutterTransition shutterTransition;
+    private CanvasGroup catTheftTutorialCanvasGroup;
+    private Vector3 catTheftTutorialBaseScale = Vector3.one;
+    private Coroutine catTheftTutorialAnimation;
+    private bool introFlowStarted;
+    private Coroutine walkInCoroutine;
+    private bool walkInStarted;
+    private bool walkInCompleted;
+    private Vector2 upperBlackBarTargetPosition;
+    private Vector2 lowerBlackBarTargetPosition;
+    private Coroutine blackBarAnimation;
 
     // ตัวแปรเช็คสถานะการคลิก
     private bool isTyping = false;
     private bool skipTyping = false;
     private bool isWaitingForNextPage = false;
 
-    private void Start()
+    private IEnumerator Start()
     {
-        if (GameManager.Instance != null)
-        {
-            StageConfig currentStage = GameManager.Instance.GetCurrentStage();
-            if (currentStage != null && !string.IsNullOrEmpty(currentStage.introMessage))
-            {
-                dialogPages = currentStage.introMessage.Split('\n');
-            }
-            else
-            {
-                dialogPages = new string[] { "ภารกิจวันนี้... เอ่อ... ฉันลืมบทน่ะ!" };
-            }
-        }
+        yield return LoadDialoguePages();
 
         savedBubbleScale = dialogBubble.localScale;
         dialogBubble.localScale = Vector3.zero;
@@ -126,6 +168,8 @@ public class IntroDialogue : MonoBehaviour
         }
         dialogCanvasGroup.alpha = 0f;
 
+        PrepareBlackBars();
+
         if (continueIndicator != null)
         {
             indicatorBasePos = continueIndicator.localPosition;
@@ -134,21 +178,28 @@ public class IntroDialogue : MonoBehaviour
 
         if (readyGoRoot != null)
         {
-            savedReadyGoScale = readyGoRoot.localScale;
-            readyGoRoot.localScale = Vector3.zero;
-            readyGoCanvasGroup = readyGoRoot.GetComponent<CanvasGroup>();
-            if (readyGoCanvasGroup == null)
+            if (readyBanner == null && goBanner == null)
             {
-                readyGoCanvasGroup = readyGoRoot.gameObject.AddComponent<CanvasGroup>();
+                savedReadyGoScale = readyGoRoot.localScale;
+                readyGoRoot.localScale = Vector3.zero;
+                readyGoCanvasGroup = readyGoRoot.GetComponent<CanvasGroup>();
+                if (readyGoCanvasGroup == null)
+                {
+                    readyGoCanvasGroup = readyGoRoot.gameObject.AddComponent<CanvasGroup>();
+                }
+                readyGoCanvasGroup.alpha = 0f;
+                readyGoRoot.gameObject.SetActive(false);
             }
-            readyGoCanvasGroup.alpha = 0f;
-            readyGoRoot.gameObject.SetActive(false);
         }
+
+        PrepareReadyGoBanner(readyBanner);
+        PrepareReadyGoBanner(goBanner);
 
         // ป้องกัน Image โชว์เป็นกล่องสีขาวตอนยังไม่ได้ผูก sprite (เผื่อ build ที่ไม่มี OnValidate ทำงาน)
         if (readyGoImage != null)
         {
-            readyGoImage.enabled = readySprite != null || goSprite != null;
+            readyGoImage.enabled = (readyBanner != null && goBanner != null) ||
+                readySprite != null || goSprite != null;
         }
 
         if (skipIntroButton != null)
@@ -156,7 +207,85 @@ public class IntroDialogue : MonoBehaviour
             skipIntroButton.onClick.AddListener(SkipIntro);
         }
 
-        StartCoroutine(IntroSequence());
+        if (!enableCatTheftTutorial)
+        {
+            StartWalkIn();
+        }
+
+        if (catTheftTutorialPanel != null)
+        {
+            catTheftTutorialCanvasGroup = catTheftTutorialPanel.GetComponent<CanvasGroup>();
+            if (catTheftTutorialCanvasGroup == null)
+            {
+                catTheftTutorialCanvasGroup = catTheftTutorialPanel.AddComponent<CanvasGroup>();
+            }
+
+            catTheftTutorialBaseScale = catTheftTutorialPanel.transform.localScale;
+            if (catTheftTutorialBaseScale == Vector3.zero)
+            {
+                catTheftTutorialBaseScale = Vector3.one;
+            }
+
+            catTheftTutorialCanvasGroup.alpha = 0f;
+            catTheftTutorialCanvasGroup.interactable = false;
+            catTheftTutorialCanvasGroup.blocksRaycasts = false;
+            catTheftTutorialPanel.SetActive(false);
+        }
+
+        shutterTransition = FindAnyObjectByType<SceneShutterTransition>(FindObjectsInactive.Include);
+        if (shutterTransition != null && !shutterTransition.HasFinishedOpening)
+        {
+            shutterTransition.OpeningFinished += OnShutterOpeningFinished;
+        }
+        else
+        {
+            ShowTutorialOrStartIntro();
+        }
+    }
+
+    private IEnumerator LoadDialoguePages()
+    {
+        string introMessage = null;
+
+        if (GameManager.Instance != null)
+        {
+            StageConfig currentStage = GameManager.Instance.GetCurrentStage();
+            if (currentStage != null)
+            {
+                if (currentStage.introMessageLocalized != null &&
+                    !currentStage.introMessageLocalized.IsEmpty)
+                {
+                    AsyncOperationHandle<string> localizedHandle =
+                        currentStage.introMessageLocalized.GetLocalizedStringAsync();
+                    yield return localizedHandle;
+
+                    if (localizedHandle.Status == AsyncOperationStatus.Succeeded)
+                    {
+                        introMessage = localizedHandle.Result;
+                    }
+                    else
+                    {
+                        Debug.LogWarning(
+                            "[IntroDialogue] Failed to load the localized intro message. Falling back to Intro Message.",
+                            this);
+                    }
+
+                    Addressables.Release(localizedHandle);
+                }
+
+                if (string.IsNullOrWhiteSpace(introMessage))
+                {
+                    introMessage = currentStage.introMessage;
+                }
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(introMessage))
+        {
+            introMessage = "ภารกิจวันนี้... เอ่อ... ฉันลืมบทน่ะ!";
+        }
+
+        dialogPages = introMessage.Split('\n');
     }
 
     // ป้องกัน Image โชว์เป็นกล่องสีขาว (ค่า default ของ Unity ตอนไม่ได้ใส่ sprite) ตอนยังไม่ได้ผูก readySprite/goSprite
@@ -168,16 +297,356 @@ public class IntroDialogue : MonoBehaviour
         }
     }
 
+    private void OnShutterOpeningFinished()
+    {
+        if (shutterTransition != null)
+        {
+            shutterTransition.OpeningFinished -= OnShutterOpeningFinished;
+        }
+
+        ShowTutorialOrStartIntro();
+    }
+
+    private void ShowTutorialOrStartIntro()
+    {
+        if (introFlowStarted)
+        {
+            return;
+        }
+
+        introFlowStarted = true;
+
+        if (ShouldShowCatTheftTutorial())
+        {
+            ShowCatTheftTutorial();
+        }
+        else
+        {
+            StartWalkIn();
+            StartCoroutine(IntroSequence());
+        }
+    }
+
     // เรียกจากปุ่ม Skip (Debug) เพื่อข้าม Intro ทั้งหมดทันทีและเริ่มเกมเลย
     public void SkipIntro()
     {
         StopAllCoroutines();
+        CameraController cameraController = FindAnyObjectByType<CameraController>();
+        if (cameraController != null)
+        {
+            cameraController.EndIntroFocus();
+        }
+
+        if (shutterTransition != null)
+        {
+            shutterTransition.OpeningFinished -= OnShutterOpeningFinished;
+        }
+        StartCoroutine(CloseCatTheftTutorial(false));
+
+        DialogueFinished?.Invoke();
 
         if (GameManager.Instance != null)
         {
             GameManager.Instance.ChangeState(GameManager.GameState.Playing);
         }
         Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        if (shutterTransition != null)
+        {
+            shutterTransition.OpeningFinished -= OnShutterOpeningFinished;
+        }
+    }
+
+    private bool ShouldShowCatTheftTutorial()
+    {
+        if (!enableCatTheftTutorial)
+        {
+            return false;
+        }
+
+        if (catTheftTutorialPanel == null)
+        {
+            Debug.LogWarning("[IntroDialogue] Cat Theft Tutorial Panel is not assigned. Skipping tutorial.", this);
+            return false;
+        }
+
+        if (catTheftTutorialOkButton == null)
+        {
+            Debug.LogError("[IntroDialogue] Cat Theft Tutorial Ok Button is not assigned. The tutorial panel cannot be dismissed.", this);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void ShowCatTheftTutorial()
+    {
+        if (catTheftTutorialAnimation != null)
+        {
+            StopCoroutine(catTheftTutorialAnimation);
+        }
+
+        catTheftTutorialOkButton.onClick.AddListener(ConfirmCatTheftTutorial);
+        catTheftTutorialPanel.SetActive(true);
+        SoundManager.Instance.PlaySFX(SoundIds.PopUpAppear);
+        catTheftTutorialAnimation = StartCoroutine(AnimateCatTheftTutorial(true));
+        Debug.Log("[IntroDialogue] Showing Cat Theft Tutorial.", this);
+    }
+
+    private void ConfirmCatTheftTutorial()
+    {
+        if (catTheftTutorialAnimation != null)
+        {
+            return;
+        }
+
+        StartCoroutine(CloseCatTheftTutorialAndStartIntro());
+    }
+
+    private IEnumerator CloseCatTheftTutorialAndStartIntro()
+    {
+        yield return CloseCatTheftTutorial(true);
+        StartWalkIn();
+        StartCoroutine(IntroSequence());
+    }
+
+    private void StartWalkIn()
+    {
+        if (walkInStarted)
+        {
+            return;
+        }
+
+        walkInStarted = true;
+        StartCoroutine(ShowBlackBarsAfterDelay());
+        walkInCoroutine = StartCoroutine(WalkIntoPosition());
+    }
+
+    private IEnumerator ShowBlackBarsAfterDelay()
+    {
+        if (blackBarStartDelay > 0f)
+        {
+            yield return new WaitForSeconds(blackBarStartDelay);
+        }
+
+        ShowBlackBars();
+    }
+
+    private void PrepareBlackBars()
+    {
+        if (upperBlackBar != null)
+        {
+            upperBlackBar.gameObject.SetActive(true);
+            upperBlackBarTargetPosition = upperBlackBar.anchoredPosition;
+            upperBlackBar.anchoredPosition = upperBlackBarTargetPosition +
+                Vector2.up * Mathf.Abs(blackBarMoveDistance);
+        }
+
+        if (lowerBlackBar != null)
+        {
+            lowerBlackBar.gameObject.SetActive(true);
+            lowerBlackBarTargetPosition = lowerBlackBar.anchoredPosition;
+            lowerBlackBar.anchoredPosition = lowerBlackBarTargetPosition +
+                Vector2.down * Mathf.Abs(blackBarMoveDistance);
+        }
+    }
+
+    private void ShowBlackBars()
+    {
+        if (upperBlackBar == null && lowerBlackBar == null)
+        {
+            return;
+        }
+
+        if (blackBarAnimation != null)
+        {
+            StopCoroutine(blackBarAnimation);
+        }
+
+        blackBarAnimation = StartCoroutine(AnimateBlackBars(true));
+    }
+
+    private IEnumerator HideBlackBars()
+    {
+        if (upperBlackBar == null && lowerBlackBar == null)
+        {
+            yield break;
+        }
+
+        if (blackBarAnimation != null)
+        {
+            StopCoroutine(blackBarAnimation);
+            blackBarAnimation = null;
+        }
+
+        yield return AnimateBlackBars(false);
+    }
+
+    private IEnumerator AnimateBlackBars(bool show)
+    {
+        Vector2 upperStart = upperBlackBar != null
+            ? upperBlackBar.anchoredPosition
+            : Vector2.zero;
+        Vector2 lowerStart = lowerBlackBar != null
+            ? lowerBlackBar.anchoredPosition
+            : Vector2.zero;
+        Vector2 upperEnd = show
+            ? upperBlackBarTargetPosition
+            : upperBlackBarTargetPosition + Vector2.up * Mathf.Abs(blackBarMoveDistance);
+        Vector2 lowerEnd = show
+            ? lowerBlackBarTargetPosition
+            : lowerBlackBarTargetPosition + Vector2.down * Mathf.Abs(blackBarMoveDistance);
+        float elapsed = 0f;
+        float duration = Mathf.Max(0.0001f, blackBarAnimationDuration);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            t = t * t * (3f - 2f * t);
+
+            if (upperBlackBar != null)
+            {
+                upperBlackBar.anchoredPosition = Vector2.LerpUnclamped(upperStart, upperEnd, t);
+            }
+
+            if (lowerBlackBar != null)
+            {
+                lowerBlackBar.anchoredPosition = Vector2.LerpUnclamped(lowerStart, lowerEnd, t);
+            }
+
+            yield return null;
+        }
+
+        if (upperBlackBar != null)
+        {
+            upperBlackBar.anchoredPosition = upperEnd;
+        }
+
+        if (lowerBlackBar != null)
+        {
+            lowerBlackBar.anchoredPosition = lowerEnd;
+        }
+
+        blackBarAnimation = null;
+    }
+
+    private IEnumerator WalkIntoPosition()
+    {
+        if (preWalkDelay > 0f)
+        {
+            yield return new WaitForSeconds(preWalkDelay);
+        }
+
+        // ยิงที่ stopPoint เพราะถ้าเสียงตั้ง Is 3D ไว้ จุดเกิดอยู่นอกจอจะไกลจนแทบไม่ได้ยิน
+        SoundManager.Instance.PlaySFX(arriveSoundId, stopPoint.position);
+        StartCoroutine(BeginIntroCameraAfterDelay());
+        yield return StartCoroutine(WalkTo(stopPoint.position));
+        walkInCompleted = true;
+        walkInCoroutine = null;
+    }
+
+    private IEnumerator BeginIntroCameraAfterDelay()
+    {
+        if (introCameraFollowDelay > 0f)
+        {
+            yield return new WaitForSeconds(introCameraFollowDelay);
+        }
+
+        CameraController cameraController = FindAnyObjectByType<CameraController>();
+        if (cameraController != null)
+        {
+            cameraController.BeginIntroFocus(transform);
+        }
+    }
+
+    private IEnumerator CloseCatTheftTutorial(bool animate)
+    {
+        if (catTheftTutorialOkButton != null)
+        {
+            catTheftTutorialOkButton.onClick.RemoveListener(ConfirmCatTheftTutorial);
+        }
+
+        if (catTheftTutorialPanel == null)
+        {
+            yield break;
+        }
+
+        if (catTheftTutorialAnimation != null)
+        {
+            StopCoroutine(catTheftTutorialAnimation);
+            catTheftTutorialAnimation = null;
+        }
+
+        if (animate)
+        {
+            yield return AnimateCatTheftTutorial(false);
+        }
+        else
+        {
+            SetCatTheftTutorialVisualState(0f, catTheftTutorialAnimationStartScale);
+            catTheftTutorialPanel.SetActive(false);
+        }
+    }
+
+    private IEnumerator AnimateCatTheftTutorial(bool show)
+    {
+        if (catTheftTutorialPanel == null || catTheftTutorialCanvasGroup == null)
+            yield break;
+
+        if (show)
+        {
+            SetCatTheftTutorialVisualState(0f, catTheftTutorialAnimationStartScale);
+            catTheftTutorialCanvasGroup.interactable = false;
+            catTheftTutorialCanvasGroup.blocksRaycasts = false;
+        }
+
+        float startAlpha = show ? 0f : catTheftTutorialCanvasGroup.alpha;
+        float endAlpha = show ? 1f : 0f;
+        float startScale = show ? catTheftTutorialAnimationStartScale : 1f;
+        float endScale = show ? 1f : catTheftTutorialAnimationStartScale;
+        float elapsed = 0f;
+        float duration = Mathf.Max(0.0001f, catTheftTutorialAnimationDuration);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            t = t * t * (3f - 2f * t);
+            SetCatTheftTutorialVisualState(
+                Mathf.Lerp(startAlpha, endAlpha, t),
+                Mathf.Lerp(startScale, endScale, t));
+            yield return null;
+        }
+
+        SetCatTheftTutorialVisualState(endAlpha, endScale);
+        catTheftTutorialAnimation = null;
+
+        if (show)
+        {
+            catTheftTutorialCanvasGroup.interactable = true;
+            catTheftTutorialCanvasGroup.blocksRaycasts = true;
+        }
+        else
+        {
+            catTheftTutorialPanel.SetActive(false);
+        }
+    }
+
+    private void SetCatTheftTutorialVisualState(float alpha, float scale)
+    {
+        if (catTheftTutorialCanvasGroup != null)
+        {
+            catTheftTutorialCanvasGroup.alpha = Mathf.Clamp01(alpha);
+        }
+
+        if (catTheftTutorialPanel != null)
+        {
+            catTheftTutorialPanel.transform.localScale = catTheftTutorialBaseScale * scale;
+        }
     }
 
     private void Update()
@@ -202,24 +671,21 @@ public class IntroDialogue : MonoBehaviour
     private static bool WasAdvancePressedThisFrame()
     {
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) return true;
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) return true;
+        return WasSpacePressedThisFrame();
+    }
 
-        return false;
+    private static bool WasSpacePressedThisFrame()
+    {
+        return Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame;
     }
 
     private IEnumerator IntroSequence()
     {
-        // 1. หน่วงเวลาก่อนเริ่มเดิน (ถ้าตั้งค่าไว้) แล้วเดินเข้ามาจากนอกจอ (เดินช้าลงตอนใกล้ถึงจุดหมาย)
-        if (preWalkDelay > 0f)
+        // เดินเข้ามาเริ่มทันทีตั้งแต่เปิดฉาก แม้ shutter door จะยังเปิดไม่สุด
+        if (!walkInCompleted && walkInCoroutine != null)
         {
-            yield return new WaitForSeconds(preWalkDelay);
+            yield return walkInCoroutine;
         }
-
-        // เล่นตอนเริ่มก้าวเท้า (ไม่ใช่ตอนเดินถึง) จะได้ดังพร้อมกับที่ผู้เล่นเห็น NPC โผล่เข้ามาในจอ
-        // ยิงที่ stopPoint เพราะถ้าเสียงตั้ง Is 3D ไว้ จุดเกิดอยู่นอกจอจะไกลจนแทบไม่ได้ยิน
-        SoundManager.Instance.PlaySFX(SoundIds.DialogueArrive, stopPoint.position);
-
-        yield return StartCoroutine(WalkTo(stopPoint.position));
 
         // 2. เด้งกรอบข้อความ (ตอนแรกจะยังไม่มีข้อความ)
         dialogText.text = "";
@@ -277,18 +743,36 @@ public class IntroDialogue : MonoBehaviour
         yield return StartCoroutine(PopOutAnimation(dialogBubble));
 
         // 5. เดินกลับออกไปนอกจอ
-        SoundManager.Instance.PlaySFX(SoundIds.DialogueLeave, transform.position);
+        StartCoroutine(HideBlackBars());
+        SoundManager.Instance.PlaySFX(leaveSoundId, transform.position);
+        StartCoroutine(EndIntroCameraAfterDelay());
         yield return StartCoroutine(WalkTo(startPoint.position));
 
         // 5.5 โชว์ Ready? แล้วตามด้วย Go!!! เป็นการนับถอยหลังก่อนเริ่มเกมจริง
         yield return StartCoroutine(PlayReadyGoSequence());
 
         // 6. สั่งให้เกมเริ่ม และทำลายตัวเองทิ้ง
+        DialogueFinished?.Invoke();
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.ChangeState(GameManager.GameState.Playing);
         }
         Destroy(gameObject);
+    }
+
+    private IEnumerator EndIntroCameraAfterDelay()
+    {
+        if (introCameraReturnDelay > 0f)
+        {
+            yield return new WaitForSeconds(introCameraReturnDelay);
+        }
+
+        CameraController cameraController = FindAnyObjectByType<CameraController>();
+        if (cameraController != null)
+        {
+            cameraController.EndIntroFocus();
+        }
     }
 
     // ==========================================
@@ -374,7 +858,7 @@ public class IntroDialogue : MonoBehaviour
         if (charsSinceBlip < Mathf.Max(1, typeSoundEveryNChars)) return;
 
         charsSinceBlip = 0;
-        SoundManager.Instance.PlaySFX(SoundIds.DialogueType, transform.position);
+        SoundManager.Instance.PlaySFX(typingSoundId, transform.position);
     }
 
     // สระบน/สระล่าง/ไม้ไต่คู้/วรรณยุกต์/การันต์ ที่เขียนซ้อนกับพยัญชนะตัวหน้า ไม่กินความกว้างเพิ่ม
@@ -444,24 +928,66 @@ public class IntroDialogue : MonoBehaviour
     // เล่นลำดับ Ready? -> Go!!! ก่อนเข้าเกมจริง (ถ้าไม่ได้ผูก readyGoRoot ไว้ก็ข้ามไปเลย)
     private IEnumerator PlayReadyGoSequence()
     {
-        if (readyGoRoot == null || !enableReadyGoSequence) yield break;
+        if (!enableReadyGoSequence) yield break;
 
-        readyGoRoot.gameObject.SetActive(true);
+        RectTransform readyTarget = readyBanner != null
+            ? readyBanner
+            : readyGoRoot as RectTransform;
+        RectTransform goTarget = goBanner != null
+            ? goBanner
+            : readyGoRoot as RectTransform;
 
-        if (readyGoImage != null) readyGoImage.sprite = readySprite;
+        if (readyTarget == null || goTarget == null) yield break;
+
+        if (readyGoRoot != null) readyGoRoot.gameObject.SetActive(true);
+
+        CanvasGroup readyCanvasGroup = GetReadyGoCanvasGroup(readyTarget);
+        CanvasGroup goCanvasGroup = GetReadyGoCanvasGroup(goTarget);
+        Vector3 readyScale = readyTarget.localScale;
+        Vector3 goScale = goTarget.localScale;
+
+        readyTarget.gameObject.SetActive(true);
+        if (readyBanner == null && readyGoImage != null) readyGoImage.sprite = readySprite;
         // ยิงเสียงพร้อมกับที่ไอคอนเริ่มเด้งเข้ามา จะได้ดังตรงกับที่ผู้เล่นเห็น
         SoundManager.Instance.PlaySFX(SoundIds.UiReady);
-        yield return StartCoroutine(ScalePopIn(readyGoRoot, savedReadyGoScale, readyGoCanvasGroup));
+        yield return StartCoroutine(ScalePopIn(readyTarget, readyScale, readyCanvasGroup));
         yield return new WaitForSeconds(readyHoldDuration);
-        yield return StartCoroutine(ScalePopOut(readyGoRoot, readyGoCanvasGroup));
+        yield return StartCoroutine(ScalePopOut(readyTarget, readyCanvasGroup));
 
-        if (readyGoImage != null) readyGoImage.sprite = goSprite;
+        readyTarget.gameObject.SetActive(false);
+        goTarget.gameObject.SetActive(true);
+        if (goBanner == null && readyGoImage != null) readyGoImage.sprite = goSprite;
         SoundManager.Instance.PlaySFX(SoundIds.UiGo);
-        yield return StartCoroutine(ScalePopIn(readyGoRoot, savedReadyGoScale, readyGoCanvasGroup));
+        yield return StartCoroutine(ScalePopIn(goTarget, goScale, goCanvasGroup));
         yield return new WaitForSeconds(goHoldDuration);
-        yield return StartCoroutine(ScalePopOut(readyGoRoot, readyGoCanvasGroup));
+        yield return StartCoroutine(ScalePopOut(goTarget, goCanvasGroup));
 
-        readyGoRoot.gameObject.SetActive(false);
+        goTarget.gameObject.SetActive(false);
+        if (readyBanner != null || goBanner != null)
+        {
+            if (readyGoRoot != null) readyGoRoot.gameObject.SetActive(false);
+        }
+    }
+
+    private void PrepareReadyGoBanner(RectTransform banner)
+    {
+        if (banner == null || banner == readyGoRoot) return;
+
+        CanvasGroup canvasGroup = banner.GetComponent<CanvasGroup>();
+        if (canvasGroup != null) canvasGroup.alpha = 0f;
+        banner.gameObject.SetActive(false);
+    }
+
+    private CanvasGroup GetReadyGoCanvasGroup(RectTransform target)
+    {
+        if (target == readyGoRoot) return readyGoCanvasGroup;
+
+        CanvasGroup canvasGroup = target.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = target.gameObject.AddComponent<CanvasGroup>();
+        }
+        return canvasGroup;
     }
 
     // เด้งเข้าแบบ ease-out-back (overshoot) พร้อมหมุนคลายมุมเอียงและเฟดอัลฟ่า

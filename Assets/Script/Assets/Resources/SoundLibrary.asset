@@ -176,7 +176,7 @@ MonoBehaviour:
   - id: customer_angry
     clips:
     - {fileID: 8300000, guid: 1a19b9596bd1d2946917f6eb80a1ab0b, type: 3}
-    volume: 0.55
+    volume: 0.45
     minPitch: 1
     maxPitch: 1
     loop: 0
@@ -237,10 +237,10 @@ MonoBehaviour:
     minInterval: 0
     maxSimultaneous: 0
     avoidRepeat: 0
-  - id: dialogue_type
+  - id: dialogue_tutorial
     clips:
-    - {fileID: 8300000, guid: e9ea5d3c75bbd194b89d17beb273a01f, type: 3}
-    volume: 0.35
+    - {fileID: 8300000, guid: efa94cb5dba4209458da0d15d18264e8, type: 3}
+    volume: 0.65
     minPitch: 1
     maxPitch: 1
     loop: 0
@@ -384,7 +384,7 @@ MonoBehaviour:
   - id: food_burnt
     clips:
     - {fileID: 8300000, guid: 873ec633ef1911f4f9ed0da27858ed64, type: 3}
-    volume: 0.75
+    volume: 0.45
     minPitch: 1
     maxPitch: 1
     loop: 0
@@ -543,7 +543,7 @@ MonoBehaviour:
     avoidRepeat: 0
   - id: ui_ready
     clips:
-    - {fileID: 8300000, guid: 4d0b2986533a3294a8961f9233bd8a75, type: 3}
+    - {fileID: 8300000, guid: f093b64675570ab4aa552a7d9e4308f8, type: 3}
     volume: 1
     minPitch: 1
     maxPitch: 1
@@ -559,7 +559,7 @@ MonoBehaviour:
     avoidRepeat: 0
   - id: ui_go
     clips:
-    - {fileID: 8300000, guid: 4d0b2986533a3294a8961f9233bd8a75, type: 3}
+    - {fileID: 8300000, guid: 85f1335bdc9309746a112ec2a28895c7, type: 3}
     volume: 1
     minPitch: 1
     maxPitch: 1
@@ -576,23 +576,7 @@ MonoBehaviour:
   - id: investigate_timeout
     clips:
     - {fileID: 8300000, guid: 873ec633ef1911f4f9ed0da27858ed64, type: 3}
-    volume: 0.55
-    minPitch: 1
-    maxPitch: 1
-    loop: 0
-    seamlessLoop: 0
-    loopStartTrim: 0
-    loopEndTrim: 0
-    is3D: 0
-    minDistance: 0
-    maxDistance: 0
-    minInterval: 0
-    maxSimultaneous: 0
-    avoidRepeat: 0
-  - id: stage_win
-    clips:
-    - {fileID: 8300000, guid: 71faddf06c8f3584fa1e96bb702dce81, type: 3}
-    volume: 0.75
+    volume: 0.45
     minPitch: 1
     maxPitch: 1
     loop: 0
@@ -608,7 +592,7 @@ MonoBehaviour:
   - id: ui_notebook_open
     clips:
     - {fileID: 8300000, guid: 12cae0755fc988f49a1e1ae2c593dbfb, type: 3}
-    volume: 0.75
+    volume: 0.7
     minPitch: 1
     maxPitch: 1
     loop: 0
@@ -622,8 +606,9 @@ MonoBehaviour:
     maxSimultaneous: 0
     avoidRepeat: 0
   - id: ui_notebook_close
-    clips: []
-    volume: 0.85
+    clips:
+    - {fileID: 8300000, guid: 12cae0755fc988f49a1e1ae2c593dbfb, type: 3}
+    volume: 0.7
     minPitch: 1
     maxPitch: 1
     loop: 0
@@ -686,10 +671,282 @@ MonoBehaviour:
     avoidRepeat: 0
   - id: investigate_appear
     clips:
-    - {fileID: 8300000, guid: 2dd43572610f7a74b92e4cd4dd7b7033, type: 3}
+    - {fileID: 8300000, guid: eb6f27c515e6bc944a6dd7a4b4496baf, type: 3}
+    volume: 0.85
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: cat_appear
+    clips:
+    - {fileID: 8300000, guid: 31bbeba8d7e0e2242be838edaa143c2d, type: 3}
     volume: 0.5
     minPitch: 1
     maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: cat_disappear
+    clips:
+    - {fileID: 8300000, guid: a57be8c67b3669e4fafdb52f460b43e0, type: 3}
+    volume: 0.2
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: cat_theft_success
+    clips:
+    - {fileID: 8300000, guid: f4ad680e4ef04d34cad06e688b8fb07b, type: 3}
+    volume: 0.45
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: cat_got_treat
+    clips:
+    - {fileID: 8300000, guid: 497c719c773d30a4798162df6c04a61e, type: 3}
+    volume: 0.2
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: verdict_complete
+    clips:
+    - {fileID: 8300000, guid: 5dc7be167966bdd4ba559e109ad0c296, type: 3}
+    volume: 0.65
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: verdict_failed
+    clips:
+    - {fileID: 8300000, guid: 2512d730b1b2de34da28040f3370ed14, type: 3}
+    volume: 0.65
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: result_panel_appear
+    clips:
+    - {fileID: 8300000, guid: 5a6f9aca6e192d44cab543079b017841, type: 3}
+    volume: 1
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: ui_space_continue
+    clips:
+    - {fileID: 8300000, guid: 4e35161df7959f840b537905dc1136e0, type: 3}
+    volume: 0.35
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: dialogue_lv1
+    clips:
+    - {fileID: 8300000, guid: e9ea5d3c75bbd194b89d17beb273a01f, type: 3}
+    volume: 0.25
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: dialogue_lv2
+    clips:
+    - {fileID: 8300000, guid: 5d232f98750f06a4aba20b6bbb05aade, type: 3}
+    volume: 0.95
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: rank_ex_appear
+    clips:
+    - {fileID: 8300000, guid: 18524d424768fc94184ec4d4b1d17a8d, type: 3}
+    volume: 0.45
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: pop_up_appear
+    clips:
+    - {fileID: 8300000, guid: 535e0ad84a72d744a95819386be2e9f9, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: pause_appear
+    clips:
+    - {fileID: 8300000, guid: 535e0ad84a72d744a95819386be2e9f9, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: showcase_move
+    clips:
+    - {fileID: 8300000, guid: 68ac4383b0af36045817d11488ea2a34, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: dialogue_arrive_cat
+    clips:
+    - {fileID: 8300000, guid: 2e36ebeab6017bf4a8f8e63555c43a0c, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: dialogue_leave_cat
+    clips:
+    - {fileID: 8300000, guid: e2e60de0347db69499c09a3cd37efede, type: 3}
+    volume: 0.55
+    minPitch: 1
+    maxPitch: 1
+    loop: 0
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: result_stat_appear
+    clips:
+    - {fileID: 8300000, guid: 023cdae7f8951d740a5ca10fa5b2d91c, type: 3}
+    volume: 0.95
+    minPitch: 0.75
+    maxPitch: 1.55
     loop: 0
     seamlessLoop: 0
     loopStartTrim: 0
@@ -737,6 +994,22 @@ MonoBehaviour:
     clips:
     - {fileID: 8300000, guid: 075eddb48de74b345b55d8a9880170f8, type: 3}
     volume: 0.85
+    minPitch: 0.1
+    maxPitch: 0.1
+    loop: 1
+    seamlessLoop: 0
+    loopStartTrim: 0
+    loopEndTrim: 0
+    is3D: 0
+    minDistance: 0
+    maxDistance: 0
+    minInterval: 0
+    maxSimultaneous: 0
+    avoidRepeat: 0
+  - id: bgm_gameplay
+    clips:
+    - {fileID: 8300000, guid: 5de74cb7f7e7d9b48ace24e405e0b770, type: 3}
+    volume: 0.25
     minPitch: 0.1
     maxPitch: 0.1
     loop: 1

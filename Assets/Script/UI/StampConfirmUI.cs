@@ -62,11 +62,17 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public float dragScale = 1.15f;
     [Tooltip("Scale of the stamp at the moment it hits the paper.")]
     public float pressScale = 0.85f;
+    [Tooltip("Scale the stamp briefly grows to when it hits the paper, before pressing down.")]
+    public float impactScale = 1.25f;
     public float pressDuration = 0.1f;
+    [Tooltip("Animation graph used for the stamp growing and pressing down.")]
+    public AnimationCurve pressCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     [Tooltip("How long the stamp stays on the paper before it disappears and shows the ink mark.")]
     public float holdOnPaperDuration = 0.25f;
     [Tooltip("How fast the stamp flies back home when released outside the area.")]
     public float returnSpeed = 14f;
+    [Tooltip("Animation graph used while the stamp returns to its pad.")]
+    public AnimationCurve returnCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
     [Header("Imprint Placement")]
     [Tooltip("Where the ink mark shows up. Where Stamped = under the stamp, wherever the player pressed. Fixed Position = always the spot the imprint sits at in the scene.")]
@@ -389,9 +395,12 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         rectTransform.position = pressPosition;
 
         Vector3 liftedScale = homeScale * dragScale;
+        Vector3 impactScaleValue = homeScale * impactScale;
         Vector3 pressedScale = homeScale * pressScale;
 
-        yield return ScaleTo(liftedScale, pressedScale, pressDuration);
+        float impactDuration = pressDuration * 0.4f;
+        yield return ScaleTo(liftedScale, impactScaleValue, impactDuration);
+        yield return ScaleTo(impactScaleValue, pressedScale, pressDuration - impactDuration);
 
         // read the center after the squash, so the mark sits under the stamp as it looks on the paper
         PlaceImprint();
@@ -421,9 +430,10 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         while (Vector2.Distance(rectTransform.anchoredPosition, homeAnchoredPosition) > 0.5f)
         {
             float t = 1f - Mathf.Exp(-returnSpeed * Time.unscaledDeltaTime);
+            float easedT = EvaluateCurve(returnCurve, t);
 
-            rectTransform.anchoredPosition = Vector2.Lerp(rectTransform.anchoredPosition, homeAnchoredPosition, t);
-            rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, homeScale, t);
+            rectTransform.anchoredPosition = Vector2.Lerp(rectTransform.anchoredPosition, homeAnchoredPosition, easedT);
+            rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, homeScale, easedT);
 
             yield return null;
         }
@@ -446,11 +456,17 @@ public class StampConfirmUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         {
             // unscaledDeltaTime so the stamp still animates while the notebook pauses the game
             elapsed += Time.unscaledDeltaTime;
-            rectTransform.localScale = Vector3.Lerp(from, to, Mathf.Clamp01(elapsed / duration));
+            float t = Mathf.Clamp01(elapsed / duration);
+            rectTransform.localScale = Vector3.Lerp(from, to, EvaluateCurve(pressCurve, t));
             yield return null;
         }
 
         rectTransform.localScale = to;
+    }
+
+    private float EvaluateCurve(AnimationCurve curve, float time)
+    {
+        return curve == null ? time : Mathf.Clamp01(curve.Evaluate(Mathf.Clamp01(time)));
     }
 
     private void ReturnToHomeParent(bool keepWorldPosition)

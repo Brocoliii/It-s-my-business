@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -48,8 +49,11 @@ public class StageResultPanel : MonoBehaviour
     public TextMeshProUGUI ordersText;
     public TextMeshProUGUI cluesText;
     public TextMeshProUGUI mistakesText;
+    public TextMeshProUGUI timeText;
     [Tooltip("บรรทัดเล็กใต้หัวข้อ ใช้โชว์ชื่อด่าน หรือสาเหตุที่แพ้ ไม่ใส่ก็ได้")]
     public TextMeshProUGUI subtitleText;
+    [Tooltip("ภาพอันดับที่แสดงจากคะแนนออเดอร์ที่ทำสำเร็จ")]
+    public Image rankImage;
 
     [Header("ข้อความ")]
     public string winTitle = "CASE CLOSED";
@@ -60,10 +64,24 @@ public class StageResultPanel : MonoBehaviour
     public string cluesFormat = "Clues Found: {0}/{1}";
     [Tooltip("{0} = จำนวนครั้งที่พลาด, {1} = โควตาความผิดพลาดของด่าน")]
     public string mistakesFormat = "Mistakes: {0}/{1}";
+    [Tooltip("{0} = นาที, {1} = วินาที")]
+    public string timeFormat = "Time: {0:00}:{1:00}";
     [Tooltip("ติ๊กถูก = ช่อง Clues Found เทียบกับเบาะแสทั้งหมดของด่าน (Clues Pool)\nติ๊กออก = เทียบกับโควตาที่ต้องเก็บให้ผ่าน (Required Clues To Pass)")]
     public bool countCluesAgainstPool = true;
     [Tooltip("ติ๊กถูก = โชว์ชื่อด่าน (Stage Name) ไว้ใต้หัวข้อตอนชนะ")]
     public bool showStageNameOnWin = true;
+
+    [Header("อันดับจากคะแนน")]
+    [Tooltip("คะแนนที่ต้องมีอย่างน้อยเพื่อได้อันดับ A (คะแนน = จำนวนออเดอร์ที่ทำสำเร็จ)")]
+    [Min(0)] public int rankARequiredScore = 8;
+    [Tooltip("คะแนนที่ต้องมีอย่างน้อยเพื่อได้อันดับ B (คะแนน = จำนวนออเดอร์ที่ทำสำเร็จ)")]
+    [Min(0)] public int rankBRequiredScore = 5;
+    [Tooltip("คะแนนที่ต้องมีอย่างน้อยเพื่อได้อันดับ C (คะแนน = จำนวนออเดอร์ที่ทำสำเร็จ)")]
+    [Min(0)] public int rankCRequiredScore = 3;
+    public Sprite rankASprite;
+    public Sprite rankBSprite;
+    public Sprite rankCSprite;
+    public Sprite rankDSprite;
 
     [Header("ปุ่มด้านล่าง")]
     [Tooltip("ปุ่มบันทึกเกม โผล่เฉพาะตอนชนะและยังมีด่านถัดไปให้เล่นต่อ\nกดแล้วจะเปิดแผงให้เลือกช่องเซฟ (แผงสร้างตัวเองตอนถูกเรียก ไม่ต้องเตรียมอะไรในฉาก)")]
@@ -75,6 +93,34 @@ public class StageResultPanel : MonoBehaviour
     public string nextCaseLabel = "NEXT CASE";
     public string retryLabel = "RETRY";
     public string mainMenuLabel = "MAIN MENU";
+
+    [Header("แอนิเมชันก่อนเปลี่ยนฉาก")]
+    [Tooltip("ภาพดำเต็มจอสำหรับเฟดก่อน Retry, Next Case หรือ Main Menu ปล่อยว่างเพื่อสร้างให้อัตโนมัติ")]
+    public Image transitionFadeImage;
+    public float transitionFadeDuration = 0.35f;
+
+    [Header("Localization")]
+    [Tooltip("Optional localized result title for a won stage. Leave empty to use Win Title.")]
+    public LocalizedString winTitleLocalized;
+    [Tooltip("Optional localized result title for a lost stage. Leave empty to use Lose Title.")]
+    public LocalizedString loseTitleLocalized;
+    [Tooltip("Optional localized format for completed orders. Keep the {0} placeholder.")]
+    public LocalizedString ordersFormatLocalized;
+    [Tooltip("Optional localized format for clues found. Keep the {0} and {1} placeholders.")]
+    public LocalizedString cluesFormatLocalized;
+    [Tooltip("Optional localized format for mistakes. Keep the {0} and {1} placeholders.")]
+    public LocalizedString mistakesFormatLocalized;
+    [Tooltip("Optional localized format for elapsed time. Keep the {0} and {1} placeholders.")]
+    public LocalizedString timeFormatLocalized;
+    [Tooltip("Optional localized SAVE button label.")]
+    public LocalizedString saveLabelLocalized;
+    [Tooltip("Optional localized NEXT CASE button label.")]
+    public LocalizedString nextCaseLabelLocalized;
+    [Tooltip("Optional localized RETRY button label.")]
+    public LocalizedString retryLabelLocalized;
+    [Tooltip("Optional localized MAIN MENU button label.")]
+    public LocalizedString mainMenuLabelLocalized;
+
     [Tooltip("ชื่อฉากเมนูหลัก ปล่อยว่าง = ไปเอาค่าจาก Main Menu Scene Name ของ UIManager ในฉากแทน")]
     public string mainMenuSceneName = "";
     [Tooltip("ติ๊กถูก = ซ่อนปุ่ม NEXT CASE ไปเลยตอนไม่มีด่านถัดไป (หรือตอนแพ้)\nติ๊กออก = โชว์ไว้แต่กดไม่ได้")]
@@ -85,26 +131,58 @@ public class StageResultPanel : MonoBehaviour
     public bool showOnLose = false;
     [Tooltip("หน่วงกี่วินาทีก่อนแผงจะเด้งขึ้นมา (เผื่อให้แอนิเมชันจบด่านเล่นจบก่อน)")]
     public float showDelay = 0.35f;
-    [Tooltip("เวลาที่แผงใช้เด้งขึ้นมา")]
+    [Tooltip("เวลาที่แผงใช้เลื่อนขึ้นมา")]
     public float popDuration = 0.4f;
+    [Tooltip("ระยะที่แผงเลื่อนขึ้นมาจากด้านล่างของหน้าจอ (พิกเซล)")]
+    public float slideDistance = 260f;
     [Tooltip("เวลาที่ตัวเลขแต่ละบรรทัดทยอยโผล่ตามกันมา ใส่ 0 = ขึ้นพร้อมกันหมด")]
     public float rowStagger = 0.12f;
+    [Tooltip("หน่วงเวลาก่อนภาพอันดับจะเริ่มปรากฏ")]
+    public float rankRevealDelay = 0.25f;
+    [Tooltip("ระยะเวลาของแอนิเมชันตอนภาพอันดับปรากฏ")]
+    public float rankRevealDuration = 0.35f;
+    [Tooltip("ขนาดเริ่มต้นของภาพอันดับก่อนเด้งเข้า")]
+    [Range(0f, 1f)] public float rankRevealStartScale = 0.65f;
     [Tooltip("ติ๊กถูก = หยุดเวลาเกมตอนแผงเปิดอยู่ (คืนให้เองก่อนเปลี่ยนฉากทุกครั้ง)")]
     public bool pauseGameWhileShown = true;
+    [Tooltip("เสียงที่เล่นเมื่อข้อความสถิติแต่ละบรรทัดปรากฏ")]
+    public string statRevealSoundId = SoundIds.ResultStatAppear;
 
     private CanvasGroup panelCanvasGroup;
-    private Vector3 panelBaseScale = Vector3.one;
+    private CanvasGroup rankImageCanvasGroup;
+    private RectTransform animatedPanel;
+    private Vector2 panelBasePosition;
+    private Vector3 rankImageBaseScale = Vector3.one;
     private bool hasPanelBase = false;
+    private bool hasRankImageBaseScale = false;
+    private bool rankImageRevealed;
     private RectTransform builtCanvasRoot;
     private Coroutine showRoutine;
     private bool isShown = false;
+    private bool hasAppliedStats;
+    private bool currentIsWin;
+    private string currentReason;
+    private bool isLeavingResultScreen;
+    private bool refreshingLocalization;
+
+    public bool IsShown => isShown;
 
     // จุดที่จะเล่นต่อของด่านนี้ เก็บไว้ตอนแผงเปิด แล้วส่งให้แผงเลือกช่องเซฟตอนกดปุ่ม SAVE
     // null = ไม่มีอะไรให้เซฟ (แพ้ หรือด่านสุดท้ายที่ไม่มีด่านถัดไป) ปุ่ม SAVE จะถูกซ่อนไว้
     private SaveData pendingSaveData;
 
-    // บรรทัดสถิติทั้งสามอันตามลำดับที่จะทยอยโผล่
-    private readonly TextMeshProUGUI[] statRows = new TextMeshProUGUI[3];
+    // บรรทัดสถิติทั้งหมดตามลำดับที่จะทยอยโผล่
+    private readonly TextMeshProUGUI[] statRows = new TextMeshProUGUI[4];
+
+    private void OnEnable()
+    {
+        SubscribeLocalization();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeLocalization();
+    }
 
     // ทางเข้าเดียวที่ฝั่ง GameManager ใช้ หาแผงในฉากให้เอง (รวมตัวที่ถูกปิดอยู่)
     // คืน false = ฉากนี้ไม่มีแผงสรุปผล ให้ผู้เรียกไปใช้ทางเดิมของตัวเองต่อ
@@ -140,6 +218,7 @@ public class StageResultPanel : MonoBehaviour
         statRows[0] = ordersText;
         statRows[1] = cluesText;
         statRows[2] = mistakesText;
+        statRows[3] = timeText;
 
         // ผูกปุ่มจากโค้ดแทนการผูกใน Inspector จะได้ไม่มีเคสลืมผูกแล้วปุ่มกดไม่ติด
         // ผูกตั้งแต่ Awake เพราะแผงเริ่มมาแบบปิดอยู่ ปุ่มข้างในเลยยังไม่ทำงานถ้าไปรอผูกทีหลัง
@@ -153,6 +232,8 @@ public class StageResultPanel : MonoBehaviour
 
     private void OnDestroy()
     {
+        UnsubscribeLocalization();
+
         if (saveButton != null) saveButton.onClick.RemoveListener(OnClickSave);
         if (nextCaseButton != null) nextCaseButton.onClick.RemoveListener(OnClickNextCase);
         if (retryButton != null) retryButton.onClick.RemoveListener(OnClickRetry);
@@ -184,6 +265,13 @@ public class StageResultPanel : MonoBehaviour
         return true;
     }
 
+    public void SetVisibleForPause(bool visible)
+    {
+        if (!isShown || panelRoot == null) return;
+
+        panelRoot.SetActive(visible);
+    }
+
     private IEnumerator ShowRoutine(bool isWin, string reason)
     {
         if (showDelay > 0f)
@@ -198,6 +286,7 @@ public class StageResultPanel : MonoBehaviour
         ApplyStats(isWin, reason);
 
         panelRoot.SetActive(true);
+        SoundManager.Instance.PlaySFX(SoundIds.ResultPanelAppear);
 
         if (pauseGameWhileShown) Time.timeScale = 0f;
 
@@ -208,6 +297,9 @@ public class StageResultPanel : MonoBehaviour
 
     private void ApplyStats(bool isWin, string reason)
     {
+        currentIsWin = isWin;
+        currentReason = reason;
+        hasAppliedStats = true;
         ResolveSources();
 
         StageConfig stage = GetCurrentStage();
@@ -218,8 +310,16 @@ public class StageResultPanel : MonoBehaviour
 
         int clues = investigationManager != null ? investigationManager.collectedClues.Count : 0;
         int clueTarget = GetClueTarget(stage);
+        float elapsedTime = gameManager != null ? gameManager.GetStageElapsedTime() : 0f;
+        int totalSeconds = Mathf.FloorToInt(elapsedTime);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
 
-        if (titleText != null) titleText.text = isWin ? winTitle : loseTitle;
+        if (titleText != null)
+        {
+            LocalizedString localizedTitle = isWin ? winTitleLocalized : loseTitleLocalized;
+            titleText.text = GetLocalizedValue(localizedTitle, isWin ? winTitle : loseTitle);
+        }
 
         if (subtitleText != null)
         {
@@ -232,14 +332,196 @@ public class StageResultPanel : MonoBehaviour
             subtitleText.gameObject.SetActive(!string.IsNullOrEmpty(subtitle));
         }
 
-        if (ordersText != null) ordersText.text = string.Format(ordersFormat, orders);
+        if (ordersText != null)
+        {
+            string format = GetLocalizedValue(ordersFormatLocalized, ordersFormat);
+            ordersText.text = string.Format(format, orders);
+        }
 
         // เก็บเกินเป้าได้ (เบาะแสส่วนเกิน) แต่บนสรุปผลไม่ควรโชว์ 5/4 เลยตัดไว้ที่เป้า
-        if (cluesText != null) cluesText.text = string.Format(cluesFormat, Mathf.Min(clues, clueTarget), clueTarget);
+        if (cluesText != null)
+        {
+            string format = GetLocalizedValue(cluesFormatLocalized, cluesFormat);
+            cluesText.text = string.Format(format, Mathf.Min(clues, clueTarget), clueTarget);
+        }
 
-        if (mistakesText != null) mistakesText.text = string.Format(mistakesFormat, Mathf.Min(mistakes, maxMistakes), maxMistakes);
+        if (mistakesText != null)
+        {
+            string format = GetLocalizedValue(mistakesFormatLocalized, mistakesFormat);
+            mistakesText.text = string.Format(format, Mathf.Min(mistakes, maxMistakes), maxMistakes);
+        }
 
+        if (timeText != null)
+        {
+            string format = GetLocalizedValue(timeFormatLocalized, timeFormat);
+            timeText.text = string.Format(format, minutes, seconds);
+        }
+
+        int rankScore = Mathf.Max(0, orders + clues - mistakes);
+        ApplyRankImage(rankScore, mistakes);
+        ApplyLocalizedButtonLabels();
         ApplyButtonStates(isWin);
+    }
+
+    private void ApplyRankImage(int score, int mistakes)
+    {
+        if (rankImage == null)
+            return;
+
+        Sprite rankSprite = GetRankSprite(score, mistakes);
+        rankImage.sprite = rankSprite;
+        rankImage.gameObject.SetActive(rankSprite != null);
+        rankImage.preserveAspect = true;
+
+        if (rankSprite == null)
+        {
+            rankImageRevealed = false;
+            return;
+        }
+
+        if (!hasRankImageBaseScale)
+        {
+            rankImageBaseScale = rankImage.rectTransform.localScale;
+            hasRankImageBaseScale = true;
+        }
+
+        if (rankImageCanvasGroup == null)
+        {
+            rankImageCanvasGroup = rankImage.GetComponent<CanvasGroup>();
+            if (rankImageCanvasGroup == null)
+                rankImageCanvasGroup = rankImage.gameObject.AddComponent<CanvasGroup>();
+        }
+
+        if (rankImageRevealed)
+        {
+            rankImageCanvasGroup.alpha = 1f;
+            rankImage.rectTransform.localScale = rankImageBaseScale;
+        }
+        else
+        {
+            rankImageCanvasGroup.alpha = 0f;
+            rankImage.rectTransform.localScale = rankImageBaseScale * Mathf.Clamp01(rankRevealStartScale);
+        }
+    }
+
+    private Sprite GetRankSprite(int score, int mistakes)
+    {
+        if (mistakes == 0 && score >= rankARequiredScore) return rankASprite;
+        if (score >= rankBRequiredScore) return rankBSprite;
+        if (score >= rankCRequiredScore) return rankCSprite;
+        return rankDSprite;
+    }
+
+    private void SubscribeLocalization()
+    {
+        SubscribeLocalizedString(winTitleLocalized);
+        SubscribeLocalizedString(loseTitleLocalized);
+        SubscribeLocalizedString(ordersFormatLocalized);
+        SubscribeLocalizedString(cluesFormatLocalized);
+        SubscribeLocalizedString(mistakesFormatLocalized);
+        SubscribeLocalizedString(timeFormatLocalized);
+        SubscribeLocalizedString(saveLabelLocalized);
+        SubscribeLocalizedString(nextCaseLabelLocalized);
+        SubscribeLocalizedString(retryLabelLocalized);
+        SubscribeLocalizedString(mainMenuLabelLocalized);
+
+        refreshingLocalization = true;
+        RefreshLocalizedStrings();
+        refreshingLocalization = false;
+
+        if (hasAppliedStats)
+            ApplyStats(currentIsWin, currentReason);
+        else
+            RefreshLocalizedButtonLabels();
+    }
+
+    private void UnsubscribeLocalization()
+    {
+        UnsubscribeLocalizedString(winTitleLocalized);
+        UnsubscribeLocalizedString(loseTitleLocalized);
+        UnsubscribeLocalizedString(ordersFormatLocalized);
+        UnsubscribeLocalizedString(cluesFormatLocalized);
+        UnsubscribeLocalizedString(mistakesFormatLocalized);
+        UnsubscribeLocalizedString(timeFormatLocalized);
+        UnsubscribeLocalizedString(saveLabelLocalized);
+        UnsubscribeLocalizedString(nextCaseLabelLocalized);
+        UnsubscribeLocalizedString(retryLabelLocalized);
+        UnsubscribeLocalizedString(mainMenuLabelLocalized);
+    }
+
+    private void SubscribeLocalizedString(LocalizedString localizedString)
+    {
+        if (localizedString != null)
+            localizedString.StringChanged += OnLocalizedStringChanged;
+    }
+
+    private void UnsubscribeLocalizedString(LocalizedString localizedString)
+    {
+        if (localizedString != null)
+            localizedString.StringChanged -= OnLocalizedStringChanged;
+    }
+
+    private void OnLocalizedStringChanged(string localizedText)
+    {
+        if (refreshingLocalization)
+            return;
+
+        if (hasAppliedStats)
+            ApplyStats(currentIsWin, currentReason);
+        else
+            RefreshLocalizedButtonLabels();
+    }
+
+    private void RefreshLocalizedButtonLabels()
+    {
+        ApplyLocalizedButtonLabels();
+    }
+
+    private void RefreshLocalizedStrings()
+    {
+        RefreshLocalizedString(winTitleLocalized);
+        RefreshLocalizedString(loseTitleLocalized);
+        RefreshLocalizedString(ordersFormatLocalized);
+        RefreshLocalizedString(cluesFormatLocalized);
+        RefreshLocalizedString(mistakesFormatLocalized);
+        RefreshLocalizedString(timeFormatLocalized);
+        RefreshLocalizedString(saveLabelLocalized);
+        RefreshLocalizedString(nextCaseLabelLocalized);
+        RefreshLocalizedString(retryLabelLocalized);
+        RefreshLocalizedString(mainMenuLabelLocalized);
+    }
+
+    private void ApplyLocalizedButtonLabels()
+    {
+        SetButtonLabel(saveButton, saveLabelLocalized, saveLabel);
+        SetButtonLabel(nextCaseButton, nextCaseLabelLocalized, nextCaseLabel);
+        SetButtonLabel(retryButton, retryLabelLocalized, retryLabel);
+        SetButtonLabel(mainMenuButton, mainMenuLabelLocalized, mainMenuLabel);
+    }
+
+    private void SetButtonLabel(Button button, LocalizedString localizedString, string fallback)
+    {
+        if (button == null)
+            return;
+
+        TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>();
+        if (label != null)
+            label.text = GetLocalizedValue(localizedString, fallback);
+    }
+
+    private static string GetLocalizedValue(LocalizedString localizedString, string fallback)
+    {
+        if (localizedString == null)
+            return fallback;
+
+        string localizedValue = localizedString.GetLocalizedString();
+        return string.IsNullOrWhiteSpace(localizedValue) ? fallback : localizedValue;
+    }
+
+    private static void RefreshLocalizedString(LocalizedString localizedString)
+    {
+        if (localizedString != null)
+            localizedString.RefreshString();
     }
 
     private void ApplyButtonStates(bool isWin)
@@ -286,13 +568,19 @@ public class StageResultPanel : MonoBehaviour
 
     private IEnumerator PopRoutine()
     {
-        Transform root = panelRoot.transform;
-
-        if (!hasPanelBase)
+        if (animatedPanel == null)
         {
-            // จำสเกลจริงไว้ครั้งเดียวก่อนจะไปเขียนทับเป็น 0 ไม่งั้นรอบถัดไปจะได้ค่า 0 มาเป็นค่าฐาน
+            RectTransform panelRect = panelRoot.GetComponent<RectTransform>();
+            animatedPanel = panelRect != null
+                ? (panelRect.Find("Card") as RectTransform ?? panelRect)
+                : null;
+        }
+
+        if (!hasPanelBase && animatedPanel != null)
+        {
+            // จำตำแหน่งจริงไว้ครั้งเดียวก่อนจะเลื่อนแผงลงไปด้านล่าง
             hasPanelBase = true;
-            panelBaseScale = root.localScale == Vector3.zero ? Vector3.one : root.localScale;
+            panelBasePosition = animatedPanel.anchoredPosition;
 
             panelCanvasGroup = panelRoot.GetComponent<CanvasGroup>();
             if (panelCanvasGroup == null) panelCanvasGroup = panelRoot.AddComponent<CanvasGroup>();
@@ -304,7 +592,8 @@ public class StageResultPanel : MonoBehaviour
         float duration = Mathf.Max(0.01f, popDuration);
         float time = 0f;
 
-        root.localScale = Vector3.zero;
+        if (animatedPanel != null)
+            animatedPanel.anchoredPosition = panelBasePosition + Vector2.down * slideDistance;
         if (panelCanvasGroup != null) panelCanvasGroup.alpha = 0f;
 
         while (time < duration)
@@ -313,16 +602,22 @@ public class StageResultPanel : MonoBehaviour
             time += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(time / duration);
 
-            root.localScale = panelBaseScale * EaseOutBack(t);
+            if (animatedPanel != null)
+                animatedPanel.anchoredPosition = Vector2.LerpUnclamped(
+                    panelBasePosition + Vector2.down * slideDistance,
+                    panelBasePosition,
+                    EaseOutCubic(t));
             if (panelCanvasGroup != null) panelCanvasGroup.alpha = Mathf.Clamp01(t * 3f);
 
             yield return null;
         }
 
-        root.localScale = panelBaseScale;
+        if (animatedPanel != null)
+            animatedPanel.anchoredPosition = panelBasePosition;
         if (panelCanvasGroup != null) panelCanvasGroup.alpha = 1f;
 
         yield return RevealStatRowsRoutine();
+        yield return RevealRankImageRoutine();
     }
 
     private IEnumerator RevealStatRowsRoutine()
@@ -330,6 +625,7 @@ public class StageResultPanel : MonoBehaviour
         if (rowStagger <= 0f)
         {
             SetStatRowsAlpha(1f);
+            PlayStatRevealSounds();
             yield break;
         }
 
@@ -349,7 +645,23 @@ public class StageResultPanel : MonoBehaviour
             }
 
             SetRowAlpha(row, 1f);
+            PlayStatRevealSound();
         }
+    }
+
+    private void PlayStatRevealSounds()
+    {
+        for (int i = 0; i < statRows.Length; i++)
+        {
+            if (statRows[i] != null)
+                PlayStatRevealSound();
+        }
+    }
+
+    private void PlayStatRevealSound()
+    {
+        if (SoundManager.Instance != null && !string.IsNullOrEmpty(statRevealSoundId))
+            SoundManager.Instance.PlaySFX(statRevealSoundId);
     }
 
     private void SetStatRowsAlpha(float alpha)
@@ -369,6 +681,38 @@ public class StageResultPanel : MonoBehaviour
         row.color = color;
     }
 
+    private IEnumerator RevealRankImageRoutine()
+    {
+        if (rankImage == null || !rankImage.gameObject.activeSelf || rankImage.sprite == null)
+            yield break;
+
+        if (rankRevealDelay > 0f)
+            yield return new WaitForSecondsRealtime(rankRevealDelay);
+
+        SoundManager.Instance.PlaySFX(SoundIds.RankExAppear);
+
+        float duration = Mathf.Max(0.01f, rankRevealDuration);
+        float time = 0f;
+        Vector3 startScale = rankImageBaseScale * Mathf.Clamp01(rankRevealStartScale);
+
+        while (time < duration)
+        {
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            float easedT = EaseOutBack(t);
+
+            if (rankImageCanvasGroup != null)
+                rankImageCanvasGroup.alpha = t;
+            rankImage.rectTransform.localScale = Vector3.LerpUnclamped(startScale, rankImageBaseScale, easedT);
+            yield return null;
+        }
+
+        if (rankImageCanvasGroup != null)
+            rankImageCanvasGroup.alpha = 1f;
+        rankImage.rectTransform.localScale = rankImageBaseScale;
+        rankImageRevealed = true;
+    }
+
     // ---------- ปุ่ม ----------
 
     // กดบันทึกเกม: เปิดแผงให้ผู้เล่นเลือกว่าจะลงช่องไหน (แผงเลือกช่องจะเป็นคนเขียนไฟล์เอง)
@@ -386,6 +730,8 @@ public class StageResultPanel : MonoBehaviour
 
     public void OnClickNextCase()
     {
+        if (isLeavingResultScreen) return;
+
         string nextScene = ResolveNextSceneName();
 
         if (string.IsNullOrEmpty(nextScene))
@@ -394,18 +740,20 @@ public class StageResultPanel : MonoBehaviour
             return;
         }
 
-        LeaveResultScreen();
-        SceneManager.LoadScene(nextScene);
+        StartCoroutine(LeaveResultScreenAndLoadScene(nextScene));
     }
 
     public void OnClickRetry()
     {
-        LeaveResultScreen();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (isLeavingResultScreen) return;
+
+        StartCoroutine(LeaveResultScreenAndLoadScene(SceneManager.GetActiveScene().name));
     }
 
     public void OnClickMainMenu()
     {
+        if (isLeavingResultScreen) return;
+
         string sceneName = ResolveMainMenuSceneName();
 
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -421,8 +769,7 @@ public class StageResultPanel : MonoBehaviour
             return;
         }
 
-        LeaveResultScreen();
-        SceneManager.LoadScene(sceneName);
+        StartCoroutine(LeaveResultScreenAndLoadScene(sceneName));
     }
 
     private string ResolveMainMenuSceneName()
@@ -452,11 +799,80 @@ public class StageResultPanel : MonoBehaviour
         isShown = false;
     }
 
+    private IEnumerator LeaveResultScreenAndLoadScene(string sceneName)
+    {
+        isLeavingResultScreen = true;
+        LeaveResultScreen();
+
+        Image fadeImage = EnsureTransitionFadeImage();
+        if (fadeImage != null)
+        {
+            CanvasGroup fadeGroup = fadeImage.GetComponent<CanvasGroup>();
+            if (fadeGroup == null) fadeGroup = fadeImage.gameObject.AddComponent<CanvasGroup>();
+
+            fadeImage.gameObject.SetActive(true);
+            fadeGroup.alpha = 0f;
+
+            float duration = Mathf.Max(0.01f, transitionFadeDuration);
+            float time = 0f;
+            while (time < duration)
+            {
+                time += Time.unscaledDeltaTime;
+                fadeGroup.alpha = Mathf.Clamp01(time / duration);
+                yield return null;
+            }
+
+            fadeGroup.alpha = 1f;
+        }
+
+        SceneManager.LoadScene(sceneName);
+    }
+
+    private Image EnsureTransitionFadeImage()
+    {
+        if (transitionFadeImage != null) return transitionFadeImage;
+
+        Canvas canvas = panelRoot != null
+            ? panelRoot.GetComponentInParent<Canvas>(true)
+            : GetComponentInParent<Canvas>(true);
+
+        if (canvas == null)
+        {
+            Debug.LogWarning("[StageResultPanel] ไม่พบ Canvas สำหรับแสดงเฟดก่อนเปลี่ยนฉาก");
+            return null;
+        }
+
+        GameObject fadeObject = new GameObject("ResultTransitionBlackFade", typeof(RectTransform), typeof(Image), typeof(Canvas));
+        RectTransform fadeRect = fadeObject.GetComponent<RectTransform>();
+        fadeRect.SetParent(canvas.rootCanvas.transform, false);
+        fadeRect.anchorMin = Vector2.zero;
+        fadeRect.anchorMax = Vector2.one;
+        fadeRect.offsetMin = Vector2.zero;
+        fadeRect.offsetMax = Vector2.zero;
+
+        Canvas fadeCanvas = fadeObject.GetComponent<Canvas>();
+        fadeCanvas.overrideSorting = true;
+        fadeCanvas.sortingOrder = canvas.rootCanvas.sortingOrder + 1;
+
+        transitionFadeImage = fadeObject.GetComponent<Image>();
+        transitionFadeImage.color = Color.black;
+        transitionFadeImage.raycastTarget = false;
+        transitionFadeImage.gameObject.SetActive(false);
+        return transitionFadeImage;
+    }
+
+    private static float EaseOutCubic(float t)
+    {
+        return 1f - Mathf.Pow(1f - t, 3f);
+    }
+
     private static float EaseOutBack(float t)
     {
-        float overshoot = 1.70158f;
-        float shifted = t - 1f;
-        return 1f + (overshoot + 1f) * Mathf.Pow(shifted, 3f) + overshoot * Mathf.Pow(shifted, 2f);
+        t = Mathf.Clamp01(t);
+        const float overshoot = 1.70158f;
+        float adjustedT = t - 1f;
+        return 1f + (overshoot + 1f) * adjustedT * adjustedT * adjustedT
+            + overshoot * adjustedT * adjustedT;
     }
 
     private void ResolveSources()
@@ -518,9 +934,19 @@ public class StageResultPanel : MonoBehaviour
 
         CreateSpacer(card, 10f);
 
+        if (rankImage == null)
+        {
+            rankImage = CreateImage(card, "RankImage", Color.white, null);
+            rankImage.preserveAspect = true;
+
+            LayoutElement rankLayout = rankImage.gameObject.AddComponent<LayoutElement>();
+            rankLayout.preferredHeight = 140f;
+        }
+
         if (ordersText == null) ordersText = CreateText(card, "OrdersRow", string.Empty, Color.white, 34f, TextAlignmentOptions.Left, FontStyles.Normal);
         if (cluesText == null) cluesText = CreateText(card, "CluesRow", string.Empty, Color.white, 34f, TextAlignmentOptions.Left, FontStyles.Normal);
         if (mistakesText == null) mistakesText = CreateText(card, "MistakesRow", string.Empty, Color.white, 34f, TextAlignmentOptions.Left, FontStyles.Normal);
+        if (timeText == null) timeText = CreateText(card, "TimeRow", string.Empty, Color.white, 34f, TextAlignmentOptions.Left, FontStyles.Normal);
 
         CreateSpacer(card, 18f);
 

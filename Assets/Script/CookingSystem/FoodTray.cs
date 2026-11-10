@@ -1,11 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class FoodTrayOption
+{
+    public GameObject foodPrefab;
+    public Sprite foodTraySprite;
+}
 
 public class FoodTray : MonoBehaviour
 {
     [Header("ตั้งค่าถาดวัตถุดิบ")]
     [Tooltip("ลาก Prefab ของไม้หมาล่าชนิดนั้นๆ มาใส่ตรงนี้")]
     [SerializeField] private GameObject foodPrefab;
+    [Tooltip("สุ่มเป็นคู่ เช่น ChickenPrefab + ChickenTraySprite หรือ PorkPrefab + PorkTraySprite")]
+    [SerializeField] private FoodTrayOption[] randomFoodOptions;
+    [Tooltip("SpriteRenderer ของภาพอาหารบนหน้าถาด ถ้าไม่ใส่จะไม่เปลี่ยนภาพ")]
+    [SerializeField] private SpriteRenderer foodPreviewRenderer;
+    [Tooltip("Sprite เฉพาะที่ใช้แสดงบนถาด ถ้าไม่ใส่จะใช้ rawSprite จาก FoodData")]
+    [SerializeField] private Sprite foodTraySprite;
     [SerializeField] private Transform spawnPoint;
 
     [Header("Pickup Animation (ถาดเด้งตอนของถูกหยิบออกไป)")]
@@ -17,6 +31,25 @@ public class FoodTray : MonoBehaviour
     private Coroutine pickupAnimCoroutine;
     private Vector3 baseScale;
     private bool hasCachedBaseScale;
+    private GameObject selectedFoodPrefab;
+    private Sprite selectedFoodTraySprite;
+
+    public FoodData SelectedFoodData
+    {
+        get
+        {
+            if (selectedFoodPrefab == null) return null;
+
+            FoodInstance foodInstance = selectedFoodPrefab.GetComponentInChildren<FoodInstance>(true);
+            return foodInstance != null ? foodInstance.GetData() : null;
+        }
+    }
+
+    private void Awake()
+    {
+        SelectFoodOption();
+        UpdateFoodPreview();
+    }
 
     public FoodInstance SpawnFood()
     {
@@ -27,12 +60,12 @@ public class FoodTray : MonoBehaviour
     // ปล่อยวัตถุดิบออกมาที่ตำแหน่งที่กำหนด (ใช้ตอนหยิบจากถาด ให้ไปโผล่ตรงเมาส์เลย)
     public FoodInstance SpawnFoodAt(Vector3 worldPosition)
     {
-        if (foodPrefab == null) return null;
+        if (selectedFoodPrefab == null) return null;
 
         // คุม Z ให้เท่ากับถาดเสมอ กันวัตถุดิบหลุดไปอยู่หน้า/หลังกล้อง
         worldPosition.z = spawnPoint != null ? spawnPoint.position.z : transform.position.z;
 
-        GameObject newFoodObj = Instantiate(foodPrefab, worldPosition, Quaternion.identity);
+        GameObject newFoodObj = Instantiate(selectedFoodPrefab, worldPosition, Quaternion.identity);
 
         // เผื่อ prefab วาง FoodInstance ไว้ที่ลูก ไม่ได้อยู่ที่ root
         FoodInstance foodInstance = newFoodObj.GetComponent<FoodInstance>();
@@ -41,7 +74,7 @@ public class FoodTray : MonoBehaviour
         if (foodInstance == null)
         {
             // ถ้าไม่มี FoodInstance = ไม่มีตัวรับ IDraggable วัตถุดิบจะเกิดมาแล้วค้างอยู่กับที่ ลากไม่ได้
-            Debug.LogError($"[FoodTray] prefab '{foodPrefab.name}' ไม่มีสคริปต์ FoodInstance ติดอยู่ เลยลากไม่ได้ ให้ใส่ FoodInstance ที่ตัว root ของ prefab", this);
+            Debug.LogError($"[FoodTray] prefab '{selectedFoodPrefab.name}' ไม่มีสคริปต์ FoodInstance ติดอยู่ เลยลากไม่ได้ ให้ใส่ FoodInstance ที่ตัว root ของ prefab", this);
             Destroy(newFoodObj);
             return null;
         }
@@ -58,6 +91,46 @@ public class FoodTray : MonoBehaviour
         foodInstance.PlayTrayPickupAnimation();
 
         return foodInstance;
+    }
+
+    private void SelectFoodOption()
+    {
+        List<FoodTrayOption> validOptions = new List<FoodTrayOption>();
+        if (randomFoodOptions != null)
+        {
+            foreach (FoodTrayOption option in randomFoodOptions)
+            {
+                if (option != null && option.foodPrefab != null)
+                    validOptions.Add(option);
+            }
+        }
+
+        if (validOptions.Count > 0)
+        {
+            FoodTrayOption selectedOption = validOptions[Random.Range(0, validOptions.Count)];
+            selectedFoodPrefab = selectedOption.foodPrefab;
+            selectedFoodTraySprite = selectedOption.foodTraySprite;
+            return;
+        }
+
+        selectedFoodPrefab = foodPrefab;
+        selectedFoodTraySprite = foodTraySprite;
+    }
+
+    private void UpdateFoodPreview()
+    {
+        if (foodPreviewRenderer == null || selectedFoodPrefab == null) return;
+
+        if (selectedFoodTraySprite != null)
+        {
+            foodPreviewRenderer.sprite = selectedFoodTraySprite;
+            return;
+        }
+
+        FoodInstance foodInstance = selectedFoodPrefab.GetComponentInChildren<FoodInstance>(true);
+        FoodData foodData = foodInstance != null ? foodInstance.GetData() : null;
+        if (foodData != null && foodData.rawSprite != null)
+            foodPreviewRenderer.sprite = foodData.rawSprite;
     }
 
     // ถาดยุบตัวแวบนึงแล้วเด้งกลับ เหมือนสั่นตอบรับตอนของถูกหยิบออกไป

@@ -36,6 +36,10 @@ public class Customer : MonoBehaviour
     [Tooltip("ระยะเวลาที่แสดงสปริทตอบสนองก่อนจากไป")]
     public float reactionDuration = 1.5f;
 
+    [Header("Delivery Highlight")]
+    [Tooltip("ความหนาของเส้นขอบสีขาวตอนกำลังถือถ้วยอาหาร")]
+    [SerializeField] private float deliveryOutlineThickness = 0.04f;
+
     [Header("Investigate Hide Effect")]
     [Tooltip("ระยะเวลาที่สปริทลูกค้าค่อยๆ ดำลง ก่อนจะเริ่มจางหาย")]
     public float blackenDuration = 0.25f;
@@ -49,6 +53,21 @@ public class Customer : MonoBehaviour
     public float walkBobHeight = 0.15f;
     [Tooltip("ความเร็วของการเด้งขึ้นลงตอนเดินเข้ามา (ยิ่งมากยิ่งเดินถี่)")]
     public float walkBobSpeed = 10f;
+
+    [Header("Customer-specific sounds")]
+    [Tooltip("Optional sound for this customer's arrival. Leave empty to use CustomerArrive from SoundLibrary.")]
+    public AudioClip customArriveSound;
+    [Tooltip("Optional sound for this customer's departure. Leave empty to use CustomerLeave from SoundLibrary.")]
+    public AudioClip customLeaveSound;
+
+    [Header("Animal Customer")]
+    public bool isAnimalCustomer;
+    public float animalJumpHeight = 0.75f;
+    public float animalJumpDuration = 0.45f;
+    public float animalLandingHeight = 0.25f;
+    public float animalSortingOrderDelay = 0.15f;
+    public float animalLeavingSortingOrderDelay = 0.15f;
+    public int animalSortingOrder = 99;
 
     [Header("UI ออเดอร์ (ลากจากในลูกของตัวเองมาใส่)")]
     [Tooltip("ถ้าใส่ Animator นี้ไว้ จะสั่ง Trigger \"Show\" ตอน Canvas ปรากฏ แทนการเล่นแอนิเมชันขยายจากโค้ด")]
@@ -95,6 +114,10 @@ public class Customer : MonoBehaviour
     private Coroutine visibilityCoroutine;
     private bool isHiddenForInvestigation = false;
     private Vector3 spawnPosition;
+    private Vector3 normalRendererLocalPosition;
+    private readonly List<SpriteRenderer> deliveryOutlineRenderers = new List<SpriteRenderer>();
+    private bool deliveryHighlightActive;
+    private Material deliveryOutlineMaterial;
 
     // standPosition คือจุดยืนจริงของลูกค้า (ตำแหน่งช่อง) ส่วน transform.position ตอนเรียกเมธอดนี้
     // ควรถูกตั้งเป็นจุดที่ลูกค้าจะโผล่ออกมาก่อน (เช่น นอกจอ) แล้วค่อยเดินเข้ามายัง standPosition
@@ -107,11 +130,16 @@ public class Customer : MonoBehaviour
         isLeaving = false;
         isWalkingIn = true;
         spawnPosition = transform.position;
+        deliveryHighlightActive = false;
 
-        if (customerRenderer != null) normalRendererColor = customerRenderer.color;
+        if (customerRenderer != null)
+        {
+            normalRendererColor = customerRenderer.color;
+            normalRendererLocalPosition = customerRenderer.transform.localPosition;
+        }
         if (customerCanvas != null) customerCanvas.SetActive(false);
 
-        SoundManager.Instance.PlaySFX(SoundIds.CustomerArrive, standPosition);
+        PlayArriveSound(standPosition);
 
         string sauceText = order.wantedSauce ? "ทาซอสด้วย" : "ไม่เอาซอส";
 
@@ -237,10 +265,85 @@ public class Customer : MonoBehaviour
             {
                 customerRenderer.enabled = false;
             }
+            UpdateDeliveryOutline();
             return;
         }
 
         visibilityCoroutine = StartCoroutine(isVisible ? FadeInRoutine() : FadeOutRoutine());
+    }
+
+    public void SetDeliveryHighlight(bool isHighlighted)
+    {
+        deliveryHighlightActive = isHighlighted;
+        UpdateDeliveryOutline();
+    }
+
+    private void UpdateDeliveryOutline()
+    {
+        if (customerRenderer == null) return;
+
+        if (deliveryOutlineRenderers.Count == 0)
+        {
+            Shader outlineShader = Shader.Find("Custom/CustomerOutline");
+            if (outlineShader == null)
+            {
+                Debug.LogError("Customer outline shader was not found. Ensure CustomerOutline.shader is included in the project.", this);
+                return;
+            }
+
+            deliveryOutlineMaterial = new Material(outlineShader) { name = "Customer Delivery Outline (Runtime)" };
+            deliveryOutlineMaterial.SetColor("_OutlineColor", Color.white);
+            deliveryOutlineMaterial.SetFloat("_OutlineSize", 2f);
+
+            for (int i = 0; i < 8; i++)
+            {
+                GameObject outlineObject = new GameObject("DeliveryOutline");
+                outlineObject.transform.SetParent(customerRenderer.transform, false);
+                SpriteRenderer outlineRenderer = outlineObject.AddComponent<SpriteRenderer>();
+                outlineRenderer.material = deliveryOutlineMaterial;
+                deliveryOutlineRenderers.Add(outlineRenderer);
+            }
+        }
+
+        Sprite sprite = customerRenderer.sprite;
+        bool isVisible = deliveryHighlightActive
+            && !isLeaving
+            && !isWalkingIn
+            && !isShowingReaction
+            && !isHiddenForInvestigation
+            && customerRenderer.enabled
+            && sprite != null;
+        float outlineOffset = deliveryOutlineThickness;
+        Vector3[] offsets =
+        {
+            new Vector3(-outlineOffset, -outlineOffset),
+            new Vector3(0f, -outlineOffset),
+            new Vector3(outlineOffset, -outlineOffset),
+            new Vector3(-outlineOffset, 0f),
+            new Vector3(outlineOffset, 0f),
+            new Vector3(-outlineOffset, outlineOffset),
+            new Vector3(0f, outlineOffset),
+            new Vector3(outlineOffset, outlineOffset)
+        };
+
+        for (int i = 0; i < deliveryOutlineRenderers.Count; i++)
+        {
+            SpriteRenderer outlineRenderer = deliveryOutlineRenderers[i];
+            outlineRenderer.sprite = sprite;
+            outlineRenderer.color = Color.white;
+            outlineRenderer.flipX = customerRenderer.flipX;
+            outlineRenderer.flipY = customerRenderer.flipY;
+            outlineRenderer.sortingLayerID = customerRenderer.sortingLayerID;
+            outlineRenderer.sortingOrder = customerRenderer.sortingOrder - 1;
+            outlineRenderer.transform.localPosition = offsets[i];
+            outlineRenderer.enabled = isVisible;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (deliveryOutlineMaterial != null)
+            Destroy(deliveryOutlineMaterial);
     }
 
     // ค่อยๆ ดำลงก่อน แล้วค่อยจางหาย (ตอนผู้เล่นเริ่มสืบสวน)
@@ -253,6 +356,7 @@ public class Customer : MonoBehaviour
         yield return LerpRendererColor(blackOpaque, blackTransparent, fadeOutDuration);
 
         customerRenderer.enabled = false;
+        UpdateDeliveryOutline();
         visibilityCoroutine = null;
     }
 
@@ -268,6 +372,7 @@ public class Customer : MonoBehaviour
 
         yield return LerpRendererColor(blackOpaque, normalRendererColor, blackenDuration);
 
+        UpdateDeliveryOutline();
         visibilityCoroutine = null;
     }
 
@@ -361,6 +466,8 @@ public class Customer : MonoBehaviour
         {
             customerRenderer.sprite = normalSprite;
         }
+
+        UpdateDeliveryOutline();
     }
 
     private IEnumerator ShowReactionAndLeave(bool isSatisfied)
@@ -368,6 +475,7 @@ public class Customer : MonoBehaviour
         if (isLeaving) yield break;
 
         isShowingReaction = true;
+        SetDeliveryHighlight(false);
         Sprite reactionSprite = isSatisfied ? correctReactionSprite : wrongReactionSprite;
 
         SoundManager.Instance.PlaySFX(isSatisfied ? SoundIds.CustomerHappy : SoundIds.CustomerAngry, transform.position);
@@ -387,6 +495,7 @@ public class Customer : MonoBehaviour
     {
         ApplyCustomerSprite(true);
         isShowingReaction = true;
+        SetDeliveryHighlight(false);
 
         // ความอดทนหมดก็นับเป็นการทำพลาดเหมือนกัน เลยใช้เสียงหงุดหงิดชุดเดียวกับตอนส่งอาหารผิด
         SoundManager.Instance.PlaySFX(SoundIds.CustomerAngry, transform.position);
@@ -403,8 +512,9 @@ public class Customer : MonoBehaviour
         if (isLeaving) return;
 
         isLeaving = true;
+        SetDeliveryHighlight(false);
 
-        SoundManager.Instance.PlaySFX(SoundIds.CustomerLeave, transform.position);
+        PlayLeaveSound();
 
         if (!isSatisfied)
         {
@@ -417,8 +527,30 @@ public class Customer : MonoBehaviour
             Debug.Log("ลูกค้าพอใจ จ่ายเงิน!");
         }
 
-        manager.OnCustomerLeft(mySlotIndex);
+        manager.OnCustomerLeft(mySlotIndex, isSatisfied);
         StartCoroutine(WalkOutAnimation());
+    }
+
+    private void PlayArriveSound(Vector3 position)
+    {
+        if (customArriveSound != null)
+        {
+            SoundManager.Instance.PlaySFX(customArriveSound);
+            return;
+        }
+
+        SoundManager.Instance.PlaySFX(SoundIds.CustomerArrive, position);
+    }
+
+    private void PlayLeaveSound()
+    {
+        if (customLeaveSound != null)
+        {
+            SoundManager.Instance.PlaySFX(customLeaveSound);
+            return;
+        }
+
+        SoundManager.Instance.PlaySFX(SoundIds.CustomerLeave, transform.position);
     }
 
     // ลูกค้าเดินเข้ามาจากตำแหน่งที่เกิด (นอกจอ) ยัง standPosition (จุดยืนในช่อง)
@@ -426,6 +558,12 @@ public class Customer : MonoBehaviour
     private IEnumerator WalkInAnimation(Vector3 standPosition)
     {
         yield return WalkTo(standPosition);
+
+        if (isAnimalCustomer)
+        {
+            StartCoroutine(ChangeAnimalSortingOrderAfterDelay());
+            yield return AnimalJumpAnimation();
+        }
 
         isWalkingIn = false;
 
@@ -440,15 +578,91 @@ public class Customer : MonoBehaviour
         }
     }
 
+    private IEnumerator ChangeAnimalSortingOrderAfterDelay()
+    {
+        if (animalSortingOrderDelay > 0f)
+        {
+            yield return new WaitForSeconds(animalSortingOrderDelay);
+        }
+
+        if (customerRenderer != null) customerRenderer.sortingOrder = animalSortingOrder;
+    }
+
+    private IEnumerator AnimalJumpAnimation()
+    {
+        if (customerRenderer == null) yield break;
+
+        Transform rendererTransform = customerRenderer.transform;
+        Vector3 jumpStartPosition = rendererTransform.localPosition;
+        float duration = Mathf.Max(0.01f, animalJumpDuration);
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float progress = Mathf.Clamp01(time / duration);
+            float jumpOffset = Mathf.Sin(progress * Mathf.PI) * animalJumpHeight;
+            float landingOffset = progress * animalLandingHeight;
+            rendererTransform.localPosition = jumpStartPosition + Vector3.up * (jumpOffset + landingOffset);
+            yield return null;
+        }
+
+        rendererTransform.localPosition = jumpStartPosition + Vector3.up * animalLandingHeight;
+    }
+
     // หลังจากลูกค้าถือสปริทตอบสนอง (ถูก/ผิด) ค้างไว้ครบ reactionDuration แล้ว
     // ให้เดินกลับไปยังจุดที่เกิด (spawnPosition) ก่อนค่อยหายไปจากฉาก
     private IEnumerator WalkOutAnimation()
     {
         if (customerCanvas != null && customerCanvas.activeSelf) StartCoroutine(HideOrderCanvasAnimation());
 
+        if (isAnimalCustomer && customerRenderer != null)
+        {
+            yield return AnimalJumpToNormalPosition();
+        }
+        else if (customerRenderer != null)
+        {
+            customerRenderer.transform.localPosition = normalRendererLocalPosition;
+        }
+
         yield return WalkTo(spawnPosition);
 
         Destroy(gameObject);
+    }
+
+    private IEnumerator AnimalJumpToNormalPosition()
+    {
+        Transform rendererTransform = customerRenderer.transform;
+        Vector3 jumpStartPosition = rendererTransform.localPosition;
+        float duration = Mathf.Max(0.01f, animalJumpDuration);
+        float time = 0f;
+
+        StartCoroutine(ResetAnimalSortingOrderAfterDelay());
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float progress = Mathf.Clamp01(time / duration);
+            float jumpOffset = Mathf.Sin(progress * Mathf.PI) * animalJumpHeight;
+            Vector3 position = Vector3.Lerp(jumpStartPosition, normalRendererLocalPosition, progress);
+            rendererTransform.localPosition = position + Vector3.up * jumpOffset;
+            yield return null;
+        }
+
+        rendererTransform.localPosition = normalRendererLocalPosition;
+    }
+
+    private IEnumerator ResetAnimalSortingOrderAfterDelay()
+    {
+        if (animalLeavingSortingOrderDelay > 0f)
+        {
+            yield return new WaitForSeconds(animalLeavingSortingOrderDelay);
+        }
+
+        if (customerRenderer != null)
+        {
+            customerRenderer.sortingOrder = 5;
+        }
     }
 
     // เดินจากตำแหน่งปัจจุบันไปยัง targetPosition แบบชะลอความเร็วตอนใกล้ถึง (ease-out)

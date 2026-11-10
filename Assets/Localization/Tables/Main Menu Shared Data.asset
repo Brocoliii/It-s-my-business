@@ -1,0 +1,358 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Main Menu Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: Main Menu
+  m_TableCollectionNameGuidString: 79ead5d8261fbb74f805c937ed7c68a2
+  m_Entries:
+  - m_Id: 244973498368
+    m_Key: 'Start_Key
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387776966656
+    m_Key: Setting_Key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 389840564224
+    m_Key: Exit_Key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15393226682368
+    m_Key: SETTING_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15471404314624
+    m_Key: CAMERA_SENSITIVITY_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15602262405120
+    m_Key: CAMERA_SMOOTH_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15619844927488
+    m_Key: CAMERA_INERTIA_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15633379946496
+    m_Key: MASTER_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15684525289472
+    m_Key: SFX_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15697376636928
+    m_Key: BGM_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15714984325120
+    m_Key: RESOLUTION_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15730574553088
+    m_Key: DISPLAY_MODE_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15747016224768
+    m_Key: BACK_SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19481414791168
+    m_Key: CLUE_UI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24594573357056
+    m_Key: tutorial_intro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1701217882271744
+    m_Key: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2051116100415488
+    m_Key: MISTAKE_UI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2819991456903168
+    m_Key: AUDIO_UI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2837389631221760
+    m_Key: CAMERA_UI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3151803794255872
+    m_Key: Credit_Key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3883540157493248
+    m_Key: Tutorial_Step
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887083253854208
+    m_Key: CookedFood_Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887155752398848
+    m_Key: CookedFood_Tip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887196332290048
+    m_Key: SauceBrush_Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887253366435840
+    m_Key: SauceBrush_Tip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887309519777792
+    m_Key: MalaX3_Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887313588252672
+    m_Key: MalaX3_Tip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887436661714944
+    m_Key: FoodIntoCup_Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887497013555200
+    m_Key: FoodIntoCup_Tip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887530798673920
+    m_Key: InvestGroup_Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887566206988288
+    m_Key: InvestGroup_Tip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3888625138724864
+    m_Key: MoveCamera_Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3888661675307008
+    m_Key: MoveCamera_Tip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903744912584704
+    m_Key: Tutorial_Step01
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903791733600256
+    m_Key: Tutorial_Step02
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903793298075648
+    m_Key: Tutorial_Step03
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903794673807360
+    m_Key: Tutorial_Step04
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903796154396672
+    m_Key: Tutorial_Step05
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3904497983090688
+    m_Key: Tutorial_Step06
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903797932781568
+    m_Key: Tutorial_Step07
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3904794360999936
+    m_Key: Tutorial_Step08
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3911988225699840
+    m_Key: Orders_Result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3912389268271104
+    m_Key: Clues_Result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3912408138444800
+    m_Key: Mistake_Result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3912411217063936
+    m_Key: Time_Result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3914546461732864
+    m_Key: Retry_Button
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3914622462521344
+    m_Key: MainMenu_Button
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3914675860205568
+    m_Key: Nextcase_Button
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3915827897102336
+    m_Key: Case_Closed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3917017900838912
+    m_Key: Failed_UI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3920594614546432
+    m_Key: A beautiful hairdresser.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3920758037213184
+    m_Key: Long blonde ponytail.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3920759836569600
+    m_Key: Red shirt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3920761677869056
+    m_Key: Heavy makeup and red lipstick.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3922323250802688
+    m_Key: Resume_Button
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3923705492074496
+    m_Key: Day_Complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4123387648471040
+    m_Key: Ready_Popup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4123390039224320
+    m_Key: Go_Popup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4128179976335360
+    m_Key: dialogue_Lv1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4591090335150080
+    m_Key: Skip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4591114427232256
+    m_Key: Play Tutorial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4591569198837760
+    m_Key: TutorialTopic__Skip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8636835581325312
+    m_Key: Cutscene_Audio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8639798299258880
+    m_Key: Choose the Red Suspect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660286245367808
+    m_Key: HelloMeow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660663799836672
+    m_Key: Lots of black markings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660665267843072
+    m_Key: Big, round inner eyes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660666819735552
+    m_Key: A pink nose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660668329684992
+    m_Key: Yellow outer eyes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662035735703552
+    m_Key: PRESS SPACEBAR TO CONTINUE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662607868129280
+    m_Key: NEW EVENT!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662609478742016
+    m_Key: CAT STOLE FOOD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662610770587648
+    m_Key: DON'T LET IT STEAL!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662612028878848
+    m_Key: THROW IT A TREAT!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662613303947264
+    m_Key: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8870925081440256
+    m_Key: Smart and alert
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10672278342660096
+    m_Key: Correct
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10672400128471040
+    m_Key: Wrong
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10716011977175040
+    m_Key: YOU'VE REACHED THE END OF THE DEMO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10716065953673216
+    m_Key: THANKS FOR PLAYING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11534947631165440
+    m_Key: GATHER CLUES AND WATCH YOUR MISTAKES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11534949988364288
+    m_Key: Objective
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 5324608485803688142
+  references:
+    version: 2
+    RefIds:
+    - rid: 5324608485803688142
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1791594236644

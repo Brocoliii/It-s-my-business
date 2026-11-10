@@ -25,6 +25,7 @@ public class InputManager : MonoBehaviour
     private bool isDraggingFreshFromTray;
     private bool foodRemovedFromStation;
     private TrashBin hoveredTrashBin;
+    private Customer highlightedDeliveryCustomer;
 
     // วัดเป็น "พิกเซลบนจอ" ไม่ใช่หน่วยโลก เพราะระยะในโลกจะเปลี่ยนตามการซูม/การเลื่อนกล้อง
     // (กล้องยังไถลต่อหลังแพน และมีดันขอบจอตอนกดค้าง) ทำให้คลิกนิ่ง ๆ ถูกนับเป็นการลากจนคลิกหาย
@@ -79,6 +80,18 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
+        if (TutorialBookUI.IsOpen)
+        {
+            CancelActiveInteraction();
+            return;
+        }
+
+        if (TutorialFlowController.IsStepPanelOpen)
+        {
+            CancelActiveInteraction();
+            return;
+        }
+
         // หยุดเกมอยู่: ห้ามลากของ/แอบฟังต่อ ปุ่มในแผงหยุดเกมอยู่บน Canvas จึงไม่เกี่ยวกับตรงนี้
         // (ของที่ค้างอยู่ในมือถูกปล่อยไปแล้วตอน PauseMenuController สั่ง CancelActiveInteraction)
         if (PauseMenuController.IsPaused)
@@ -88,6 +101,7 @@ public class InputManager : MonoBehaviour
 
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
         {
+            CancelActiveInteraction();
             return;
         }
 
@@ -209,6 +223,11 @@ public class InputManager : MonoBehaviour
             return;
         }
 
+        if (TutorialFlowController.IsStepPanelOpen)
+        {
+            return;
+        }
+
         if (!HasActiveInvestigation())
         {
             return;
@@ -326,6 +345,7 @@ public class InputManager : MonoBehaviour
                     if (currentDraggable is Cup draggedCup)
                     {
                         BeginGrabOffsetEase(dragOffset, draggedCup.VisualCenterOffset, grabCenterEaseDuration);
+                        ClearDeliveryCustomerHighlight();
                     }
 
                     return;
@@ -341,6 +361,15 @@ public class InputManager : MonoBehaviour
                 {
                     // หยิบวัตถุดิบออกมาทันทีที่กด แล้วลากต่อได้เลยในทีเดียว
                     GrabFoodFromTray(clickedTray, mouseWorldPos);
+                    return;
+                }
+
+                CatTreatTray clickedTreatTray = hit.collider.GetComponent<CatTreatTray>();
+                if (clickedTreatTray == null) clickedTreatTray = hit.collider.GetComponentInParent<CatTreatTray>();
+
+                if (clickedTreatTray != null)
+                {
+                    GrabCatTreatFromTray(clickedTreatTray, mouseWorldPos);
                     return;
                 }
             }
@@ -405,6 +434,7 @@ public class InputManager : MonoBehaviour
                 // เพิ่งรู้ว่านี่คือการ "ลาก" จริงๆ (ขยับเกิน threshold) ไม่ใช่แค่คลิก
                 // ค่อยถอดออกจากเตา/โต๊ะปรุงรสตอนนี้ ไม่ใช่ตั้งแต่ตอนกดลง
                 if (!foodRemovedFromStation && currentDraggable is FoodInstance draggedFood
+                    && !draggedFood.IsBeingStolen
                     && Vector2.Distance(pressDownScreenPos, mouseScreenPos) >= ClickMoveThresholdPixels)
                 {
                     // ต้องจำก่อนถอด เพราะ RemoveFood จะล้าง currentGrill/currentSeasoning ทิ้ง
@@ -422,9 +452,11 @@ public class InputManager : MonoBehaviour
                 // ส่งตำแหน่งเมาส์ดิบให้ตัวอาหารเอาไปคิดการส่าย ต้องเป็นค่าดิบเท่านั้น
                 // เพราะ mouseWorldPos + dragOffset ขยับตามมุมที่มันเพิ่งเอียงไปแล้ว
                 if (currentDraggable is FoodInstance swayingFood) swayingFood.UpdateDragSway(mouseWorldPos);
+                if (currentDraggable is Cup swayingCup) swayingCup.UpdateDragSway(mouseWorldPos);
 
                 currentDraggable.OnDrag(mouseWorldPos + dragOffset);
                 UpdateTrashHighlight(mouseWorldPos);
+                UpdateDeliveryCustomerHighlight(mouseWorldPos);
             }
             else if (HasActiveInvestigation())
             {
@@ -443,6 +475,7 @@ public class InputManager : MonoBehaviour
             {
                 FoodInstance food = currentDraggable as FoodInstance;
                 Cup cup = currentDraggable as Cup;
+                CatTreat treat = currentDraggable as CatTreat;
 
                 RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
                 bool placed = false;
@@ -553,6 +586,13 @@ public class InputManager : MonoBehaviour
                         if (customer != null) { customer.ReceiveCup(cup); placed = true; break; }
                     }
                 }
+                else if (treat != null && isDraggingFreshFromTray)
+                {
+                    CatTheftSystem theftSystem = CatTheftSystem.Instance;
+                    bool delivered = theftSystem != null && theftSystem.TryDeliverTreat(mouseWorldPos, treat);
+                    if (!delivered) Destroy(treat.gameObject);
+                    placed = true;
+                }
 
                 currentDraggable.OnEndDrag();
                 currentDraggable = null;
@@ -560,6 +600,7 @@ public class InputManager : MonoBehaviour
                 foodRemovedFromStation = false;
                 isEasingGrabOffset = false;
                 ClearTrashHighlight();
+                ClearDeliveryCustomerHighlight();
             }
             else if (HasActiveInvestigation())
             {
@@ -755,6 +796,7 @@ public class InputManager : MonoBehaviour
             foodRemovedFromStation = false;
             isEasingGrabOffset = false;
             ClearTrashHighlight();
+            ClearDeliveryCustomerHighlight();
         }
 
         if (HasActiveInvestigation())
@@ -771,6 +813,12 @@ public class InputManager : MonoBehaviour
     // เช็คทุกเฟรมตอนลากของว่าเมาส์อยู่เหนือถังขยะไหม เพื่อสลับสีเตือนเฉพาะถังที่ชี้อยู่
     private void UpdateTrashHighlight(Vector2 mouseWorldPos)
     {
+        if (!(currentDraggable is FoodInstance) && !(currentDraggable is Cup))
+        {
+            ClearTrashHighlight();
+            return;
+        }
+
         TrashBin trashBin = null;
         RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
         foreach (RaycastHit2D hit in hits)
@@ -795,6 +843,43 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    private void UpdateDeliveryCustomerHighlight(Vector2 mouseWorldPos)
+    {
+        if (!(currentDraggable is Cup cup) || cup.contents.Count == 0)
+        {
+            ClearDeliveryCustomerHighlight();
+            return;
+        }
+
+        Customer customerUnderCup = null;
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorldPos, Vector2.zero);
+        foreach (RaycastHit2D hit in hits)
+        {
+            customerUnderCup = hit.collider.GetComponent<Customer>();
+            if (customerUnderCup == null)
+                customerUnderCup = hit.collider.GetComponentInParent<Customer>();
+
+            if (customerUnderCup != null) break;
+        }
+
+        if (customerUnderCup == highlightedDeliveryCustomer) return;
+
+        ClearDeliveryCustomerHighlight();
+        if (customerUnderCup != null)
+        {
+            highlightedDeliveryCustomer = customerUnderCup;
+            highlightedDeliveryCustomer.SetDeliveryHighlight(true);
+        }
+    }
+
+    private void ClearDeliveryCustomerHighlight()
+    {
+        if (highlightedDeliveryCustomer == null) return;
+
+        highlightedDeliveryCustomer.SetDeliveryHighlight(false);
+        highlightedDeliveryCustomer = null;
+    }
+
     // กดถาดปุ๊บ วัตถุดิบเด้งออกมาอยู่กลางเมาส์ทันที แล้วลากไปไหนต่อก็ได้ในการกดครั้งเดียว
     private void GrabFoodFromTray(FoodTray tray, Vector2 mouseWorldPos)
     {
@@ -810,6 +895,19 @@ public class InputManager : MonoBehaviour
         isDraggingFreshFromTray = true;
         currentDraggable.OnBeginDrag();
         currentDraggable.OnDrag(mouseWorldPos + dragOffset);
+    }
+
+    private void GrabCatTreatFromTray(CatTreatTray tray, Vector2 mouseWorldPos)
+    {
+        CatTreat spawnedTreat = tray.SpawnTreatAt(mouseWorldPos);
+        if (spawnedTreat == null) return;
+
+        currentDraggable = spawnedTreat;
+        dragOffset = Vector2.zero;
+        isEasingGrabOffset = false;
+        isDraggingFreshFromTray = true;
+        currentDraggable.OnBeginDrag();
+        currentDraggable.OnDrag(mouseWorldPos);
     }
 
     private void HandleInvestigationInput()

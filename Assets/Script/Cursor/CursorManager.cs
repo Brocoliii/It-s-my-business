@@ -27,6 +27,10 @@ public enum GameCursorState
 //
 // ตัวนี้อ่านสถานะจาก InputManager ตัวเดียวกับที่คุมการลาก/การแอบฟังจริง
 // จึงไม่มีทางที่รูปเมาส์จะบอกว่า "กดได้" ทั้งที่กดไปแล้วไม่มีอะไรเกิดขึ้น
+//
+// ขนาดเมาส์ตามความละเอียดหน้าจอ: เมาส์ฮาร์ดแวร์ของระบบปฏิบัติการวาดตามพิกเซลจริง ไม่ขยายตามจอ
+// (เมาส์ 32x32 บน Full HD ดูพอดี แต่บน 4K จะเล็กลงครึ่งนึง) ตัวนี้จึงขยายรูปเป็นเท่าตัวเต็มตาม Screen.height
+// ให้เอง (1080p = 1x, 4K = 2x) โดยขยายแบบ Point เพื่อให้พิกเซลอาร์ตยังคมอยู่
 public class CursorManager : MonoBehaviour
 {
     // จุดที่ถือว่าเป็น "ปลายเมาส์" จริง ๆ นับเป็นพิกเซลจากมุมซ้ายบนของรูป
@@ -37,11 +41,14 @@ public class CursorManager : MonoBehaviour
         [Tooltip("รูปเมาส์ (Texture Type ต้องเป็น Cursor)")]
         public Texture2D texture;
 
-        [Tooltip("จุดชี้จริงของรูป นับเป็นพิกเซลจากมุมซ้ายบน\nลูกศร = (0,0) / ปลายนิ้ว = ตรงปลายนิ้วชี้ / แว่นขยาย = กลางเลนส์ / มือกำ = กลางฝ่ามือ")]
+        [Tooltip("จุดชี้จริงของรูป นับเป็นพิกเซลจากมุมซ้ายบน (นับที่ขนาดรูปต้นฉบับ ระบบขยายให้เองตามสเกล)\nลูกศร = (0,0) / ปลายนิ้ว = ตรงปลายนิ้วชี้ / แว่นขยาย = กลางเลนส์ / มือกำ = กลางฝ่ามือ")]
         public Vector2 hotspot;
     }
 
     public static CursorManager Instance { get; private set; }
+
+    // ระบบปฏิบัติการวาดเมาส์ฮาร์ดแวร์ได้ไม่เกินขนาดนี้ ใหญ่กว่านี้ต้องให้เกมวาดเอง
+    private const int MaxHardwareCursorSize = 32;
 
     [Header("รูปเมาส์แต่ละสถานะ")]
     [Tooltip("ลูกศรปกติ (ค่า hotspot ที่เข้ากับรูปสำรอง: 0,0)")]
@@ -57,11 +64,21 @@ public class CursorManager : MonoBehaviour
     [SerializeField] private CursorArt dragCursor = new CursorArt();
 
     [Header("ตั้งค่า")]
-    [Tooltip("Auto = ให้ระบบปฏิบัติการวาดให้ถ้าทำได้ (ลื่นที่สุด ไม่มีอาการเมาส์ตามไม่ทัน)\nForceSoftware = ให้เกมวาดเอง ใช้ตอนอยากได้รูปใหญ่เกิน 32x32")]
+    [Tooltip("Auto = ให้ระบบปฏิบัติการวาดให้ถ้าทำได้ (ลื่นที่สุด ไม่มีอาการเมาส์ตามไม่ทัน)\nForceSoftware = ให้เกมวาดเอง ใช้ตอนอยากได้รูปใหญ่เกิน 32x32\nถ้าเลือก Auto แล้วรูป (หลังขยาย) ใหญ่เกิน 32x32 ระบบจะสลับเป็น ForceSoftware ให้เองเฉพาะรูปนั้น")]
     [SerializeField] private CursorMode cursorMode = CursorMode.Auto;
 
     [Tooltip("ปิดได้ถ้าอยากคุมรูปเมาส์เองทั้งหมดผ่าน ForceState()")]
     [SerializeField] private bool autoDetectState = true;
+
+    [Header("ขนาดตามความละเอียดจอ")]
+    [Tooltip("เปิด = ขยายรูปเมาส์เป็นเท่าตัวเต็มตามความสูงของจอ ให้ขนาดที่ตาเห็นใกล้เคียงกันทุกความละเอียด")]
+    [SerializeField] private bool scaleWithResolution = true;
+
+    [Tooltip("ความสูงจอที่ถือว่าเมาส์เป็นขนาด 1 เท่า (1080 = Full HD)\nสเกล = Screen.height / ค่านี้ ปัดเป็นจำนวนเต็ม เช่น 1080p = 1x, 4K = 2x\nอยากให้ 1440p ใหญ่ขึ้นด้วยให้ลดค่านี้ เช่น 720 จะได้ 1440p = 2x, 4K = 3x")]
+    [SerializeField] private float referenceHeight = 1080f;
+
+    [Tooltip("สเกลสูงสุดที่อนุญาต กันรูปใหญ่เกินเวลาเจอจอความละเอียดสูงมาก ๆ")]
+    [SerializeField, Range(1, 8)] private int maxScale = 4;
 
     // จำค่าที่ "สั่งไปแล้วจริง ๆ" ไว้ เพราะ Cursor.SetCursor ต้องยิงเฉพาะตอนเปลี่ยนเท่านั้น
     // ยิงทุกเฟรมจะทำให้เมาส์กะพริบบนบางเครื่อง (โดยเฉพาะโหมด ForceSoftware)
@@ -88,6 +105,13 @@ public class CursorManager : MonoBehaviour
     // รูปไหนตรวจแล้วว่าใช้เป็นเมาส์ได้/ไม่ได้ จำไว้เลย จะได้ไม่ต้องตรวจซ้ำทุกเฟรม
     // และรูปที่ใช้ไม่ได้จะเตือนแค่ครั้งเดียวต่อรูป ไม่ถล่ม Console
     private readonly Dictionary<Texture2D, bool> cursorTextureUsable = new Dictionary<Texture2D, bool>();
+
+    // รูปที่ขยายแล้ว เก็บไว้ใช้ซ้ำ (key = รูปต้นฉบับ + สเกล) ไม่งั้นต้องสร้างใหม่ทุกครั้งที่เปลี่ยนสถานะ
+    // รูปพวกนี้เราสร้างเอง จึงต้อง Destroy เองตอนปิดเกม
+    private readonly Dictionary<(Texture2D, int), Texture2D> scaledCache = new Dictionary<(Texture2D, int), Texture2D>();
+
+    // ความสูงจอรอบก่อน ใช้จับว่าผู้เล่นเปลี่ยนความละเอียด/สลับเต็มจอ เพื่อสั่งเมาส์ใหม่ด้วยสเกลที่ถูกต้อง
+    private int lastScreenHeight;
 
     private void Awake()
     {
@@ -117,6 +141,7 @@ public class CursorManager : MonoBehaviour
 
     private void Start()
     {
+        lastScreenHeight = Screen.height;
         WarnAboutUnusableTextures();
         ApplyState(GameCursorState.Default);
     }
@@ -128,6 +153,13 @@ public class CursorManager : MonoBehaviour
         Instance = null;
         // คืนเมาส์ปกติของเครื่องตอนปิดเกม ไม่งั้นรูปที่ตั้งไว้อาจค้างอยู่บน Editor หลังกดหยุดเล่น
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+
+        // ทำลายรูปที่ขยายไว้ทิ้ง (ต้องทำหลังคืนเมาส์ปกติ จะได้ไม่มีเมาส์ที่ชี้รูปที่ถูกลบไปแล้ว)
+        foreach (Texture2D scaled in scaledCache.Values)
+        {
+            if (scaled != null) Destroy(scaled);
+        }
+        scaledCache.Clear();
     }
 
     // ตัวนี้ข้ามฉากไปด้วย แต่ InputManager กับกล้องเป็นของประจำฉาก ต้องหาใหม่ทุกครั้งที่เปลี่ยนฉาก
@@ -184,7 +216,20 @@ public class CursorManager : MonoBehaviour
     // ถ้าเช็คใน Update ด้วยกัน ลำดับการวิ่งของสองสคริปต์จะไม่แน่นอน รูปมือกำจะช้าไป 1 เฟรมบ้างไม่ช้าบ้าง
     private void LateUpdate()
     {
-        if (!autoDetectState && !hasForcedState) return;
+        // ความละเอียดเปลี่ยน (ปรับในตั้งค่าเกม / สลับเต็มจอ / ลากย่อขยายหน้าต่าง)
+        // ต้องสั่งเมาส์ใหม่ด้วยสเกลใหม่ ไม่งั้นเมาส์จะค้างขนาดเดิมไปเรื่อย ๆ
+        if (Screen.height != lastScreenHeight)
+        {
+            lastScreenHeight = Screen.height;
+            hasAppliedOnce = false;
+        }
+
+        if (!autoDetectState && !hasForcedState)
+        {
+            // โหมดคุมเองแต่ยังไม่ได้บังคับอะไร ถ้าความละเอียดเปลี่ยนก็ยังต้องสั่งรูปเดิมใหม่ให้ขนาดถูก
+            if (!hasAppliedOnce) ApplyState(appliedState);
+            return;
+        }
 
         ApplyState(ResolveState());
     }
@@ -258,6 +303,10 @@ public class CursorManager : MonoBehaviour
             FoodTray tray = hit.GetComponent<FoodTray>();
             if (tray == null) tray = hit.GetComponentInParent<FoodTray>();
             if (tray != null) return GameCursorState.Interactable;
+
+            CatTreatTray catTreatTray = hit.GetComponent<CatTreatTray>();
+            if (catTreatTray == null) catTreatTray = hit.GetComponentInParent<CatTreatTray>();
+            if (catTreatTray != null) return GameCursorState.Interactable;
         }
 
         foreach (Collider2D hit in hits)
@@ -326,18 +375,88 @@ public class CursorManager : MonoBehaviour
             hotspot = Vector2.zero;
         }
 
+        // ขยายรูปตามความละเอียดจอ (ทำหลังตรวจรูปแล้ว เพราะต้องอ่านพิกเซลจากรูปต้นฉบับที่ใช้ได้เท่านั้น)
+        // hotspot ต้องคูณสเกลตามด้วย ไม่งั้นปลายเมาส์จะเลื่อนไปจากที่ตาเห็น
+        if (texture != null && scaleWithResolution)
+        {
+            int scale = GetScale();
+            if (scale > 1)
+            {
+                Texture2D scaled = GetScaledTexture(texture, scale);
+                if (scaled != null)
+                {
+                    texture = scaled;
+                    hotspot *= scale;
+                }
+            }
+        }
+
+        // รูปใหญ่เกิน 32x32 ระบบปฏิบัติการวาดให้ไม่ได้ ถ้าตั้ง Auto ไว้ให้สลับเป็นเกมวาดเองเฉพาะรูปนี้
+        CursorMode mode = cursorMode;
+        if (texture != null && mode == CursorMode.Auto &&
+            (texture.width > MaxHardwareCursorSize || texture.height > MaxHardwareCursorSize))
+        {
+            mode = CursorMode.ForceSoftware;
+        }
+
         if (hasAppliedOnce && appliedTexture == texture && appliedHotspot == hotspot)
         {
             appliedState = state;
             return;
         }
 
-        Cursor.SetCursor(texture, hotspot, cursorMode);
+        Cursor.SetCursor(texture, hotspot, mode);
 
         appliedState = state;
         appliedTexture = texture;
         appliedHotspot = hotspot;
         hasAppliedOnce = true;
+    }
+
+    // สเกลเป็นจำนวนเต็มเสมอ เพื่อให้พิกเซลอาร์ตคม ไม่เบลอ (1080p = 1x, 4K = 2x)
+    private int GetScale()
+    {
+        float safeReference = Mathf.Max(1f, referenceHeight);
+        int scale = Mathf.RoundToInt(Screen.height / safeReference);
+        return Mathf.Clamp(scale, 1, maxScale);
+    }
+
+    // ขยายรูปแบบ Point (ก๊อปพิกเซลซ้ำเป็นบล็อก) แล้วจำไว้ใช้ซ้ำ
+    // ต้องอ่านพิกเซลจากรูปต้นฉบับ ซึ่งผ่าน CanUseAsCursor มาแล้วว่า Read/Write เปิดอยู่
+    private Texture2D GetScaledTexture(Texture2D source, int scale)
+    {
+        var key = (source, scale);
+        if (scaledCache.TryGetValue(key, out Texture2D cached) && cached != null) return cached;
+
+        int srcW = source.width;
+        int srcH = source.height;
+        int dstW = srcW * scale;
+        int dstH = srcH * scale;
+
+        Color32[] srcPixels = source.GetPixels32();
+        Color32[] dstPixels = new Color32[dstW * dstH];
+
+        for (int y = 0; y < dstH; y++)
+        {
+            int srcRow = (y / scale) * srcW;
+            int dstRow = y * dstW;
+
+            for (int x = 0; x < dstW; x++)
+            {
+                dstPixels[dstRow + x] = srcPixels[srcRow + (x / scale)];
+            }
+        }
+
+        // ต้องเป็น RGBA32 ไม่มี mipmap ตรงตามที่ Cursor.SetCursor ต้องการ
+        Texture2D result = new Texture2D(dstW, dstH, TextureFormat.RGBA32, false);
+        result.name = source.name + "_x" + scale;
+        result.filterMode = FilterMode.Point;
+        result.wrapMode = TextureWrapMode.Clamp;
+        result.SetPixels32(dstPixels);
+        result.Apply(false, false); // ต้องคงไว้ให้อ่านได้ (makeNoLongerReadable = false) ไม่งั้นใช้เป็นเมาส์ไม่ได้
+
+        scaledCache[key] = result;
+        return result;
     }
 
     private CursorArt GetArt(GameCursorState state)
@@ -388,12 +507,14 @@ public class CursorManager : MonoBehaviour
         if (!CanUseAsCursor(texture))
         {
             Debug.LogWarning($"[CursorManager] รูปที่ใช้ไม่ได้ข้างบนคือช่อง '{label}' ระหว่างนี้ช่องนี้จะใช้เมาส์ปกติของเครื่องแทน", this);
+            return;
         }
 
-        // เกิน 32x32 ระบบปฏิบัติการวาดให้ไม่ได้ ต้องให้เกมวาดเอง ซึ่งเมาส์จะตามช้ากว่าของจริงนิดหน่อย
-        if (cursorMode == CursorMode.Auto && (texture.width > 32 || texture.height > 32))
+        // รูปต้นฉบับเกิน 32x32 จะถูกวาดโดยเกมเองเสมอ (ForceSoftware) ซึ่งเมาส์จะตามช้ากว่าของจริงนิดหน่อย
+        // เตือนไว้ให้รู้ แต่ไม่ได้ทำให้ใช้ไม่ได้ เพราะ ApplyState สลับโหมดให้เองแล้ว
+        if (texture.width > MaxHardwareCursorSize || texture.height > MaxHardwareCursorSize)
         {
-            Debug.LogWarning($"[CursorManager] รูป '{texture.name}' (ช่อง {label}) ใหญ่เกิน 32x32 บางเครื่องจะไม่ยอมแสดง\nย่อรูปให้เหลือ 32x32 หรือเปลี่ยน Cursor Mode เป็น ForceSoftware", this);
+            Debug.LogWarning($"[CursorManager] รูป '{texture.name}' (ช่อง {label}) ใหญ่เกิน 32x32 จะใช้โหมดให้เกมวาดเอง (ForceSoftware) เมาส์อาจตามช้ากว่าปกตินิดหน่อย", this);
         }
     }
 

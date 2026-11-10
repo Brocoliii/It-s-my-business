@@ -1,0 +1,365 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Main Menu_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 79ead5d8261fbb74f805c937ed7c68a2, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 244973498368
+    m_Localized: Start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387776966656
+    m_Localized: Setting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 389840564224
+    m_Localized: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15393226682368
+    m_Localized: SETTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15471404314624
+    m_Localized: CAMERA SENSITIVITY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15602262405120
+    m_Localized: CAMERA SMOOTH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15619844927488
+    m_Localized: CAMERA INERTIA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15633379946496
+    m_Localized: MASTER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15684525289472
+    m_Localized: SFX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15697376636928
+    m_Localized: BGM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15714984325120
+    m_Localized: RESOLUTION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15730574553088
+    m_Localized: DISPLAY MODE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15747016224768
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19481414791168
+    m_Localized: CLUE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24594573357056
+    m_Localized: 'Welcome to your mala shop!
+
+      Grill some skewers, serve your
+      customers
+
+      But don''t forget to keep your ears open...
+
+      There''s
+      always something interesting going on around here!
+
+      Let''s get to work!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1701217882271744
+    m_Localized: LANGUAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2051116100415488
+    m_Localized: MISTAKE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2819991456903168
+    m_Localized: AUDIO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2837389631221760
+    m_Localized: CAMERA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3151803794255872
+    m_Localized: CREDIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3883540157493248
+    m_Localized: TUTORIAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887083253854208
+    m_Localized: GRILL IT!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887155752398848
+    m_Localized: FLIP TO COOK BOTH SIDES!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887196332290048
+    m_Localized: SAUCE IT UP!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887253366435840
+    m_Localized: Brush the sauce up and down!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887309519777792
+    m_Localized: MAKE IT SPICY!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887313588252672
+    m_Localized: Shake the chili bottle!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887436661714944
+    m_Localized: TIME TO SERVE!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887497013555200
+    m_Localized: Drag the food into the cup!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887530798673920
+    m_Localized: TIME TO INVESTIGATE!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3887566206988288
+    m_Localized: Investigate and look for clues!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3888625138724864
+    m_Localized: LOOK AROUND!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3888661675307008
+    m_Localized: Use WASD or right-click and drag.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903744912584704
+    m_Localized: Move the Camera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903791733600256
+    m_Localized: Grill the Skewers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903793298075648
+    m_Localized: Brush on the Sauce
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903794673807360
+    m_Localized: Reach Spice Level 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903796154396672
+    m_Localized: Fill the Cup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3904497983090688
+    m_Localized: Serve the Customer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3903797932781568
+    m_Localized: Investigate the Group
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3904794360999936
+    m_Localized: Finish Investigating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3911988225699840
+    m_Localized: 'Orders Completed: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3912389268271104
+    m_Localized: 'Clues Found: {0}/{1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3912408138444800
+    m_Localized: 'Mistakes: {0}/{1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3912411217063936
+    m_Localized: 'Time: {0:00}:{1:00}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3914546461732864
+    m_Localized: Retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3914675860205568
+    m_Localized: Next Case
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3914622462521344
+    m_Localized: Main Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3915827897102336
+    m_Localized: Case Closed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3917017900838912
+    m_Localized: Failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3920594614546432
+    m_Localized: A beautiful hairdresser.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3920758037213184
+    m_Localized: Long blonde ponytail.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3920759836569600
+    m_Localized: Red shirt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3920761677869056
+    m_Localized: Heavy makeup and red lipstick.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3922323250802688
+    m_Localized: Resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3923705492074496
+    m_Localized: Day Complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4123387648471040
+    m_Localized: READY?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4123390039224320
+    m_Localized: GO!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4128179976335360
+    m_Localized: "Hi\u2026 I'm Rin\nRumor has it my husband is seeing someone else\u2026
+      \nbut nobody knows who\nI don't want to believe it, but I can't just brush
+      it off\u2026\nCan you please help me investigate this?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4591090335150080
+    m_Localized: Skip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4591114427232256
+    m_Localized: Play Tutorial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4591569198837760
+    m_Localized: Would you like to learn how to play first?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8636835581325312
+    m_Localized: Cutscene
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8639798299258880
+    m_Localized: Choose the Red Suspect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660286245367808
+    m_Localized: "Hello, meow!\nThe mackerel Grandma bought this morning is missing.
+      \nI only had one bite, then it suddenly disappeared!\nA cat must have stolen
+      it!\nCould you help me investigate, Grandma? Meow!\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660663799836672
+    m_Localized: Mostly black fur.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660665267843072
+    m_Localized: Big, round inner eyes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660666819735552
+    m_Localized: A pink nose.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8660668329684992
+    m_Localized: Yellow outer eyes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662035735703552
+    m_Localized: PRESS SPACEBAR TO CONTINUE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662607868129280
+    m_Localized: NEW EVENT!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662609478742016
+    m_Localized: CAT STOLE FOOD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662610770587648
+    m_Localized: DON'T LET IT STEAL!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662612028878848
+    m_Localized: THROW IT A TREAT!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8662613303947264
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8870925081440256
+    m_Localized: Smart and alert.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10672278342660096
+    m_Localized: CORRECT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10672400128471040
+    m_Localized: WRONG
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10716011977175040
+    m_Localized: YOU'VE REACHED THE END OF THE DEMO.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10716065953673216
+    m_Localized: THANKS FOR PLAYING!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11534949988364288
+    m_Localized: Objective
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11534947631165440
+    m_Localized: GATHER CLUES AND WATCH YOUR MISTAKES!
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

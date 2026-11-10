@@ -19,17 +19,21 @@ public static class SoundIds
 
     // ---------- UI ----------
     public const string UiClick = "ui_click";
+    public const string UiSpaceContinue = "ui_space_continue";
     public const string UiHover = "ui_hover";
     public const string UiBack = "ui_back";
     public const string UiCountdownTick = "ui_countdown_tick";
     public const string UiNotebookOpen = "ui_notebook_open";
     public const string UiNotebookClose = "ui_notebook_close";
     public const string UiPageTurn = "ui_page_turn";   // ดังตอนหน้าประวัติผู้ต้องสงสัยไถลเข้ามา (กดการ์ดในสมุด)
+    public const string ShowcaseMove = "showcase_move";
     public const string UiStamp = "ui_stamp";
     public const string UiShutter = "ui_shutter";
     public const string UiDayComplete = "ui_day_complete";   // ดังตอนป้าย DAY COMPLETE! เด้งขึ้นจอ (ก่อนม่านปิด)
     public const string UiReady = "ui_ready";   // ดังตอนไอคอน Ready? เด้งขึ้นจอ
     public const string UiGo = "ui_go";         // ดังตอนไอคอน Go!!! เด้งขึ้นจอ
+    public const string PopUpAppear = "pop_up_appear";
+    public const string PauseAppear = "pause_appear";
 
     // ---------- ระบบทำอาหาร ----------
     public const string FoodPickup = "food_pickup";
@@ -53,6 +57,7 @@ public static class SoundIds
     // ---------- บทสนทนา (Intro) ----------
     public const string DialogueArrive = "dialogue_arrive";   // ตอน NPC เริ่มเดินเข้ามาในฉาก
     public const string DialogueType = "dialogue_type";       // เสียงพิมพ์ตัวอักษรตอน NPC กำลังพูด
+    public const string DialogueTypeGameplay = "dialogue_type_gameplay"; // เสียงพิมพ์ตัวอักษรสำหรับฉาก Gameplay
     public const string DialogueLeave = "dialogue_leave";     // ตอน NPC พูดจบแล้วเดินกลับออกไป
 
     // ---------- ลูกค้า ----------
@@ -71,6 +76,19 @@ public static class SoundIds
     public const string InvestigateTimeout = "investigate_timeout";   // ดังตอนหมดเวลาแล้วฟังไม่จบ เบาะแสหลุด (คนละตัวกับ investigate_success)
     public const string BinocularsOn = "binoculars_on";
     public const string BinocularsOff = "binoculars_off";
+
+    // ---------- แมวขโมยอาหาร ----------
+    public const string CatAppear = "cat_appear";
+    public const string CatDisappear = "cat_disappear";
+    public const string CatTheftSuccess = "cat_theft_success";
+    public const string CatGotTreat = "cat_got_treat";
+
+    // ---------- ภาพผลการตัดสิน ----------
+    public const string VerdictComplete = "verdict_complete";
+    public const string VerdictFailed = "verdict_failed";
+    public const string ResultPanelAppear = "result_panel_appear";
+    public const string ResultStatAppear = "result_stat_appear";
+    public const string RankExAppear = "rank_ex_appear";
 
     // ---------- ผลของเกม ----------
     public const string Mistake = "mistake";

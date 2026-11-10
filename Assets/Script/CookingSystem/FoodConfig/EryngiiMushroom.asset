@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75d2635783c640944a4b1028a1d283d4, type: 3}
+  m_Name: EryngiiMushroom
+  m_EditorClassIdentifier: Assembly-CSharp::FoodData
+  foodName: EryngiiMushroom
+  foodIcon: {fileID: 21300000, guid: d4c629df8df3cb642bf252eef7d7e736, type: 3}
+  rawSprite: {fileID: 21300000, guid: e2ad2e35298ab7045b018e7e9225b615, type: 3}
+  mediumSprite: {fileID: 21300000, guid: e2ad2e35298ab7045b018e7e9225b615, type: 3}
+  cookedSprite: {fileID: 21300000, guid: 07d67cfc339b0844489510ffe16c30e0, type: 3}
+  burntSprite: {fileID: 21300000, guid: 36d42643ff760cb4cbf0505926ced430, type: 3}
+  mediumTime: 5
+  cookTime: 8
+  burnTime: 20
+  sauceSprite: {fileID: 21300000, guid: d65c2538cbec1d74c9694c052f49ea5b, type: 3}
+  spicyLevel1Sprite: {fileID: 21300000, guid: ca6336f3d67565c428aea26bc8773d36, type: 3}
+  spicyLevel2Sprite: {fileID: 21300000, guid: 040842861cf258a4fb4d5e634697e932, type: 3}
+  spicyLevel3Sprite: {fileID: 21300000, guid: d28c3a19cf003b64da6087c894800311, type: 3}
+  sauceSpicyLevel1Sprite: {fileID: 21300000, guid: 93d7303d4c91d4640a44725ebcfd958c, type: 3}
+  sauceSpicyLevel2Sprite: {fileID: 21300000, guid: 036dccb3c8f77114cb9fdbe194c2344d, type: 3}
+  sauceSpicyLevel3Sprite: {fileID: 21300000, guid: 64ef4a7e72ab1fb45a8d4ba56c1b1389, type: 3}

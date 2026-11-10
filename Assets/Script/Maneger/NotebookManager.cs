@@ -3,6 +3,8 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 
 [System.Serializable]
 public class SuspectData
@@ -75,6 +77,8 @@ public class NotebookManager : MonoBehaviour
     public RectTransform showcaseLayer;
     [Tooltip("เวลาที่หน้าประวัติใช้ลอยไปกลางจอ")]
     public float showcaseMoveDuration = 0.45f;
+    [Tooltip("กราฟการเคลื่อนไหวของหน้าโชว์ ใช้ควบคุมความเร็วตอนเลื่อน ขยาย และหมุน")]
+    public AnimationCurve showcaseMoveCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     [Tooltip("ขนาดตอนไปอยู่กลางจอ เทียบกับขนาดปกติของหน้าประวัติ (1 = เท่าเดิม)")]
     public float showcaseScale = 1.2f;
     [Tooltip("องศาที่หน้าประวัติค่อยๆ เอียงตอนลอยไปกลางจอ เหมือนวางแฟ้มเอียงไว้บนโต๊ะ (0 = ไม่เอียง, ค่าบวก = เอียงทวนเข็ม)")]
@@ -83,6 +87,40 @@ public class NotebookManager : MonoBehaviour
     public float showcaseHoldDuration = 0.6f;
     [Tooltip("ขยับออกจากจุดกึ่งกลางจอ หน่วยเป็นพิกเซลบนจอ เผื่ออยากให้เยื้องขึ้น/ลง")]
     public Vector2 showcaseCenterOffset = Vector2.zero;
+    [Tooltip("เวลาที่หน้าประวัติผู้ต้องสงสัยใช้ย่อและจางหายก่อนเข้าสู่ฉากจบ")]
+    public float showcaseDisappearDuration = 0.25f;
+    [Tooltip("ขนาดสุดท้ายของหน้าประวัติก่อนหาย (เทียบกับขนาดตอนโชว์)")]
+    [Range(0.1f, 1f)] public float showcaseDisappearScale = 0.8f;
+
+    [Header("ภาพผลการตัดสินก่อนจอจบเกม")]
+    [Tooltip("Image ใน Hierarchy ที่จะแสดงเมื่อเลือกผู้ต้องสงสัยถูกต้อง ลาก Image ของ Complete มาใส่ช่องนี้")]
+    public Image completeVerdictImage;
+    [Tooltip("Image ใน Hierarchy ที่จะแสดงเมื่อเลือกผู้ต้องสงสัยผิด ลาก Image ของ Failed มาใส่ช่องนี้")]
+    public Image failedVerdictImage;
+    [Tooltip("ภาพ UI ที่จะแสดงเมื่อเลือกผู้ต้องสงสัยถูกต้อง ลาก CompleteUI.png มาใส่ช่องนี้")]
+    public Sprite completeVerdictSprite;
+    [Tooltip("ภาพ UI ที่จะแสดงเมื่อเลือกผู้ต้องสงสัยผิด ลาก FailedUI.png มาใส่ช่องนี้")]
+    public Sprite failedVerdictSprite;
+    [Tooltip("Image เต็มจอสำหรับแสดงภาพผลการตัดสิน ปล่อยว่างได้ ระบบจะสร้างให้เอง")]
+    public Image verdictImage;
+    [Tooltip("เวลาที่ภาพผลการตัดสินค้างอยู่ก่อนเปิดแผงผลลัพธ์")]
+    public float verdictImageHoldDuration = 1f;
+    [Tooltip("เวลาที่ภาพผลการตัดสินใช้เด้งเข้าจอแบบตราปั๊ม")]
+    public float verdictImageAppearDuration = 0.3f;
+    [Tooltip("ความทึบของภาพจะค่อยๆ เพิ่มพร้อมกับการเด้ง")]
+    public bool fadeVerdictImage = true;
+    [Tooltip("เวลาที่ภาพ Complete/Failed ใช้จางและย่อหาย ก่อนเข้าสู่ฉากจบ")]
+    public float verdictImageDisappearDuration = 0.25f;
+    [Tooltip("ขนาดสุดท้ายของภาพ Complete/Failed ก่อนหาย (เทียบกับขนาดปกติ)")]
+    [Range(0.1f, 1f)] public float verdictImageDisappearScale = 0.8f;
+    [Tooltip("เปิดใช้งานเฟดดำหลังภาพ Complete/Failed หาย")]
+    public bool useBlackFadeBeforeEnding = true;
+    [Tooltip("เวลาที่เฟดดำค่อยๆ ปิดจอก่อนเข้าสู่ฉากจบ")]
+    public float blackFadeDuration = 0.35f;
+    [Tooltip("เวลาค้างจอดำเต็มจอก่อนเริ่มวิดีโอจบหรือหน้าจอแพ้")]
+    public float blackFadeHoldDuration = 0.3f;
+    [Tooltip("ภาพดำเต็มจอสำหรับเฟด ถ้าปล่อยว่างระบบจะสร้างให้เอง")]
+    public Image blackFadeImage;
 
     [Header("แอนิเมชัน: เก็บหน้าเบาะแสตอนปั๊มเสร็จ")]
     [Tooltip("ปั๊มเสร็จแล้ว ให้หน้าเบาะแสไถลออกไปทางซ้ายแล้วจางหายก่อน แล้วสมุดค่อยหุบปิดตามไป")]
@@ -133,6 +171,16 @@ public class NotebookManager : MonoBehaviour
     private bool hasCachedNotebookBase;
     private bool isClosing;
     private bool isOpen;
+    private bool suppressCloseSoundOnDisable;
+
+    public bool IsOpen => isOpen;
+
+    public void SetVisibleForPause(bool visible)
+    {
+        if (!isOpen) return;
+
+        gameObject.SetActive(visible);
+    }
 
     private RectTransform detailTabRect;
     private CanvasGroup detailTabCanvasGroup;
@@ -150,6 +198,38 @@ public class NotebookManager : MonoBehaviour
     private Vector3 detailTabBaseScale = Vector3.one;
     private Quaternion detailTabBaseRotation = Quaternion.identity;
     private Canvas detailTabCanvas;
+    private Vector3 verdictImageBaseScale = Vector3.one;
+    private bool hasCachedVerdictImageBase;
+
+    private void OnEnable()
+    {
+        LocalizationSettings.SelectedLocaleChanged += OnSelectedLocaleChanged;
+    }
+
+    private void OnDisable()
+    {
+        LocalizationSettings.SelectedLocaleChanged -= OnSelectedLocaleChanged;
+
+        // เล่นเสียงปิดเฉพาะตอนที่สมุดถูกปิดจริง ๆ ระหว่างเล่นอยู่
+        // ตอนเปลี่ยนฉาก/ปิดเกม Unity จะปิดทุกอย่างในฉากพร้อมกัน ถ้าไม่กันไว้เสียงจะดังตอนกดเปลี่ยนด่านด้วย
+        if (isOpen && !suppressCloseSoundOnDisable && SoundManager.Exists && gameObject.scene.isLoaded)
+        {
+            SoundManager.Instance.PlaySFX(SoundIds.UiNotebookClose);
+            RestoreBgmBeforeOpen();
+        }
+
+        isOpen = false;
+    }
+
+    private void OnSelectedLocaleChanged(Locale locale)
+    {
+        if (locale == null || !isOpen || clueContentContainer == null)
+        {
+            return;
+        }
+
+        RefreshClueTexts();
+    }
 
     public void OpenNotebook()
     {
@@ -157,12 +237,14 @@ public class NotebookManager : MonoBehaviour
         // ถ้าไม่กันไว้ สมุดจะย่อกลับไปเด้งใหม่ทั้งใบ แล้วการ์ดที่กำลังทยอยโผล่ก็จะโดนตัดกลางคันไปเริ่มนับหนึ่งใหม่
         if (isOpen) return;
         isOpen = true;
+        suppressCloseSoundOnDisable = false;
 
         SoundManager.Instance.PlaySFX(SoundIds.UiNotebookOpen);
         PlayNotebookBgm();
 
         gameObject.SetActive(true);
         selectedSuspect = null;
+        HideVerdictImage();
 
         CacheNotebookBase();
         StopAllNotebookAnimations();
@@ -185,20 +267,6 @@ public class NotebookManager : MonoBehaviour
         ShowSuspectDetailTab(false);
 
         openCloseRoutine = StartCoroutine(OpenRoutine());
-    }
-
-    // เคลียร์ธงตรงนี้ที่เดียว จะได้ครอบทุกทางที่สมุดถูกปิด ไม่ใช่แค่ทางที่ปั๊มเลือกคนร้ายเสร็จ
-    private void OnDisable()
-    {
-        // เล่นเสียงปิดเฉพาะตอนที่สมุดถูกปิดจริง ๆ ระหว่างเล่นอยู่
-        // ตอนเปลี่ยนฉาก/ปิดเกม Unity จะปิดทุกอย่างในฉากพร้อมกัน ถ้าไม่กันไว้เสียงจะดังตอนกดเปลี่ยนด่านด้วย
-        if (isOpen && SoundManager.Exists && gameObject.scene.isLoaded)
-        {
-            SoundManager.Instance.PlaySFX(SoundIds.UiNotebookClose);
-            RestoreBgmBeforeOpen();
-        }
-
-        isOpen = false;
     }
 
     // สลับไปเพลงของช่วงเลือกคนร้าย พร้อมจำเพลงเดิมไว้เผื่อต้องคืนตอนปิด
@@ -269,7 +337,7 @@ public class NotebookManager : MonoBehaviour
             TMP_Text clueText = newClue.GetComponent<TMP_Text>();
             if (clueText != null)
             {
-                clueText.text = $"- {invMgr.collectedClues[i]}";
+                clueText.text = $"- {GetLocalizedClueText(invMgr.collectedClues[i])}";
             }
 
             clueEntries.Add(BuildEntry(newClue));
@@ -277,6 +345,53 @@ public class NotebookManager : MonoBehaviour
 
         // ซ่อนทันทีตั้งแต่ตอนสร้าง ไม่งั้นจะเห็นทุกบรรทัดโผล่เต็มจอหนึ่งเฟรมก่อนจะยุบไปเริ่มแอนิเมชัน
         HideEntries(clueEntries);
+    }
+
+    private void RefreshClueTexts()
+    {
+        InvestigationManager invMgr = FindObjectOfType<InvestigationManager>();
+        if (invMgr == null || clueContentContainer == null)
+        {
+            return;
+        }
+
+        int clueCount = Mathf.Min(invMgr.collectedClues.Count, clueContentContainer.childCount);
+        for (int i = 0; i < clueCount; i++)
+        {
+            TMP_Text clueText = clueContentContainer.GetChild(i).GetComponent<TMP_Text>();
+            if (clueText != null)
+            {
+                clueText.text = $"- {GetLocalizedClueText(invMgr.collectedClues[i])}";
+            }
+        }
+    }
+
+    private string GetLocalizedClueText(string clueText)
+    {
+        StageConfig currentStage = GameManager.Instance != null
+            ? GameManager.Instance.GetCurrentStage()
+            : null;
+
+        if (currentStage != null && currentStage.cluesPool != null)
+        {
+            for (int i = 0; i < currentStage.cluesPool.Count; i++)
+            {
+                ClueData1 clue = currentStage.cluesPool[i];
+                if (clue == null || clue.clueText != clueText ||
+                    clue.clueTextLocalized == null || clue.clueTextLocalized.IsEmpty)
+                {
+                    continue;
+                }
+
+                string localizedText = clue.clueTextLocalized.GetLocalizedString();
+                if (!string.IsNullOrWhiteSpace(localizedText))
+                {
+                    return localizedText;
+                }
+            }
+        }
+
+        return clueText;
     }
 
     private void PopulateSuspectCards()
@@ -372,6 +487,7 @@ public class NotebookManager : MonoBehaviour
         // กันสั่งซ้ำ: ตราปั๊มยิง event ได้อีกรอบระหว่างที่สมุดยังเล่นแอนิเมชันปิดค้างอยู่
         if (isClosing) return;
         isClosing = true;
+        suppressCloseSoundOnDisable = true;
 
         Debug.Log($"<color=orange>�����蹪����: {chosenName}!</color>");
 
@@ -399,6 +515,18 @@ public class NotebookManager : MonoBehaviour
             if (showcaseHoldDuration > 0f)
             {
                 yield return new WaitForSecondsRealtime(showcaseHoldDuration);
+            }
+        }
+
+        bool willWin = GameManager.Instance != null && GameManager.Instance.WillVerdictWin(chosenName);
+        yield return ShowVerdictImageRoutine(willWin);
+        yield return HideShowcaseAndVerdictRoutine();
+        if (willWin)
+        {
+            yield return FadeToBlackRoutine();
+            if (useBlackFadeBeforeEnding && blackFadeHoldDuration > 0f)
+            {
+                yield return new WaitForSecondsRealtime(blackFadeHoldDuration);
             }
         }
 
@@ -1042,6 +1170,377 @@ public class NotebookManager : MonoBehaviour
         return true;
     }
 
+    private IEnumerator ShowVerdictImageRoutine(bool isWin)
+    {
+        Image configuredImage = isWin ? completeVerdictImage : failedVerdictImage;
+        Image otherConfiguredImage = isWin ? failedVerdictImage : completeVerdictImage;
+        if (otherConfiguredImage != null && otherConfiguredImage != configuredImage)
+        {
+            otherConfiguredImage.gameObject.SetActive(false);
+        }
+
+        Image image = configuredImage != null ? configuredImage : EnsureVerdictImage();
+        if (image == null)
+        {
+            yield break;
+        }
+
+        if (configuredImage == null)
+        {
+            string resourceName = isWin ? "CompleteUI" : "FailedUI";
+            Sprite sprite = isWin ? completeVerdictSprite : failedVerdictSprite;
+            if (sprite == null)
+            {
+                sprite = Resources.Load<Sprite>(resourceName);
+            }
+
+            if (sprite == null)
+            {
+                Debug.LogWarning($"[NotebookManager] ไม่พบภาพผลการตัดสิน Resources/{resourceName}.png");
+                yield break;
+            }
+
+            image.sprite = sprite;
+        }
+        else if (image.sprite == null)
+        {
+            Debug.LogWarning($"[NotebookManager] Image ผลการตัดสิน {(isWin ? "Complete" : "Failed")} ยังไม่ได้ใส่ Sprite");
+            yield break;
+        }
+
+        if (verdictImage != image)
+        {
+            hasCachedVerdictImageBase = false;
+        }
+        verdictImage = image;
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+        image.transform.SetAsLastSibling();
+        image.gameObject.SetActive(true);
+        SoundManager.Instance.PlaySFX(isWin ? SoundIds.VerdictComplete : SoundIds.VerdictFailed);
+        yield return PlayVerdictImageAppearRoutine(image);
+
+        float remainingHold = verdictImageHoldDuration - verdictImageAppearDuration;
+        if (remainingHold > 0f)
+        {
+            yield return new WaitForSecondsRealtime(remainingHold);
+        }
+    }
+
+    private IEnumerator PlayVerdictImageAppearRoutine(Image image)
+    {
+        Transform imageTransform = image.transform;
+        if (!hasCachedVerdictImageBase)
+        {
+            verdictImageBaseScale = imageTransform.localScale;
+            hasCachedVerdictImageBase = true;
+        }
+
+        Vector3 baseScale = verdictImageBaseScale;
+        CanvasGroup canvasGroup = image.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = image.gameObject.AddComponent<CanvasGroup>();
+        }
+
+        float duration = Mathf.Max(0.01f, verdictImageAppearDuration);
+        float time = 0f;
+        imageTransform.localScale = Vector3.zero;
+        canvasGroup.alpha = fadeVerdictImage ? 0f : 1f;
+
+        while (time < duration)
+        {
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            imageTransform.localScale = baseScale * EaseOutBack(t);
+            if (fadeVerdictImage)
+            {
+                canvasGroup.alpha = t;
+            }
+
+            yield return null;
+        }
+
+        imageTransform.localScale = baseScale;
+        canvasGroup.alpha = 1f;
+    }
+
+    private IEnumerator HideVerdictImageRoutine()
+    {
+        if (verdictImage == null || !verdictImage.gameObject.activeSelf)
+        {
+            yield break;
+        }
+
+        Transform imageTransform = verdictImage.transform;
+        CanvasGroup canvasGroup = verdictImage.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = verdictImage.gameObject.AddComponent<CanvasGroup>();
+        }
+
+        float duration = Mathf.Max(0.01f, verdictImageDisappearDuration);
+        Vector3 startScale = imageTransform.localScale;
+        Vector3 endScale = verdictImageBaseScale * Mathf.Clamp(verdictImageDisappearScale, 0.1f, 1f);
+        float startAlpha = canvasGroup.alpha;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            float easedT = t * t * (3f - 2f * t);
+
+            imageTransform.localScale = Vector3.Lerp(startScale, endScale, easedT);
+            canvasGroup.alpha = Mathf.Lerp(startAlpha, 0f, easedT);
+            yield return null;
+        }
+
+        imageTransform.localScale = endScale;
+        canvasGroup.alpha = 0f;
+    }
+
+    private IEnumerator HideShowcaseAndVerdictRoutine()
+    {
+        bool hasShowcase = detailTabRect != null && detailTabRect.gameObject.activeSelf;
+        bool hasVerdict = verdictImage != null && verdictImage.gameObject.activeSelf;
+        if (!hasShowcase && !hasVerdict)
+        {
+            yield break;
+        }
+
+        CanvasGroup showcaseGroup = null;
+        if (hasShowcase)
+        {
+            showcaseGroup = detailTabCanvasGroup;
+            if (showcaseGroup == null)
+            {
+                showcaseGroup = EnsureCanvasGroup(detailTabRect.gameObject);
+            }
+
+            showcaseGroup.blocksRaycasts = false;
+        }
+
+        CanvasGroup verdictGroup = null;
+        if (hasVerdict)
+        {
+            verdictGroup = verdictImage.GetComponent<CanvasGroup>();
+            if (verdictGroup == null)
+            {
+                verdictGroup = verdictImage.gameObject.AddComponent<CanvasGroup>();
+            }
+        }
+
+        Vector3 showcaseStartScale = hasShowcase ? detailTabRect.localScale : Vector3.one;
+        Vector3 showcaseEndScale = hasShowcase ? detailTabBaseScale : Vector3.one;
+        Vector3 verdictStartScale = hasVerdict ? verdictImage.transform.localScale : Vector3.one;
+        Vector3 verdictEndScale = hasVerdict ? verdictImageBaseScale : Vector3.one;
+        float showcaseStartAlpha = hasShowcase ? showcaseGroup.alpha : 0f;
+        float verdictStartAlpha = hasVerdict ? verdictGroup.alpha : 0f;
+        float duration = Mathf.Max(0.01f, showcaseDisappearDuration, verdictImageDisappearDuration);
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            float ease = t * t * (3f - 2f * t);
+
+            if (hasShowcase)
+            {
+                detailTabRect.localScale = Vector3.Lerp(showcaseStartScale, showcaseEndScale, ease);
+                showcaseGroup.alpha = Mathf.Lerp(showcaseStartAlpha, 0f, ease);
+            }
+
+            if (hasVerdict)
+            {
+                verdictImage.transform.localScale = Vector3.Lerp(verdictStartScale, verdictEndScale, ease);
+                verdictGroup.alpha = Mathf.Lerp(verdictStartAlpha, 0f, ease);
+            }
+
+            yield return null;
+        }
+
+        if (hasShowcase)
+        {
+            detailTabRect.localScale = showcaseEndScale;
+            showcaseGroup.alpha = 0f;
+            detailTabRect.gameObject.SetActive(false);
+            RestoreDetailTabHome();
+            RestoreDetailTabPose();
+        }
+
+        if (hasVerdict)
+        {
+            verdictImage.transform.localScale = verdictEndScale;
+            verdictGroup.alpha = 0f;
+        }
+    }
+
+    private IEnumerator FadeToBlackRoutine()
+    {
+        if (!useBlackFadeBeforeEnding)
+        {
+            yield break;
+        }
+
+        Image image = EnsureBlackFadeImage();
+        if (image == null)
+        {
+            yield break;
+        }
+
+        CanvasGroup canvasGroup = image.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = image.gameObject.AddComponent<CanvasGroup>();
+        }
+
+        image.gameObject.SetActive(true);
+        canvasGroup.alpha = 0f;
+
+        float duration = Mathf.Max(0.01f, blackFadeDuration);
+        float time = 0f;
+        while (time < duration)
+        {
+            time += Time.unscaledDeltaTime;
+            canvasGroup.alpha = Mathf.Clamp01(time / duration);
+            yield return null;
+        }
+
+        canvasGroup.alpha = 1f;
+    }
+
+    private Image EnsureVerdictImage()
+    {
+        if (verdictImage != null)
+        {
+            return verdictImage;
+        }
+
+        RectTransform layer = ResolveShowcaseLayer();
+        if (layer == null)
+        {
+            Canvas canvas = GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                layer = canvas.rootCanvas.transform as RectTransform;
+            }
+        }
+
+        if (layer == null)
+        {
+            Debug.LogWarning("[NotebookManager] ไม่พบ Canvas สำหรับแสดงภาพผลการตัดสิน");
+            return null;
+        }
+
+        GameObject imageObject = new GameObject("VerdictImage", typeof(RectTransform), typeof(Image));
+        RectTransform imageRect = imageObject.GetComponent<RectTransform>();
+        imageRect.SetParent(layer, false);
+        imageRect.anchorMin = Vector2.zero;
+        imageRect.anchorMax = Vector2.one;
+        imageRect.offsetMin = Vector2.zero;
+        imageRect.offsetMax = Vector2.zero;
+
+        verdictImage = imageObject.GetComponent<Image>();
+        verdictImage.raycastTarget = false;
+        verdictImage.gameObject.SetActive(false);
+        return verdictImage;
+    }
+
+    private Image EnsureBlackFadeImage()
+    {
+        if (blackFadeImage != null)
+        {
+            return blackFadeImage;
+        }
+
+        RectTransform layer = ResolveShowcaseLayer();
+        if (layer == null)
+        {
+            Canvas canvas = GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                layer = canvas.rootCanvas.transform as RectTransform;
+            }
+        }
+
+        if (layer == null)
+        {
+            Debug.LogWarning("[NotebookManager] ไม่พบ Canvas สำหรับแสดงเฟดดำ");
+            return null;
+        }
+
+        GameObject imageObject = new GameObject("EndingBlackFade", typeof(RectTransform), typeof(Image));
+        RectTransform imageRect = imageObject.GetComponent<RectTransform>();
+        imageRect.SetParent(layer, false);
+        imageRect.anchorMin = Vector2.zero;
+        imageRect.anchorMax = Vector2.one;
+        imageRect.offsetMin = Vector2.zero;
+        imageRect.offsetMax = Vector2.zero;
+
+        blackFadeImage = imageObject.GetComponent<Image>();
+        blackFadeImage.color = Color.black;
+        blackFadeImage.raycastTarget = false;
+        blackFadeImage.gameObject.SetActive(false);
+        return blackFadeImage;
+    }
+
+    public void HideVerdictImage()
+    {
+        if (verdictImage != null)
+        {
+            verdictImage.gameObject.SetActive(false);
+            if (hasCachedVerdictImageBase)
+            {
+                verdictImage.transform.localScale = verdictImageBaseScale;
+            }
+
+            CanvasGroup canvasGroup = verdictImage.GetComponent<CanvasGroup>();
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 1f;
+            }
+        }
+
+        if (completeVerdictImage != null && completeVerdictImage != verdictImage)
+        {
+            completeVerdictImage.gameObject.SetActive(false);
+        }
+
+        if (failedVerdictImage != null && failedVerdictImage != verdictImage)
+        {
+            failedVerdictImage.gameObject.SetActive(false);
+        }
+    }
+
+    public IEnumerator FadeEndingBlackToClear()
+    {
+        if (blackFadeImage == null || !blackFadeImage.gameObject.activeSelf)
+        {
+            yield break;
+        }
+
+        CanvasGroup canvasGroup = blackFadeImage.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = blackFadeImage.gameObject.AddComponent<CanvasGroup>();
+        }
+
+        float duration = Mathf.Max(0.01f, blackFadeDuration);
+        float startAlpha = canvasGroup.alpha;
+        float time = 0f;
+        while (time < duration)
+        {
+            time += Time.unscaledDeltaTime;
+            canvasGroup.alpha = Mathf.Lerp(startAlpha, 0f, Mathf.Clamp01(time / duration));
+            yield return null;
+        }
+
+        canvasGroup.alpha = 0f;
+        blackFadeImage.gameObject.SetActive(false);
+    }
+
     // ลอยไปหยุดกลางจอพร้อมขยายขึ้นนิดหนึ่ง ใช้ smoothstep ให้ไปจอดสนิท ไม่เลยเป้าแล้วดีดกลับ
     // (เหตุผลเดียวกับหน้าประวัติตอนไถลเข้ามา คือมีรูปคนอยู่ในนั้น พอดีดกลับแล้วรูปจะดูสั่น)
     private IEnumerator MoveDetailTabToCenter()
@@ -1057,11 +1556,14 @@ public class NotebookManager : MonoBehaviour
             yield break;
         }
 
+        SoundManager.Instance.PlaySFX(SoundIds.ShowcaseMove);
+
         float duration = Mathf.Max(0.01f, showcaseMoveDuration);
 
         Vector3 startPos = detailTabRect.position;
-        Vector3 startScale = detailTabRect.localScale;
-        Vector3 endScale = startScale * Mathf.Max(0.01f, showcaseScale);
+        Vector3 startScale = detailTabBaseScale;
+        Vector3 endScale = detailTabBaseScale * Mathf.Max(1.2f, showcaseScale);
+        detailTabRect.localScale = startScale;
 
         // เอียงต่อจากมุมที่หน้ากำลังวางอยู่ตอนนี้ ไม่ใช่จากมุมศูนย์
         // เพราะตอน PrepareDetailShowcase ย้ายหน้าไปแขวนใต้ Canvas ชั้นบนสุดแบบคงท่าเดิมบนจอ
@@ -1075,7 +1577,9 @@ public class NotebookManager : MonoBehaviour
             // unscaledDeltaTime เหมือนแอนิเมชันอื่นในสมุด เผื่อหน้าเลือกคนร้ายไปหยุดเวลาเกมไว้
             time += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(time / duration);
-            float ease = t * t * (3f - 2f * t);
+            float ease = showcaseMoveCurve != null
+                ? Mathf.Clamp01(showcaseMoveCurve.Evaluate(t))
+                : t * t * (3f - 2f * t);
 
             detailTabRect.localScale = Vector3.Lerp(startScale, endScale, ease);
 
@@ -1141,6 +1645,56 @@ public class NotebookManager : MonoBehaviour
     public void HideSuspectShowcase()
     {
         ShowSuspectDetailTab(false);
+    }
+
+    private IEnumerator HideSuspectShowcaseRoutine()
+    {
+        if (detailTabRect == null || !detailTabRect.gameObject.activeSelf)
+        {
+            yield break;
+        }
+
+        CanvasGroup canvasGroup = detailTabCanvasGroup;
+        if (canvasGroup == null)
+        {
+            canvasGroup = EnsureCanvasGroup(detailTabRect.gameObject);
+        }
+
+        Vector3 startScale = detailTabRect.localScale;
+        Vector3 endScale = startScale * Mathf.Clamp(showcaseDisappearScale, 0.1f, 1f);
+        float startAlpha = canvasGroup != null ? canvasGroup.alpha : 1f;
+        float duration = Mathf.Max(0.01f, showcaseDisappearDuration);
+        float time = 0f;
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.blocksRaycasts = false;
+        }
+
+        while (time < duration)
+        {
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            float ease = t * t * (3f - 2f * t);
+
+            detailTabRect.localScale = Vector3.Lerp(startScale, endScale, ease);
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = Mathf.Lerp(startAlpha, 0f, ease);
+            }
+
+            yield return null;
+        }
+
+        detailTabRect.localScale = endScale;
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+        }
+
+        detailTabRect.gameObject.SetActive(false);
+        RestoreDetailTabHome();
+        RestoreDetailTabPose();
     }
 
     // ทยอยเด้งของทีละชิ้นตามลำดับ ใช้ coroutine เดียวคุมทั้งลิสต์ จะได้หยุดทีเดียวจบ

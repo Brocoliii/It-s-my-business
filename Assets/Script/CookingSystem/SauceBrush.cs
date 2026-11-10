@@ -35,6 +35,16 @@ public class SauceBrush : MonoBehaviour, IDraggable
     [Tooltip("How quickly the tilt eases toward its target angle")]
     [SerializeField] private float shakeSpeed = 12f;
 
+    [Header("Success Feedback")]
+    [Tooltip("Sprite that pops up above the food when the sauce is applied successfully.")]
+    [SerializeField] private Sprite successSprite;
+    [SerializeField] private Vector3 successSpriteOffset = new Vector3(0f, 0.8f, 0f);
+    [SerializeField] private float successSpriteDuration = 0.7f;
+    [SerializeField] private float successSpriteRise = 0.35f;
+    [SerializeField] private float successSpriteScale = 1f;
+    [SerializeField] private string successSpriteSortingLayer = "Dragging";
+    [SerializeField] private int successSpriteSortingOrder = 20;
+
     private static readonly Collider2D[] overlapResults = new Collider2D[16];
     private static readonly ContactFilter2D overlapFilter = new ContactFilter2D().NoFilter();
 
@@ -227,6 +237,7 @@ public class SauceBrush : MonoBehaviour, IDraggable
         if (strokeCount >= requiredStrokes)
         {
             previewFood.ApplySauce();
+            ShowSuccessSprite(previewFood);
             ClearPreviewState();
             return;
         }
@@ -296,5 +307,50 @@ public class SauceBrush : MonoBehaviour, IDraggable
             }
         }
         return null;
+    }
+
+    // ป๊อปอัพ sprite เด้งขึ้นเหนืออาหารตอนทาซอสสำเร็จ (เหมือน combo sprite ของขวดพริก)
+    private void ShowSuccessSprite(FoodInstance food)
+    {
+        if (food == null || successSprite == null)
+            return;
+
+        GameObject popupObject = new GameObject("SauceSuccessFeedback");
+        SpriteRenderer popupRenderer = popupObject.AddComponent<SpriteRenderer>();
+        popupRenderer.sprite = successSprite;
+        popupRenderer.sortingLayerName = successSpriteSortingLayer;
+        popupRenderer.sortingOrder = successSpriteSortingOrder;
+        popupObject.transform.position = food.transform.position + successSpriteOffset;
+        popupObject.transform.localScale = Vector3.one * successSpriteScale;
+
+        // กันไว้เผื่อแปรงถูกปิด (deactivate) ระหว่าง animation ทำให้ coroutine หยุด popup จะได้ไม่ค้างอยู่ในฉาก
+        Destroy(popupObject, successSpriteDuration + 0.1f);
+
+        StartCoroutine(AnimateSuccessSprite(popupObject, popupRenderer));
+    }
+
+    private IEnumerator AnimateSuccessSprite(GameObject popupObject, SpriteRenderer popupRenderer)
+    {
+        float duration = Mathf.Max(0.01f, successSpriteDuration);
+        Vector3 startPosition = popupObject.transform.position;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            if (popupObject == null) yield break;
+
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / duration);
+            popupObject.transform.position = startPosition + Vector3.up * (successSpriteRise * progress);
+
+            Color color = popupRenderer.color;
+            color.a = 1f - progress;
+            popupRenderer.color = color;
+
+            yield return null;
+        }
+
+        if (popupObject != null)
+            Destroy(popupObject);
     }
 }

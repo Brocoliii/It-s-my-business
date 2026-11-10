@@ -12,6 +12,8 @@ public class CustomerManager : MonoBehaviour
     [Tooltip("จุดที่ลูกค้าจะโผล่ออกมาก่อนเดินเข้ามายัง customerSlots (เรียงตามช่องเดียวกัน) ถ้าช่องไหนไม่ใส่ไว้ จะโผล่ที่จุดยืนเลยโดยไม่เดินเข้ามา")]
     public Transform[] customerSpawnPoints;
     public float spawnCooldown = 3f;
+    [HideInInspector] public bool tutorialSingleCustomerMode;
+    [HideInInspector] public bool tutorialCustomerHasSpawned;
     private int currentActiveCustomerCount = 0;
 
     [Header("การตั้งค่าตอนเริ่มเกม")]
@@ -33,6 +35,7 @@ public class CustomerManager : MonoBehaviour
     private int[] activeCustomerFoodCount;
     private int currentTotalFoodOrdered = 0;
     private bool customersHiddenForInvestigation = false;
+    private bool deliveryHighlightActive = false;
 
     private void Awake()
     {
@@ -61,6 +64,17 @@ public class CustomerManager : MonoBehaviour
         }
     }
 
+    public void SetAllCustomersDeliveryHighlight(bool isHighlighted)
+    {
+        deliveryHighlightActive = isHighlighted;
+        if (activeCustomers == null) return;
+
+        foreach (Customer customer in activeCustomers)
+        {
+            if (customer != null) customer.SetDeliveryHighlight(isHighlighted);
+        }
+    }
+
     public void StartSpawningCustomers()
     {
         StartCoroutine(InitialSpawnRoutine());
@@ -69,6 +83,8 @@ public class CustomerManager : MonoBehaviour
     public void SpawnCustomer(int slotIndex)
     {
         if (GameManager.Instance.stopSpawningCustomers) return;
+
+        if (tutorialSingleCustomerMode && tutorialCustomerHasSpawned) return;
 
         // จบเกมไปแล้ว (แพ้/ชนะ) ห้ามมีลูกค้าใหม่เดินเข้ามาทับหน้าจอแพ้
         // คิวเกิดจาก SpawnCooldownRoutine ที่ตั้งไว้ก่อนแพ้ยังเดินต่ออยู่ ต้องกันตรงนี้
@@ -109,17 +125,25 @@ public class CustomerManager : MonoBehaviour
             randomOrder.wantedFoods.Add(currentStage.availableMenu[Random.Range(0, currentStage.availableMenu.Count)]);
         }
 
-        randomOrder.wantedSpicyLevel = Random.Range(0, currentStage.maxSpicyLevel + 1);
-
-        if (currentStage.allowSauce) randomOrder.wantedSauce = (Random.value > 0.5f);
-        else randomOrder.wantedSauce = false;
+        if (tutorialSingleCustomerMode)
+        {
+            randomOrder.wantedSpicyLevel = 3;
+            randomOrder.wantedSauce = true;
+        }
+        else
+        {
+            randomOrder.wantedSpicyLevel = Random.Range(0, currentStage.maxSpicyLevel + 1);
+            randomOrder.wantedSauce = currentStage.allowSauce && Random.value > 0.5f;
+        }
 
         newCustomer.Init(randomOrder, slotIndex, this, standPosition);
+        newCustomer.SetDeliveryHighlight(deliveryHighlightActive);
 
         // ถ้าผู้เล่นกำลังกดค้างสืบสวนอยู่พอดี ลูกค้าที่เพิ่งเกิดใหม่ต้องซ่อนทันที ไม่ใช่โผล่มาเป็นปกติก่อน
         if (customersHiddenForInvestigation) newCustomer.SetCustomerVisible(false, animate: false);
 
         activeCustomers[slotIndex] = newCustomer;
+        if (tutorialSingleCustomerMode) tutorialCustomerHasSpawned = true;
         activeCustomerFoodCount[slotIndex] = orderAmount;
         currentTotalFoodOrdered += orderAmount;
         currentActiveCustomerCount++;
@@ -165,7 +189,7 @@ public class CustomerManager : MonoBehaviour
         return availableIndices[Random.Range(0, availableIndices.Count)];
     }
 
-    public void OnCustomerLeft(int slotIndex)
+    public void OnCustomerLeft(int slotIndex, bool isSatisfied)
     {
         activeCustomers[slotIndex] = null;
         activeCustomerPrefabIndex[slotIndex] = -1;
@@ -173,6 +197,9 @@ public class CustomerManager : MonoBehaviour
         currentTotalFoodOrdered = Mathf.Max(0, currentTotalFoodOrdered - activeCustomerFoodCount[slotIndex]);
         activeCustomerFoodCount[slotIndex] = 0;
         currentActiveCustomerCount--;
+
+        if (tutorialSingleCustomerMode && !isSatisfied)
+            tutorialCustomerHasSpawned = false;
 
         if (GameManager.Instance.stopSpawningCustomers && currentActiveCustomerCount <= 0)
         {

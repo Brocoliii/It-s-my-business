@@ -15,6 +15,8 @@ public class AudioSettingsUI : MonoBehaviour
     public Slider bgmSlider;
     [Tooltip("เสียงประกอบ")]
     public Slider sfxSlider;
+    [Tooltip("เสียงวิดีโอและคัตซีน")]
+    public Slider cutsceneSlider;
 
     [Header("ปุ่มปิดเสียง (ไม่มีก็ได้)")]
     public Toggle muteToggle;
@@ -23,6 +25,7 @@ public class AudioSettingsUI : MonoBehaviour
     public TextMeshProUGUI masterValueText;
     public TextMeshProUGUI bgmValueText;
     public TextMeshProUGUI sfxValueText;
+    public TextMeshProUGUI cutsceneValueText;
 
     [Header("เสียงตัวอย่าง")]
     [Tooltip("เล่นเสียงตัวอย่างตอนลากสไลเดอร์เสียงประกอบ ผู้เล่นจะได้ยินว่าดังแค่ไหน")]
@@ -40,6 +43,7 @@ public class AudioSettingsUI : MonoBehaviour
         if (masterSlider != null) masterSlider.onValueChanged.AddListener(OnMasterChanged);
         if (bgmSlider != null) bgmSlider.onValueChanged.AddListener(OnBgmChanged);
         if (sfxSlider != null) sfxSlider.onValueChanged.AddListener(OnSfxChanged);
+        if (cutsceneSlider != null) cutsceneSlider.onValueChanged.AddListener(OnCutsceneChanged);
         if (muteToggle != null) muteToggle.onValueChanged.AddListener(OnMuteChanged);
     }
 
@@ -65,6 +69,7 @@ public class AudioSettingsUI : MonoBehaviour
         if (masterSlider != null) masterSlider.value = sound.MasterVolume;
         if (bgmSlider != null) bgmSlider.value = sound.BgmVolume;
         if (sfxSlider != null) sfxSlider.value = sound.SfxVolume;
+        if (cutsceneSlider != null) cutsceneSlider.value = sound.CutsceneVolume;
         if (muteToggle != null) muteToggle.isOn = sound.IsMuted;
 
         isRefreshing = false;
@@ -102,6 +107,14 @@ public class AudioSettingsUI : MonoBehaviour
         }
     }
 
+    private void OnCutsceneChanged(float value)
+    {
+        if (isRefreshing) return;
+
+        SoundManager.Instance.SetCutsceneVolume(value);
+        UpdateValueTexts();
+    }
+
     private void OnMuteChanged(bool isOn)
     {
         if (isRefreshing) return;
@@ -117,6 +130,7 @@ public class AudioSettingsUI : MonoBehaviour
         if (masterValueText != null) masterValueText.text = ToPercent(sound.MasterVolume);
         if (bgmValueText != null) bgmValueText.text = ToPercent(sound.BgmVolume);
         if (sfxValueText != null) sfxValueText.text = ToPercent(sound.SfxVolume);
+        if (cutsceneValueText != null) cutsceneValueText.text = ToPercent(sound.CutsceneVolume);
     }
 
     private string ToPercent(float value)

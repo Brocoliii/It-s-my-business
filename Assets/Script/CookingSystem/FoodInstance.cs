@@ -324,7 +324,7 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
 
     public void OnDrag(Vector2 mousePos)
     {
-        if (isBeingDragged) FoodRoot.position = mousePos;
+        if (isBeingDragged && !IsBeingStolen) FoodRoot.position = mousePos;
     }
 
     // ลากไปทางไหน ชิ้นเนื้อก็ถ่วงเอียงไปทางตรงข้ามเหมือนถูกลากผ่านอากาศ แล้วแกว่งกลับเองตอนเมาส์หยุด
@@ -480,6 +480,12 @@ public class FoodInstance : MonoBehaviour, IDraggable, IClickable
 
     // ตัวควันคอยอ่านค่านี้เพื่อรู้ว่าตอนนี้ต้องพ่นควันอยู่ไหม
     public bool IsOnGrill => isOnGrill;
+    public bool IsBeingStolen { get; private set; }
+
+    public void SetBeingStolen(bool state)
+    {
+        IsBeingStolen = state;
+    }
 
     public void SetGrilling(bool state)
     {

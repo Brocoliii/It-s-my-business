@@ -3,6 +3,9 @@ using System.Collections;
 
 public class SceneShutterTransition : MonoBehaviour
 {
+    public event System.Action OpeningFinished;
+    public bool HasFinishedOpening { get; private set; }
+
     [Header("Shutter")]
     public RectTransform shutterImage;
 
@@ -118,6 +121,9 @@ public class SceneShutterTransition : MonoBehaviour
         {
             shutterImage.gameObject.SetActive(false);
         }
+
+        HasFinishedOpening = true;
+        OpeningFinished?.Invoke();
     }
 
     // เรียกจากภายนอก (เช่นตอนจบวัน) ให้ม่านเลื่อนจากด้านบนลงมาปิดจอ

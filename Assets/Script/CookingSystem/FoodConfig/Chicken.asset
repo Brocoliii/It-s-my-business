@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75d2635783c640944a4b1028a1d283d4, type: 3}
+  m_Name: Chicken
+  m_EditorClassIdentifier: Assembly-CSharp::FoodData
+  foodName: Chicken
+  foodIcon: {fileID: 21300000, guid: 49678042936038e4f93318b1edeb5a45, type: 3}
+  rawSprite: {fileID: 21300000, guid: c4c837aa682a19942916c2ccb90b497f, type: 3}
+  mediumSprite: {fileID: 21300000, guid: c4c837aa682a19942916c2ccb90b497f, type: 3}
+  cookedSprite: {fileID: 21300000, guid: f2b257894e177e749a4ef9ec1981faa9, type: 3}
+  burntSprite: {fileID: 21300000, guid: a57ea42d5c9e8a74e92c34ce0e6bf32d, type: 3}
+  mediumTime: 5
+  cookTime: 8
+  burnTime: 20
+  sauceSprite: {fileID: 21300000, guid: b206c2fe84671a9458646b3a68f340bb, type: 3}
+  spicyLevel1Sprite: {fileID: 21300000, guid: d7cc713c64853d54fb105dbfaa49ccce, type: 3}
+  spicyLevel2Sprite: {fileID: 21300000, guid: fe859a7d944bcde42b4c3d18a4ba53f7, type: 3}
+  spicyLevel3Sprite: {fileID: 21300000, guid: f18e1b2ef2486074f8964c8b75ad327b, type: 3}
+  sauceSpicyLevel1Sprite: {fileID: 21300000, guid: e743b197b669d40488809bcdc8ce3a04, type: 3}
+  sauceSpicyLevel2Sprite: {fileID: 21300000, guid: 0671b42b4f609de4aa533fcb3bfeafc2, type: 3}
+  sauceSpicyLevel3Sprite: {fileID: 21300000, guid: 2e32bdf6f67fa1a43b7a330c8a9a7490, type: 3}

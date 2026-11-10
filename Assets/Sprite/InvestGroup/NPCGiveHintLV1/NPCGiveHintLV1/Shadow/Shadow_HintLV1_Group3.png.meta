@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: 492288f15f18b134484ff07cbd129650
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6253978907934016198
+    second: Shadow_HintLV1_Group3_0
+  - first:
+      213: -2884285805379250789
+    second: Shadow_HintLV1_Group3_1
+  - first:
+      213: 7665069132990738972
+    second: Shadow_HintLV1_Group3_2
+  - first:
+      213: 2792558531514667601
+    second: Shadow_HintLV1_Group3_3
+  - first:
+      213: -8632677405553760834
+    second: Shadow_HintLV1_Group3_4
+  - first:
+      213: -4941858628666223797
+    second: Shadow_HintLV1_Group3_5
+  - first:
+      213: -689030633524217701
+    second: Shadow_HintLV1_Group3_6
+  - first:
+      213: 2752588234214929951
+    second: Shadow_HintLV1_Group3_7
+  - first:
+      213: 3244993930849420844
+    second: Shadow_HintLV1_Group3_8
+  - first:
+      213: -5987276356899335027
+    second: Shadow_HintLV1_Group3_9
+  - first:
+      213: -557642823725226407
+    second: Shadow_HintLV1_Group3_10
+  - first:
+      213: -4703267810787292587
+    second: Shadow_HintLV1_Group3_11
+  - first:
+      213: -1960593334560987876
+    second: Shadow_HintLV1_Group3_12
+  - first:
+      213: 7886311634777002479
+    second: Shadow_HintLV1_Group3_13
+  - first:
+      213: 1692125723844509379
+    second: Shadow_HintLV1_Group3_14
+  - first:
+      213: -7225785001129864756
+    second: Shadow_HintLV1_Group3_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_0
+      rect:
+        serializedVersion: 2
+        x: 641
+        y: 169
+        width: 358
+        height: 1229
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3dbec771576539a0800000000000000
+      internalID: -6253978907934016198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_1
+      rect:
+        serializedVersion: 2
+        x: 1036
+        y: 161
+        width: 405
+        height: 1152
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b951ba37755f8f7d0800000000000000
+      internalID: -2884285805379250789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_2
+      rect:
+        serializedVersion: 2
+        x: 1067
+        y: 1033
+        width: 17
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1279b2e3cbcf5a60800000000000000
+      internalID: 7665069132990738972
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_3
+      rect:
+        serializedVersion: 2
+        x: 1071
+        y: 1059
+        width: 11
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1521b65503921c620800000000000000
+      internalID: 2792558531514667601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_4
+      rect:
+        serializedVersion: 2
+        x: 1054
+        y: 1000
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb56d6533a1923880800000000000000
+      internalID: -8632677405553760834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_5
+      rect:
+        serializedVersion: 2
+        x: 1059
+        y: 999
+        width: 33
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b439624a2cdfa6bb0800000000000000
+      internalID: -4941858628666223797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_6
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 984
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b983d691a421076f0800000000000000
+      internalID: -689030633524217701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_7
+      rect:
+        serializedVersion: 2
+        x: 973
+        y: 932
+        width: 33
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f16fc494a68233620800000000000000
+      internalID: 2752588234214929951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_8
+      rect:
+        serializedVersion: 2
+        x: 1004
+        y: 933
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c26049299c8880d20800000000000000
+      internalID: 3244993930849420844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_9
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 826
+        width: 18
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d849be610ebe8eca0800000000000000
+      internalID: -5987276356899335027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_10
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 721
+        width: 9
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 956ef4c6ecad248f0800000000000000
+      internalID: -557642823725226407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_11
+      rect:
+        serializedVersion: 2
+        x: 545
+        y: 687
+        width: 7
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55a8e7658d2aabeb0800000000000000
+      internalID: -4703267810787292587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_12
+      rect:
+        serializedVersion: 2
+        x: 1047
+        y: 656
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c156e78ffb29ac4e0800000000000000
+      internalID: -1960593334560987876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_13
+      rect:
+        serializedVersion: 2
+        x: 1515
+        y: 600
+        width: 6
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe1d9eaf5aec17d60800000000000000
+      internalID: 7886311634777002479
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_14
+      rect:
+        serializedVersion: 2
+        x: 378
+        y: 361
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ce7d0d6163ab7710800000000000000
+      internalID: 1692125723844509379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow_HintLV1_Group3_15
+      rect:
+        serializedVersion: 2
+        x: 1777
+        y: 365
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc11f4843dad8bb90800000000000000
+      internalID: -7225785001129864756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Shadow_HintLV1_Group3_0: -6253978907934016198
+      Shadow_HintLV1_Group3_1: -2884285805379250789
+      Shadow_HintLV1_Group3_10: -557642823725226407
+      Shadow_HintLV1_Group3_11: -4703267810787292587
+      Shadow_HintLV1_Group3_12: -1960593334560987876
+      Shadow_HintLV1_Group3_13: 7886311634777002479
+      Shadow_HintLV1_Group3_14: 1692125723844509379
+      Shadow_HintLV1_Group3_15: -7225785001129864756
+      Shadow_HintLV1_Group3_2: 7665069132990738972
+      Shadow_HintLV1_Group3_3: 2792558531514667601
+      Shadow_HintLV1_Group3_4: -8632677405553760834
+      Shadow_HintLV1_Group3_5: -4941858628666223797
+      Shadow_HintLV1_Group3_6: -689030633524217701
+      Shadow_HintLV1_Group3_7: 2752588234214929951
+      Shadow_HintLV1_Group3_8: 3244993930849420844
+      Shadow_HintLV1_Group3_9: -5987276356899335027
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

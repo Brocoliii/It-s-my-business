@@ -3,9 +3,36 @@ using System.Collections.Generic;
 
 public class InvestigateGroup : MonoBehaviour, IInvestigatable
 {
+    [System.Serializable]
+    private class SpeechBubbleLayout
+    {
+        [Tooltip("จำนวนฟองสำหรับสปริทกลุ่มนี้")]
+        [Range(1, 5)] public int count = 4;
+        [Tooltip("ตำแหน่งฟองแบบ Local Position รอบกลุ่ม")]
+        public Vector2[] positions = new Vector2[4];
+    }
+
     [Header("Visual")]
     [SerializeField] private SpriteRenderer groupRenderer;
     [SerializeField] private Sprite[] possibleSprites;
+    [Tooltip("Prefab เงาตามลำดับของ Possible Sprites ถ้าเว้นว่างจะไม่สร้างเงา")]
+    [SerializeField] private GameObject[] possibleShadowPrefabs;
+
+    [Header("Speech Bubbles While Listening")]
+    [Tooltip("สปริทฟองคำพูดที่จะแสดงรอบกลุ่มระหว่างผู้เล่นกำลังฟัง")]
+    [SerializeField] private Sprite[] speechBubbleSprites;
+    [Tooltip("จำนวนฟองคำพูดที่แสดง (ตั้งได้ 1-5)")]
+    [SerializeField, Range(1, 5)] private int speechBubbleCount = 4;
+    [Tooltip("ตั้งค่าจำนวนและตำแหน่งฟองแยกตามลำดับของ Possible Sprites ถ้าเว้นว่างจะใช้ค่าด้านบน")]
+    [SerializeField] private SpeechBubbleLayout[] speechBubbleLayouts;
+    [SerializeField] private float speechBubbleScale = 0.35f;
+    [SerializeField] private Vector2 speechBubbleHorizontalRange = new Vector2(-0.9f, 0.9f);
+    [SerializeField] private Vector2 speechBubbleVerticalRange = new Vector2(0.65f, 1.15f);
+    [SerializeField] private float speechBubbleFloatHeight = 0.08f;
+    [SerializeField] private float speechBubbleFloatSpeed = 1.5f;
+    [SerializeField] private float speechBubbleAppearDuration = 0.25f;
+    [SerializeField] private float speechBubbleDisappearDuration = 0.18f;
+    [SerializeField] private float speechBubbleAnimationStagger = 0.04f;
 
     [Header("Stratagem Minigame")]
     [SerializeField] private int stratagemLength = 5;
@@ -77,6 +104,18 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
     private bool skipRemainingCompleteHold = false;
     private float stratagemInputUnlockTime = 0f;
     private int stratagemGenerationToken = 0;
+    private int selectedSpriteIndex = -1;
+    private GameObject instantiatedShadow;
+    private SpriteRenderer[] shadowRenderers = new SpriteRenderer[0];
+    private Color[] shadowBaseColors = new Color[0];
+    private readonly List<Transform> speechBubbles = new List<Transform>();
+    private readonly List<float> speechBubbleBaseHeights = new List<float>();
+    private readonly List<float> speechBubblePhases = new List<float>();
+    private readonly List<float> speechBubbleBaseAlphas = new List<float>();
+    private Coroutine speechBubbleAnimationCoroutine;
+
+    public bool IsBeingListened => isBeingListened;
+    public bool IsClueCollected => isClueCollected;
 
     // ช่วงห้ามกดหลังต่อชุดปุ่มครบ ใช้เวลาแทนคอรูทีน จะได้ไม่ต้องคอยไล่เคลียร์ธงตามทางออกทุกทาง
     private bool IsStratagemInputLocked => Time.time < stratagemInputUnlockTime;
@@ -115,6 +154,11 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         if (groupRenderer != null)
         {
             baseSpriteColor = groupRenderer.color;
+        }
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowInvestigateWarningBubble();
+            UIManager.Instance.ShowInvestigateDirectionIndicator(transform);
         }
         if (UIManager.Instance != null)
         {
@@ -211,7 +255,46 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
             return;
 
         groupRenderer.enabled = true;
-        groupRenderer.sprite = possibleSprites[Random.Range(0, possibleSprites.Length)];
+        selectedSpriteIndex = Random.Range(0, possibleSprites.Length);
+        groupRenderer.sprite = possibleSprites[selectedSpriteIndex];
+        CreateSelectedShadow();
+    }
+
+    private void CreateSelectedShadow()
+    {
+        if (instantiatedShadow != null)
+        {
+            Destroy(instantiatedShadow);
+            instantiatedShadow = null;
+        }
+        shadowRenderers = new SpriteRenderer[0];
+        shadowBaseColors = new Color[0];
+
+        if (possibleShadowPrefabs == null
+            || selectedSpriteIndex < 0
+            || selectedSpriteIndex >= possibleShadowPrefabs.Length)
+            return;
+
+        GameObject shadowPrefab = possibleShadowPrefabs[selectedSpriteIndex];
+        if (shadowPrefab == null)
+            return;
+
+        instantiatedShadow = Instantiate(shadowPrefab, transform, false);
+
+        if (groupRenderer == null)
+            return;
+
+        shadowRenderers = instantiatedShadow.GetComponentsInChildren<SpriteRenderer>(true);
+        shadowBaseColors = new Color[shadowRenderers.Length];
+        for (int i = 0; i < shadowRenderers.Length; i++)
+        {
+            if (shadowRenderers[i] == null)
+                continue;
+
+            shadowBaseColors[i] = shadowRenderers[i].color;
+            shadowRenderers[i].sortingLayerID = groupRenderer.sortingLayerID;
+            shadowRenderers[i].sortingOrder = groupRenderer.sortingOrder - 1;
+        }
     }
 
     private void Update()
@@ -221,6 +304,8 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         // และ RemoveGroup() จะถูกเรียกซ้ำทุกเฟรมตอนหมดเวลา
         if (isRemoving)
             return;
+
+        UpdateSpeechBubbles();
 
         if (lifeTimer > 0)
         {
@@ -261,6 +346,7 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
             blinkPhase = 0.25f;
             if (groupRenderer.color != baseSpriteColor)
                 groupRenderer.color = baseSpriteColor;
+            SetShadowBlinkOpacity(1f);
             return;
         }
 
@@ -274,6 +360,30 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         Color c = baseSpriteColor;
         c.a = alpha;
         groupRenderer.color = c;
+        SetShadowBlinkOpacity(baseSpriteColor.a > 0f ? alpha / baseSpriteColor.a : 1f);
+    }
+
+    private void SetShadowBlinkOpacity(float opacity)
+    {
+        opacity = Mathf.Clamp01(opacity);
+
+        for (int i = 0; i < shadowRenderers.Length; i++)
+        {
+            if (shadowRenderers[i] == null)
+                continue;
+
+            Color color = shadowBaseColors[i];
+            color.a = shadowBaseColors[i].a * opacity;
+            shadowRenderers[i].color = color;
+        }
+    }
+
+    public float GetTimeoutBlinkOpacity()
+    {
+        if (groupRenderer == null || baseSpriteColor.a <= 0f)
+            return 1f;
+
+        return Mathf.Clamp01(groupRenderer.color.a / baseSpriteColor.a);
     }
 
     public void OnListenStart()
@@ -282,6 +392,7 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         {
             isBeingListened = true;
             EnsureStratagemExists();
+            UIManager.Instance?.HideInvestigateDirectionIndicator();
             // เล่นแอนิเมชันไอคอนเด้งขึ้นใหม่ทุกครั้งที่เริ่มฟัง แม้จะเป็นชุดเดิมที่ค้างไว้
             // ไม่งั้นไอคอนจะโผล่มาเฉย ๆ ตอนกดฟังซ้ำ
             pendingSequenceIntro = true;
@@ -289,6 +400,7 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
             SoundManager.Instance.PlaySFX(SoundIds.BinocularsOn);
             SoundManager.Instance.PlaySFX(SoundIds.InvestigateStart);
 
+            ShowSpeechBubbles();
             UIManager.Instance.ShowListeningBar(true);
             UIManager.Instance.ShowBinocularsOverlay(true);
             UIManager.Instance.ShowInvestigateSequence(true);
@@ -336,8 +448,14 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         {
             isBeingListened = false;
 
+            if (!isClueCollected && !isRemoving)
+            {
+                UIManager.Instance?.ShowInvestigateDirectionIndicator(transform);
+            }
+
             SoundManager.Instance.PlaySFX(SoundIds.BinocularsOff);
 
+            HideSpeechBubbles();
             UIManager.Instance.ShowListeningBar(false);
             UIManager.Instance.ShowBinocularsOverlay(false);
             UIManager.Instance.ShowInvestigateSequence(false);
@@ -349,6 +467,199 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
             // ปล่อยเมาส์ตอนกำลังค้างหลอดเต็มอยู่ InputManager จะซูมกล้องออกทันที
             // ถ้ายังค้างแว่นส่องกับฉากมืดไว้ต่อจะดูเหมือนบั๊ก ตัดจบการค้างทิ้งเลย
             skipRemainingCompleteHold = true;
+        }
+    }
+
+    private void ShowSpeechBubbles()
+    {
+        if (speechBubbleSprites == null || speechBubbleSprites.Length == 0)
+            return;
+
+        if (speechBubbles.Count == 0)
+            CreateSpeechBubbles();
+
+        if (speechBubbleAnimationCoroutine != null)
+            StopCoroutine(speechBubbleAnimationCoroutine);
+
+        for (int i = 0; i < speechBubbles.Count; i++)
+        {
+            Transform bubble = speechBubbles[i];
+            if (bubble == null)
+                continue;
+
+            bubble.gameObject.SetActive(true);
+            bubble.localScale = Vector3.zero;
+            SpriteRenderer renderer = bubble.GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
+                Color color = renderer.color;
+                color.a = 0f;
+                renderer.color = color;
+            }
+        }
+
+        speechBubbleAnimationCoroutine = StartCoroutine(AnimateSpeechBubbles(true));
+    }
+
+    private void HideSpeechBubbles()
+    {
+        if (speechBubbleAnimationCoroutine != null)
+            StopCoroutine(speechBubbleAnimationCoroutine);
+
+        speechBubbleAnimationCoroutine = StartCoroutine(AnimateSpeechBubbles(false));
+    }
+
+    private System.Collections.IEnumerator AnimateSpeechBubbles(bool appearing)
+    {
+        float duration = appearing ? speechBubbleAppearDuration : speechBubbleDisappearDuration;
+        Vector3 targetScale = Vector3.one * speechBubbleScale;
+        List<int> animationOrder = CreateRandomBubbleOrder();
+
+        for (int orderIndex = 0; orderIndex < animationOrder.Count; orderIndex++)
+        {
+            int bubbleIndex = animationOrder[orderIndex];
+            Transform bubble = speechBubbles[bubbleIndex];
+            if (bubble == null)
+                continue;
+
+            if (!appearing)
+            {
+                bubble.localScale = targetScale;
+            }
+
+            SpriteRenderer renderer = bubble.GetComponent<SpriteRenderer>();
+            Color targetColor = renderer != null ? renderer.color : Color.white;
+            if (bubbleIndex < speechBubbleBaseAlphas.Count)
+                targetColor.a = speechBubbleBaseAlphas[bubbleIndex];
+            float startAlpha = appearing ? 0f : targetColor.a;
+            float elapsed = -orderIndex * speechBubbleAnimationStagger;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = duration <= 0f ? 1f : Mathf.Clamp01(elapsed / duration);
+                t = t * t * (3f - 2f * t);
+
+                bubble.localScale = Vector3.Lerp(
+                    appearing ? Vector3.zero : targetScale,
+                    appearing ? targetScale : Vector3.zero,
+                    t);
+
+                if (renderer != null)
+                {
+                    Color color = targetColor;
+                    color.a = Mathf.Lerp(startAlpha, appearing ? targetColor.a : 0f, t);
+                    renderer.color = color;
+                }
+
+                yield return null;
+            }
+
+            if (appearing)
+            {
+                bubble.localScale = targetScale;
+                if (renderer != null)
+                    renderer.color = targetColor;
+            }
+            else
+            {
+                bubble.gameObject.SetActive(false);
+            }
+        }
+
+        speechBubbleAnimationCoroutine = null;
+    }
+
+    private List<int> CreateRandomBubbleOrder()
+    {
+        List<int> order = new List<int>();
+        for (int i = 0; i < speechBubbles.Count; i++)
+            order.Add(i);
+
+        for (int i = order.Count - 1; i > 0; i--)
+        {
+            int randomIndex = Random.Range(0, i + 1);
+            int temporary = order[i];
+            order[i] = order[randomIndex];
+            order[randomIndex] = temporary;
+        }
+
+        return order;
+    }
+
+    private void CreateSpeechBubbles()
+    {
+        SpeechBubbleLayout layout = GetSelectedSpeechBubbleLayout();
+        int count = layout != null
+            ? Mathf.Clamp(layout.count, 1, 5)
+            : Mathf.Clamp(speechBubbleCount, 1, 5);
+
+        for (int i = 0; i < count; i++)
+        {
+            GameObject bubbleObject = new GameObject("Speech Bubble");
+            bubbleObject.transform.SetParent(transform, false);
+            Vector2 position = layout != null && layout.positions != null && i < layout.positions.Length
+                ? layout.positions[i]
+                : GetDefaultSpeechBubblePosition(i, count);
+            bubbleObject.transform.localPosition = position;
+            bubbleObject.transform.localScale = Vector3.one * speechBubbleScale;
+
+            SpriteRenderer bubbleRenderer = bubbleObject.AddComponent<SpriteRenderer>();
+            bubbleRenderer.sprite = speechBubbleSprites[Random.Range(0, speechBubbleSprites.Length)];
+            if (groupRenderer != null)
+            {
+                bubbleRenderer.sortingLayerID = groupRenderer.sortingLayerID;
+                bubbleRenderer.sortingOrder = groupRenderer.sortingOrder + 1;
+            }
+
+            speechBubbles.Add(bubbleObject.transform);
+            speechBubbleBaseHeights.Add(bubbleObject.transform.localPosition.y);
+            speechBubblePhases.Add(Random.Range(0f, Mathf.PI * 2f));
+            speechBubbleBaseAlphas.Add(bubbleRenderer.color.a);
+            bubbleObject.SetActive(false);
+        }
+    }
+
+    private SpeechBubbleLayout GetSelectedSpeechBubbleLayout()
+    {
+        if (speechBubbleLayouts == null
+            || selectedSpriteIndex < 0
+            || selectedSpriteIndex >= speechBubbleLayouts.Length)
+            return null;
+
+        return speechBubbleLayouts[selectedSpriteIndex];
+    }
+
+    private Vector2 GetDefaultSpeechBubblePosition(int index, int count)
+    {
+        float horizontalT = count == 1 ? 0.5f : (float)index / (count - 1);
+        float horizontal = Mathf.Lerp(
+            speechBubbleHorizontalRange.x,
+            speechBubbleHorizontalRange.y,
+            horizontalT);
+        float verticalT = index % 2 == 0 ? 0.2f : 0.8f;
+        float vertical = Mathf.Lerp(
+            speechBubbleVerticalRange.x,
+            speechBubbleVerticalRange.y,
+            verticalT);
+        return new Vector2(horizontal, vertical);
+    }
+
+    private void UpdateSpeechBubbles()
+    {
+        if (!isBeingListened || speechBubbles.Count == 0)
+            return;
+
+        for (int i = 0; i < speechBubbles.Count; i++)
+        {
+            Transform bubble = speechBubbles[i];
+            if (bubble == null)
+                continue;
+
+            Vector3 position = bubble.localPosition;
+            position.y = speechBubbleBaseHeights[i]
+                + Mathf.Sin(Time.time * speechBubbleFloatSpeed + speechBubblePhases[i]) * speechBubbleFloatHeight;
+            bubble.localPosition = position;
         }
     }
 
@@ -437,11 +748,14 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
                 isClueCollected = true;
                 isBeingListened = false;
                 isResettingAfterMistake = false;
+                HideSpeechBubbles();
+                SoundManager.Instance.PlaySFX(SoundIds.InvestigateSuccess);
 
                 if (groupRenderer != null)
                 {
                     groupRenderer.color = baseSpriteColor;
                 }
+                SetShadowBlinkOpacity(1f);
 
                 StartCoroutine(CollectClueAfterBarFilled());
                 return;
@@ -480,7 +794,6 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
         // ถ้าผู้เล่นปล่อยเมาส์ไปแล้ว (skip) ก็ไม่ต้องฉลอง เพราะกล้องซูมออกไปแล้วมองไม่เห็นอยู่ดี
         if (!skipRemainingCompleteHold && UIManager.Instance != null)
         {
-            SoundManager.Instance.PlaySFX(SoundIds.InvestigateSuccess);
             UIManager.Instance.PlayInvestigateSuccess();
             holdTarget = Mathf.Max(holdTarget, UIManager.Instance.InvestigateSuccessDuration);
         }
@@ -604,10 +917,12 @@ public class InvestigateGroup : MonoBehaviour, IInvestigatable
             UIManager.Instance.SetBackgroundDark(false);
             CustomerManager.Instance?.SetAllCustomerCanvasesVisible(true);
         }
+        HideSpeechBubbles();
 
         if (UIManager.Instance != null)
         {
             UIManager.Instance.ShowInvestigateTimer(false);
+            UIManager.Instance.HideInvestigateDirectionIndicator();
         }
 
         // ปิด Collider ก่อนเริ่มจางหาย ไม่ให้ผู้เล่นกดฟังกลุ่มที่กำลังจะหายไปแล้วได้อีก

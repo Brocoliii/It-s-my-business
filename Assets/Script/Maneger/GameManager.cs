@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using UnityEngine.Localization;
 
 [System.Serializable]
 public class StageConfig
@@ -52,6 +53,8 @@ public class StageConfig
     [Header("เนื้อเรื่องก่อนเริ่มด่าน")]
     [TextArea(2, 4)]
     public string introMessage = "ยินดีต้อนรับสู่วันแรกของการทำงาน!";
+    [Tooltip("ข้อความบทนำจาก String Table หากกำหนดไว้จะใช้แทน Intro Message")]
+    public LocalizedString introMessageLocalized;
 
     [Header("ผ่านด่านนี้แล้วไปฉากไหนต่อ")]
 
@@ -74,6 +77,8 @@ public class GameManager : MonoBehaviour
     public List<StageConfig> stages;
     public int currentStageIndex = 0;
 
+    [Header("จังหวะจบวัน")]
+    [Min(0)] public int endOfDayCountdownSeconds = 5;
     [Header("ข้อความบนหน้าจอแพ้")]
     [Tooltip("แพ้เพราะทำพลาดเกินโควตา (Max Mistakes Allowed)")]
     [TextArea(2, 3)]
@@ -91,6 +96,10 @@ public class GameManager : MonoBehaviour
     // ผ่านโควตาเบาะแสของด่านแล้วหรือยัง (เก็บได้ >= requiredCluesToPass)
     // เป็นแค่สถานะ "มีสิทธิ์ชนะแล้ว" ไม่ได้แปลว่าการสืบสวนจบ
     [HideInInspector] public bool allCluesCollected = false;
+    private float stageStartRealtime;
+    private float stageEndRealtime;
+    private bool stageTimerStarted = false;
+    private bool stageTimerStopped = false;
 
     // ธงปิดร้าน = ไม่มีลูกค้าใหม่เข้ามาอีก
     // ตั้งตอนเบาะแสในด่านหมดกองแล้วเท่านั้น (เก็บได้บ้าง หลุดไปบ้าง จนไม่เหลือให้เกิดอีก)
@@ -122,7 +131,27 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         investigationManager = FindObjectOfType<InvestigationManager>();
+        SyncAvailableMenuWithFoodTrays();
         ChangeState(GameState.Intro);
+    }
+
+    private void SyncAvailableMenuWithFoodTrays()
+    {
+        StageConfig currentStage = GetCurrentStage();
+        if (currentStage == null) return;
+
+        FoodTray[] foodTrays = FindObjectsOfType<FoodTray>();
+        List<FoodData> selectedFoods = new List<FoodData>();
+
+        foreach (FoodTray foodTray in foodTrays)
+        {
+            if (foodTray == null || foodTray.SelectedFoodData == null) continue;
+            if (!selectedFoods.Contains(foodTray.SelectedFoodData))
+                selectedFoods.Add(foodTray.SelectedFoodData);
+        }
+
+        if (selectedFoods.Count > 0)
+            currentStage.availableMenu = selectedFoods;
     }
 
     public void ChangeState(GameState newState)
@@ -131,12 +160,26 @@ public class GameManager : MonoBehaviour
         Debug.Log($"<color=white>สถานะเกมเปลี่ยนเป็น: {newState}</color>");
         if (newState == GameState.Playing)
         {
+            if (!stageTimerStarted)
+            {
+                stageStartRealtime = Time.unscaledTime;
+                stageTimerStarted = true;
+            }
+
             CustomerManager cm = FindObjectOfType<CustomerManager>();
             if (cm != null) cm.StartSpawningCustomers();
             Debug.Log("<color=green>เริ่มเปิดร้าน ลูกค้ากำลังมา!</color>");
         }
         else if (newState == GameState.Lose)
         {
+            if (stageTimerStarted && !stageTimerStopped)
+            {
+                stageEndRealtime = Time.unscaledTime;
+                stageTimerStopped = true;
+            }
+
+            Time.timeScale = 0f;
+
             Debug.LogError("💀 จบเห่! คุณทำพลาดเกินกำหนด หรือสืบสวนล้มเหลว");
 
             // เสียงตอนแพ้: ตัดเสียงประกอบที่ค้างอยู่ทิ้งก่อน (เสียงเตาย่าง เสียงลูกค้า ฯลฯ)
@@ -165,13 +208,38 @@ public class GameManager : MonoBehaviour
             // ด่านสุดท้ายที่ไม่มีด่านถัดไปจะไม่มีอะไรถูกเขียน (ตัวมันเช็คให้เอง)
             SaveManager.AutoSave(this, investigationManager);
 
-            // ฉากไหนมีแผงสรุปผล (StageResultPanel) ให้โชว์ผลแล้วรอผู้เล่นกด NEXT CASE เอง
-            // ไม่ต้องเด้งไปฉากถัดไปอัตโนมัติ ไม่งั้นแผงจะโผล่มาแป๊บเดียวแล้วโดนเปลี่ยนฉากทับ
-            if (StageResultPanel.TryShowResult(true)) return;
-
-            // ไปด่านถัดไปตรงนี้ที่เดียว จะได้ครอบทุกทางที่เข้าสถานะ Win (รวมปุ่ม Debug ด้วย)
-            GoToNextStageScene();
+            StartCoroutine(ShowWinResultAfterCutscene());
         }
+    }
+
+    private System.Collections.IEnumerator ShowWinResultAfterCutscene()
+    {
+        // The suspect showcase and verdict image live outside the notebook canvas,
+        // so hide them before the ending video starts.
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.HideGameplayHudForEnding();
+        }
+
+        GameplayCutsceneController cutscene = FindObjectOfType<GameplayCutsceneController>(true);
+        if (cutscene != null)
+        {
+            yield return cutscene.PlayEndingCutsceneAndWait();
+        }
+
+        NotebookManager notebook = FindObjectOfType<NotebookManager>(true);
+        if (notebook != null)
+        {
+            // The ending video waits for Space. Reveal the result screen only after it finishes.
+            yield return notebook.FadeEndingBlackToClear();
+        }
+
+        // ฉากไหนมีแผงสรุปผล (StageResultPanel) ให้โชว์ผลแล้วรอผู้เล่นกด NEXT CASE เอง
+        // ไม่ต้องเด้งไปฉากถัดไปอัตโนมัติ ไม่งั้นแผงจะโผล่มาแป๊บเดียวแล้วโดนเปลี่ยนฉากทับ
+        if (StageResultPanel.TryShowResult(true)) yield break;
+
+        // ไปด่านถัดไปตรงนี้ที่เดียว จะได้ครอบทุกทางที่เข้าสถานะ Win (รวมปุ่ม Debug ด้วย)
+        GoToNextStageScene();
     }
 
     // ชื่อฉากด่านถัดไปของด่านปัจจุบัน คืนค่าว่างถ้าไปต่อไม่ได้
@@ -278,7 +346,7 @@ public class GameManager : MonoBehaviour
         int collectedClues = investigationManager != null ? investigationManager.collectedClues.Count : 0;
 
 
-        if (collectedClues >= config.requiredCluesToPass && chosenName == config.correctCulpritName)
+        if (WillVerdictWin(chosenName))
         {
             ChangeState(GameState.Win);
         }
@@ -294,7 +362,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public bool WillVerdictWin(string chosenName)
+    {
+        StageConfig config = GetCurrentStage();
+        int collectedClues = investigationManager != null ? investigationManager.collectedClues.Count : 0;
+
+        return collectedClues >= config.requiredCluesToPass && chosenName == config.correctCulpritName;
+    }
+
     public StageConfig GetCurrentStage() => stages[currentStageIndex];
+
+    public float GetStageElapsedTime()
+    {
+        if (!stageTimerStarted) return 0f;
+
+        float currentRealtime = stageTimerStopped ? stageEndRealtime : Time.unscaledTime;
+        return Mathf.Max(0f, currentRealtime - stageStartRealtime);
+    }
 
     // เรียกตอนเก็บเบาะแสถึงโควตาของด่านแล้ว (requiredCluesToPass)
     // แค่ปักธงว่า "ผ่านเงื่อนไขเบาะแสแล้ว" เท่านั้น ไม่ปิดร้าน
@@ -350,6 +434,13 @@ public class GameManager : MonoBehaviour
 
         if (isEndingSequenceStarted) return;
         isEndingSequenceStarted = true;
+        if (CatTheftSystem.Instance != null)
+            CatTheftSystem.Instance.StopForEndOfDay();
+
+        TutorialFlowController tutorial = FindObjectOfType<TutorialFlowController>(true);
+        if (tutorial != null)
+            tutorial.HideTutorialPopup();
+
         StartCoroutine(EndOfDayCoroutine());
     }
 
@@ -364,7 +455,7 @@ public class GameManager : MonoBehaviour
         // นับถอยหลังบนจอ แล้วค่อยเด้งหน้าจอจบวัน (พร้อมหน้าต่างเบาะแส)
         if (UIManager.Instance != null)
         {
-            yield return UIManager.Instance.StartCountdownDisplay(5);
+            yield return UIManager.Instance.StartCountdownDisplay(endOfDayCountdownSeconds);
         }
         else
         {

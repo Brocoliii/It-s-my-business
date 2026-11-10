@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75d2635783c640944a4b1028a1d283d4, type: 3}
+  m_Name: Broccoli
+  m_EditorClassIdentifier: Assembly-CSharp::FoodData
+  foodName: Broccoli
+  foodIcon: {fileID: 21300000, guid: 29e9168c3c8cc124599fb51e21caa150, type: 3}
+  rawSprite: {fileID: 21300000, guid: f3dc691eb3581504293a867a114e2299, type: 3}
+  mediumSprite: {fileID: 21300000, guid: f3dc691eb3581504293a867a114e2299, type: 3}
+  cookedSprite: {fileID: 21300000, guid: 580d180813adb80489d3119de293f449, type: 3}
+  burntSprite: {fileID: 21300000, guid: a84edd9ef17d2114d8ec857a190452c6, type: 3}
+  mediumTime: 5
+  cookTime: 8
+  burnTime: 20
+  sauceSprite: {fileID: 21300000, guid: 579015cb0acb4e040ac28b654e6dd901, type: 3}
+  spicyLevel1Sprite: {fileID: 21300000, guid: 57f273b3f39ccca4dac3373399f66bf2, type: 3}
+  spicyLevel2Sprite: {fileID: 21300000, guid: b90b7a9152e4d634ea6478f3bcf02a72, type: 3}
+  spicyLevel3Sprite: {fileID: 21300000, guid: 0f81c13b9dd229f468859ad13874265a, type: 3}
+  sauceSpicyLevel1Sprite: {fileID: 21300000, guid: fab3a85583b81ba448697e24deb56e55, type: 3}
+  sauceSpicyLevel2Sprite: {fileID: 21300000, guid: 33ab3aaa9b30c9b46819f1a0e9cc9cd5, type: 3}
+  sauceSpicyLevel3Sprite: {fileID: 21300000, guid: d361c25927e134342bf16daf0cf8a657, type: 3}

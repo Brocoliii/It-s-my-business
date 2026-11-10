@@ -81,9 +81,9 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 3
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 9f9850fb7cc402945a21e5b58be46918, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6612f912c4cfa7343ad295b9e92b7e02, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -111,10 +111,41 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 48e3ec44b723e9948abd10da7d4c7bb6, type: 3}
   - {fileID: 21300000, guid: b341719f3cd55c644857963e5c4602d0, type: 3}
   - {fileID: 21300000, guid: 6612f912c4cfa7343ad295b9e92b7e02, type: 3}
+  possibleShadowPrefabs:
+  - {fileID: 5265788114244591062, guid: a3b4ec4195c404449bb081eb3075aa4d, type: 3}
+  - {fileID: 6847875064122023542, guid: 598c19ff0ff2c444aaaa46e316bdbfec, type: 3}
+  - {fileID: 3463807470321667053, guid: 770712513d0c0dd4aafefc9c11e56a49, type: 3}
+  - {fileID: 6460098592688208089, guid: 6f8c97c4fbc4d8f48972bae21d1fd92c, type: 3}
+  speechBubbleSprites:
+  - {fileID: 7663754852432234523, guid: e7426154f1e78194eba8e3a5dd1ba17f, type: 3}
+  - {fileID: 21300000, guid: 22b39e32ece6eae4fa3e9ef1c3bd0484, type: 3}
+  speechBubbleCount: 4
+  speechBubbleLayouts:
+  - count: 0
+    positions:
+    - {x: 0, y: 3.5}
+  - count: 0
+    positions:
+    - {x: 1.75, y: 4.72}
+  - count: 0
+    positions:
+    - {x: 0, y: 3.5}
+  - count: 0
+    positions:
+    - {x: 0, y: 4.15}
+  speechBubbleScale: 1.2
+  speechBubbleHorizontalRange: {x: -0.9, y: 0.9}
+  speechBubbleVerticalRange: {x: 0.65, y: 1.15}
+  speechBubbleFloatHeight: 0.095
+  speechBubbleFloatSpeed: 1.5
+  speechBubbleAppearDuration: 0.25
+  speechBubbleDisappearDuration: 0.18
+  speechBubbleAnimationStagger: 0.04
   stratagemLength: 5
   progressPerSuccess: 5
   correctFlashDuration: 0.35
   sequenceClearedDelay: 0.28
+  postSequenceInputLockExtra: 0.12
   clueCompleteHoldDuration: 0.45
   fillCompleteWaitTimeout: 1
   blinkStartTime: 5

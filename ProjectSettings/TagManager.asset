@@ -38,8 +38,17 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: LightInvest
+    uniqueID: 4277584589
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: InvestGroup
+    uniqueID: 1744140057
+    locked: 0
+  - name: Customer
+    uniqueID: 541170495
     locked: 0
   - name: Background
     uniqueID: 553899955

@@ -4,6 +4,7 @@ using TMPro; // �Ӥѭ: ��ͧ��������� TextMeshPro
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.Universal;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,6 +15,37 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI clueCounterText; // ��ͤ����͡�ӹǹ�����
     public TextMeshProUGUI centerWarningText; // ���˹ѧ�����͹��ҧ�� (�� ���ҹѺ�����ѧ)
     public TextMeshProUGUI investigateTimerText; // shows remaining time for an investigate group
+
+    [Header("Investigate Warning Bubble")]
+    [Tooltip("ภาพ UI เต็มหน้าจอที่จะแสดงเมื่อกลุ่มสืบสวนปรากฏ")]
+    public Image investigateWarningBubble;
+    [Tooltip("ภาพ UI เต็มหน้าจอที่จะแสดงเมื่อแมวปรากฏ")]
+    public Image catWarningBubble;
+    public float investigateWarningDuration = 1.2f;
+    public float investigateWarningPopDuration = 0.22f;
+    [Range(0f, 1f)] public float investigateWarningStartScale = 0.7f;
+
+    private Coroutine investigateWarningCoroutine;
+    private Vector3 investigateWarningBaseScale = Vector3.one;
+    private Color investigateWarningBaseColor = Color.white;
+    private bool hasInvestigateWarningBase = false;
+    private Coroutine catWarningCoroutine;
+    private Vector3 catWarningBaseScale = Vector3.one;
+    private Color catWarningBaseColor = Color.white;
+    private bool hasCatWarningBase = false;
+
+    [Header("Investigate Direction Indicator")]
+    [Tooltip("ภาพลูกศร UI ที่ชี้ไปยังกลุ่มสืบสวนตามตำแหน่งบนโลก")]
+    public Image investigateDirectionIndicator;
+    [Tooltip("ระยะขอบหน้าจอที่เว้นไว้สำหรับลูกศร")]
+    public float investigateDirectionScreenPadding = 80f;
+    public float investigateDirectionRotationOffset = -90f;
+
+    private Transform investigateDirectionTarget;
+    private Renderer investigateDirectionTargetRenderer;
+    private InvestigateGroup investigateDirectionTargetGroup;
+    private RectTransform investigateDirectionCanvasRect;
+    private Color investigateDirectionIndicatorBaseColor = Color.white;
 
     [Header("�к� UI �ͺ�ѧ")]
     public Canvas listeningCanvas;
@@ -75,10 +107,24 @@ public class UIManager : MonoBehaviour
     public float successTextRiseDistance = 26f;
 
     [Header("Investigate Success Flash")]
-    [Tooltip("ภาพทับจอที่จะสว่างวาบตอนเก็บเบาะแสได้ ไม่ใส่ก็ได้")]
-    public Image investigateSuccessFlash;
-    public Color successFlashColor = new Color(1f, 1f, 1f, 0.5f);
+    [Tooltip("ไฟ 2D ที่จะสว่างวาบตอนเก็บเบาะแสได้ ไม่ใส่ก็ได้")]
+    public Light2D investigateSuccessFlash;
+    public Color successFlashColor = Color.white;
+    public float successFlashIntensity = 2f;
     public float successFlashDuration = 0.35f;
+    [Tooltip("ไฟ 2D รอบหลอดที่จะสว่างขึ้นและจางลงตอนเก็บเบาะแสได้ ไม่ใส่ก็ได้")]
+    public Light2D investigateSuccessGlow;
+    public Color successGlowColor = new Color(1f, 1f, 0.65f, 1f);
+    public float successGlowIntensity = 1.5f;
+    public float successGlowDuration = 0.55f;
+    [Tooltip("รัศมีสูงสุดของไฟ 2D")]
+    public float successGlowMaxRadius = 1.5f;
+    [Tooltip("ความแรงสูงสุดของไฟ 2D ตอนเก็บเบาะแสสำเร็จ")]
+    public float successGlowSuccessIntensity = 2f;
+    [Tooltip("รัศมีช่วงกลางของจังหวะไฟหด หลังจากไฟขยายสุด (0 = รัศมีปกติ, 1 = รัศมีใหญ่สุด)")]
+    [Range(0f, 1f)] public float successGlowPulseSmallRadius = 0.35f;
+    [Tooltip("เปิดไฟ 2D ตามความคืบหน้าระหว่างกำลังฟัง")]
+    public bool glowWithListeningProgress = true;
 
     private float listeningVisibility = 0f;
     private bool isListeningBarVisible = false;
@@ -102,10 +148,28 @@ public class UIManager : MonoBehaviour
     private float successPopTimer = 0f;
     private Coroutine successTextCoroutine;
     private Coroutine successFlashCoroutine;
+    private Coroutine successGlowCoroutine;
     private Vector3 successTextBaseScale = Vector3.one;
     private Vector2 successTextBasePosition;
     private Color successTextBaseColor = Color.white;
     private bool hasSuccessTextBase = false;
+    private float successGlowBaseIntensity;
+    private float successGlowBaseRadius;
+    private bool hasSuccessGlowBase = false;
+    private bool isPlayingSuccessGlow = false;
+    private float listeningGlowTargetIntensity;
+    private float listeningGlowTargetRadius;
+    private float listeningGlowIntensity;
+    private float listeningGlowRadius;
+    [Tooltip("ความเร็วการเฟดของไฟระหว่างเริ่ม/หยุดฟัง ค่ายิ่งน้อยยิ่งนุ่มและช้า")]
+    public float listeningGlowFadeSpeed = 3f;
+    [Tooltip("เปิด/ปิดการกะพริบของไฟระหว่างกำลังฟัง")]
+    public bool listeningGlowBlink = true;
+    [Tooltip("ความเร็วการกะพริบของไฟ")]
+    public float listeningGlowBlinkSpeed = 4f;
+    [Tooltip("ความแรงการกะพริบ 0 = คงที่, 0.25 = สว่าง/มืดต่างกัน 25%")]
+    [Range(0f, 1f)] public float listeningGlowBlinkAmount = 0.25f;
+    private float listeningGlowBlinkTime;
 
     [Header("Investigate Sequence Icons")]
     public RectTransform investigateSequenceIconContainer;
@@ -195,6 +259,10 @@ public class UIManager : MonoBehaviour
     {
         // �Դ��ͤ�����͹ ���˹�Ҩͨ��ѹ����͹�͹�������
         if (centerWarningText != null) centerWarningText.gameObject.SetActive(false);
+        if (investigateDirectionIndicator != null)
+            investigateDirectionIndicatorBaseColor = investigateDirectionIndicator.color;
+        HideInvestigateWarningBubble();
+        HideInvestigateDirectionIndicator();
         if (endOfDayPanel != null) endOfDayPanel.SetActive(false);
         if (losePanel != null) losePanel.SetActive(false);
         ShowListeningBar(false);
@@ -212,6 +280,8 @@ public class UIManager : MonoBehaviour
         // (แผงหน้าจอแพ้ปิดอยู่ตอนเริ่มฉาก แต่ผูกได้เพราะถือ reference ของปุ่มไว้ตรง ๆ)
         if (loseRetryButton != null) loseRetryButton.onClick.AddListener(OnClickRetry);
         if (loseMainMenuButton != null) loseMainMenuButton.onClick.AddListener(OnClickBackToMainMenu);
+        UIButtonSound.BindButton(loseRetryButton);
+        UIButtonSound.BindButton(loseMainMenuButton);
     }
 
     private void OnDestroy()
@@ -265,6 +335,144 @@ public class UIManager : MonoBehaviour
 
         if (backgroundFadeCoroutine != null) StopCoroutine(backgroundFadeCoroutine);
         backgroundFadeCoroutine = StartCoroutine(FadeBackgroundRoutine(isDark ? backgroundDarkColor : backgroundNormalColor));
+    }
+
+    public void ShowInvestigateWarningBubble()
+    {
+        if (investigateWarningBubble == null)
+            return;
+
+        if (investigateWarningCoroutine != null)
+        {
+            StopCoroutine(investigateWarningCoroutine);
+        }
+
+        if (!hasInvestigateWarningBase)
+        {
+            investigateWarningBaseScale = investigateWarningBubble.rectTransform.localScale;
+            investigateWarningBaseColor = investigateWarningBubble.color;
+            hasInvestigateWarningBase = true;
+        }
+
+        investigateWarningBubble.gameObject.SetActive(true);
+        investigateWarningCoroutine = StartCoroutine(InvestigateWarningBubbleRoutine());
+    }
+
+    public void ShowCatWarningBubble()
+    {
+        if (catWarningBubble == null)
+            return;
+
+        if (catWarningCoroutine != null)
+        {
+            StopCoroutine(catWarningCoroutine);
+        }
+
+        if (!hasCatWarningBase)
+        {
+            catWarningBaseScale = catWarningBubble.rectTransform.localScale;
+            catWarningBaseColor = catWarningBubble.color;
+            hasCatWarningBase = true;
+        }
+
+        catWarningBubble.gameObject.SetActive(true);
+        catWarningCoroutine = StartCoroutine(CatWarningBubbleRoutine());
+    }
+
+    private void HideInvestigateWarningBubble()
+    {
+        if (investigateWarningCoroutine != null)
+        {
+            StopCoroutine(investigateWarningCoroutine);
+            investigateWarningCoroutine = null;
+        }
+
+        if (investigateWarningBubble != null)
+        {
+            investigateWarningBubble.gameObject.SetActive(false);
+        }
+    }
+
+    private IEnumerator InvestigateWarningBubbleRoutine()
+    {
+        RectTransform rect = investigateWarningBubble.rectTransform;
+        float popDuration = Mathf.Max(0.01f, investigateWarningPopDuration);
+        float elapsed = 0f;
+        Color color = investigateWarningBaseColor;
+
+        rect.localScale = investigateWarningBaseScale * investigateWarningStartScale;
+        color.a = investigateWarningBaseColor.a;
+        investigateWarningBubble.color = color;
+
+        while (elapsed < popDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float progress = Mathf.Clamp01(elapsed / popDuration);
+            rect.localScale = investigateWarningBaseScale * EaseOutBack(progress);
+            yield return null;
+        }
+
+        rect.localScale = investigateWarningBaseScale;
+
+        if (investigateWarningDuration > popDuration)
+        {
+            yield return new WaitForSecondsRealtime(investigateWarningDuration - popDuration);
+        }
+
+        elapsed = 0f;
+        float fadeDuration = Mathf.Min(0.25f, investigateWarningDuration);
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            color.a = Mathf.Lerp(investigateWarningBaseColor.a, 0f, elapsed / fadeDuration);
+            investigateWarningBubble.color = color;
+            yield return null;
+        }
+
+        investigateWarningBubble.color = investigateWarningBaseColor;
+        investigateWarningBubble.gameObject.SetActive(false);
+        investigateWarningCoroutine = null;
+    }
+
+    private IEnumerator CatWarningBubbleRoutine()
+    {
+        RectTransform rect = catWarningBubble.rectTransform;
+        float popDuration = Mathf.Max(0.01f, investigateWarningPopDuration);
+        float elapsed = 0f;
+        Color color = catWarningBaseColor;
+
+        rect.localScale = catWarningBaseScale * investigateWarningStartScale;
+        color.a = catWarningBaseColor.a;
+        catWarningBubble.color = color;
+
+        while (elapsed < popDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float progress = Mathf.Clamp01(elapsed / popDuration);
+            rect.localScale = catWarningBaseScale * EaseOutBack(progress);
+            yield return null;
+        }
+
+        rect.localScale = catWarningBaseScale;
+
+        if (investigateWarningDuration > popDuration)
+        {
+            yield return new WaitForSecondsRealtime(investigateWarningDuration - popDuration);
+        }
+
+        elapsed = 0f;
+        float fadeDuration = Mathf.Min(0.25f, investigateWarningDuration);
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            color.a = Mathf.Lerp(catWarningBaseColor.a, 0f, elapsed / fadeDuration);
+            catWarningBubble.color = color;
+            yield return null;
+        }
+
+        catWarningBubble.color = catWarningBaseColor;
+        catWarningBubble.gameObject.SetActive(false);
+        catWarningCoroutine = null;
     }
 
     private IEnumerator FadeBackgroundRoutine(Color targetColor)
@@ -366,7 +574,11 @@ public class UIManager : MonoBehaviour
         // มันเลยไม่ได้ถูกปิดตามสมุดไปด้วย และค้างบังหน้าจอจบเกมอยู่ ต้องสั่งเก็บเองตรงนี้
         // เรียกทุกครั้งที่จบเกม ไม่ใช่เฉพาะทางที่มาจากการปั๊ม เพราะทางอื่นหน้านี้ถูกปิดอยู่แล้ว สั่งซ้ำก็ไม่มีผลอะไร
         NotebookManager notebook = ResolveNotebook();
-        if (notebook != null) notebook.HideSuspectShowcase();
+        if (notebook != null)
+        {
+            notebook.HideSuspectShowcase();
+            notebook.HideVerdictImage();
+        }
     }
 
     // หน้าจอแพ้ เรียกจาก GameManager ตอนเข้าสถานะ Lose
@@ -460,6 +672,7 @@ public class UIManager : MonoBehaviour
         }
 
         isListeningBarVisible = isVisible;
+        ApplyListeningProgressGlow();
 
         if (listeningCanvasAnimator != null)
         {
@@ -474,6 +687,8 @@ public class UIManager : MonoBehaviour
         {
             ShowInvestigateSequence(false);
             CancelInvestigateSuccess();
+            StopListeningGlowImmediately();
+            ApplyListeningProgressGlow();
         }
     }
 
@@ -482,6 +697,130 @@ public class UIManager : MonoBehaviour
         float dt = Time.deltaTime;
         UpdateListeningCanvasAnimation(dt);
         UpdateListeningFillAnimation(dt);
+        UpdateListeningGlowAnimation(dt);
+        UpdateInvestigateDirectionIndicator();
+    }
+
+    public void ShowInvestigateDirectionIndicator(Transform target)
+    {
+        if (investigateDirectionIndicator == null || target == null)
+            return;
+
+        investigateDirectionTarget = target;
+        investigateDirectionTargetRenderer = target.GetComponentInChildren<Renderer>();
+        investigateDirectionTargetGroup = target.GetComponent<InvestigateGroup>();
+
+        if (investigateDirectionCanvasRect == null)
+        {
+            Canvas canvas = investigateDirectionIndicator.canvas;
+            investigateDirectionCanvasRect = canvas != null ? canvas.rootCanvas.GetComponent<RectTransform>() : null;
+        }
+
+        investigateDirectionIndicator.gameObject.SetActive(true);
+        UpdateInvestigateDirectionIndicator();
+    }
+
+    public void HideInvestigateDirectionIndicator()
+    {
+        investigateDirectionTarget = null;
+        investigateDirectionTargetRenderer = null;
+        investigateDirectionTargetGroup = null;
+
+        if (investigateDirectionIndicator != null)
+        {
+            investigateDirectionIndicator.color = investigateDirectionIndicatorBaseColor;
+            investigateDirectionIndicator.gameObject.SetActive(false);
+        }
+    }
+
+    private void UpdateInvestigateDirectionIndicator()
+    {
+        if (investigateDirectionTarget == null || investigateDirectionIndicator == null)
+            return;
+
+        Camera worldCamera = Camera.main;
+        Canvas canvas = investigateDirectionIndicator.canvas;
+        RectTransform canvasRect = investigateDirectionCanvasRect;
+
+        if (worldCamera == null || canvas == null || canvasRect == null)
+            return;
+
+        if (IsInvestigateTargetFullyVisible(worldCamera))
+        {
+            investigateDirectionIndicator.gameObject.SetActive(false);
+            return;
+        }
+
+        investigateDirectionIndicator.gameObject.SetActive(true);
+        Color indicatorColor = investigateDirectionIndicatorBaseColor;
+        if (investigateDirectionTargetGroup != null)
+            indicatorColor.a *= investigateDirectionTargetGroup.GetTimeoutBlinkOpacity();
+        investigateDirectionIndicator.color = indicatorColor;
+
+        Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        Vector2 targetScreenPosition = worldCamera.WorldToScreenPoint(investigateDirectionTarget.position);
+        Vector2 direction = targetScreenPosition - screenCenter;
+
+        if (direction.sqrMagnitude < 0.001f)
+            direction = Vector2.up;
+
+        direction.Normalize();
+
+        float halfWidth = Screen.width * 0.5f - investigateDirectionScreenPadding;
+        float halfHeight = Screen.height * 0.5f - investigateDirectionScreenPadding;
+        float scaleX = Mathf.Abs(direction.x) > 0.001f ? halfWidth / Mathf.Abs(direction.x) : float.PositiveInfinity;
+        float scaleY = Mathf.Abs(direction.y) > 0.001f ? halfHeight / Mathf.Abs(direction.y) : float.PositiveInfinity;
+        float distance = Mathf.Min(scaleX, scaleY);
+        Vector2 indicatorScreenPosition = screenCenter + direction * distance;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect,
+            indicatorScreenPosition,
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera,
+            out Vector2 localPosition);
+
+        RectTransform indicatorRect = investigateDirectionIndicator.rectTransform;
+        indicatorRect.anchoredPosition = localPosition;
+        indicatorRect.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + investigateDirectionRotationOffset);
+    }
+
+    private bool IsInvestigateTargetFullyVisible(Camera worldCamera)
+    {
+        if (investigateDirectionTargetRenderer == null)
+        {
+            Vector3 viewportPosition = worldCamera.WorldToViewportPoint(investigateDirectionTarget.position);
+            return viewportPosition.z > 0f
+                && viewportPosition.x >= 0f && viewportPosition.x <= 1f
+                && viewportPosition.y >= 0f && viewportPosition.y <= 1f;
+        }
+
+        Bounds bounds = investigateDirectionTargetRenderer.bounds;
+        Vector3 min = bounds.min;
+        Vector3 max = bounds.max;
+
+        for (int x = 0; x <= 1; x++)
+        {
+            for (int y = 0; y <= 1; y++)
+            {
+                for (int z = 0; z <= 1; z++)
+                {
+                    Vector3 corner = new Vector3(
+                        x == 0 ? min.x : max.x,
+                        y == 0 ? min.y : max.y,
+                        z == 0 ? min.z : max.z);
+                    Vector3 viewportPosition = worldCamera.WorldToViewportPoint(corner);
+
+                    if (viewportPosition.z <= 0f
+                        || viewportPosition.x < 0f || viewportPosition.x > 1f
+                        || viewportPosition.y < 0f || viewportPosition.y > 1f)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     private void UpdateListeningCanvasAnimation(float dt)
@@ -758,6 +1097,81 @@ public class UIManager : MonoBehaviour
 
         color.a = listeningFillBaseColor.a;
         listeningFill.color = color;
+        ApplyListeningProgressGlow();
+    }
+
+    private void ApplyListeningProgressGlow()
+    {
+        if (investigateSuccessGlow == null)
+            return;
+
+        EnsureSuccessGlowBase();
+
+        if (isPlayingSuccessGlow)
+            return;
+
+        if (!glowWithListeningProgress || !isListeningBarVisible || listeningFillDisplayed <= 0f)
+        {
+            listeningGlowTargetIntensity = 0f;
+            listeningGlowTargetRadius = successGlowBaseRadius;
+            listeningGlowBlinkTime = 0f;
+            return;
+        }
+
+        float progress = Mathf.Clamp01(listeningFillDisplayed);
+        investigateSuccessGlow.color = successGlowColor;
+        listeningGlowTargetIntensity = Mathf.Lerp(0f, successGlowIntensity, progress);
+        listeningGlowTargetRadius = Mathf.Lerp(
+            successGlowBaseRadius,
+            Mathf.Max(successGlowBaseRadius, successGlowMaxRadius),
+            progress);
+        investigateSuccessGlow.enabled = true;
+    }
+
+    private void UpdateListeningGlowAnimation(float dt)
+    {
+        if (investigateSuccessGlow == null || isPlayingSuccessGlow)
+            return;
+
+        float speed = Mathf.Max(0.01f, listeningGlowFadeSpeed);
+        float blend = 1f - Mathf.Exp(-speed * dt);
+        listeningGlowIntensity = Mathf.Lerp(listeningGlowIntensity, listeningGlowTargetIntensity, blend);
+        listeningGlowRadius = Mathf.Lerp(listeningGlowRadius, listeningGlowTargetRadius, blend);
+
+        float blinkMultiplier = 1f;
+        if (listeningGlowBlink && listeningGlowTargetIntensity > 0f)
+        {
+            listeningGlowBlinkTime += dt * Mathf.Max(0f, listeningGlowBlinkSpeed);
+            float pulse = (Mathf.Sin(listeningGlowBlinkTime * Mathf.PI * 2f) + 1f) * 0.5f;
+            blinkMultiplier = Mathf.Lerp(1f - listeningGlowBlinkAmount, 1f, pulse);
+        }
+
+        investigateSuccessGlow.intensity = listeningGlowIntensity * blinkMultiplier;
+        investigateSuccessGlow.pointLightOuterRadius = listeningGlowRadius;
+
+        if (listeningGlowTargetIntensity <= 0f && listeningGlowIntensity <= 0.01f)
+        {
+            listeningGlowIntensity = 0f;
+            listeningGlowRadius = successGlowBaseRadius;
+            investigateSuccessGlow.intensity = 0f;
+            investigateSuccessGlow.pointLightOuterRadius = successGlowBaseRadius;
+            investigateSuccessGlow.enabled = false;
+        }
+    }
+
+    private void StopListeningGlowImmediately()
+    {
+        if (investigateSuccessGlow == null)
+            return;
+
+        listeningGlowIntensity = 0f;
+        listeningGlowRadius = successGlowBaseRadius;
+        listeningGlowTargetIntensity = 0f;
+        listeningGlowTargetRadius = successGlowBaseRadius;
+        investigateSuccessGlow.intensity = 0f;
+        investigateSuccessGlow.pointLightOuterRadius = successGlowBaseRadius;
+        investigateSuccessGlow.enabled = false;
+        listeningGlowBlinkTime = 0f;
     }
 
     public void ShowInvestigateSequence(bool isVisible)
@@ -1266,6 +1680,11 @@ public class UIManager : MonoBehaviour
                 total = Mathf.Max(total, successFlashDuration);
             }
 
+            if (investigateSuccessGlow != null)
+            {
+                total = Mathf.Max(total, successGlowDuration);
+            }
+
             return total;
         }
     }
@@ -1308,6 +1727,12 @@ public class UIManager : MonoBehaviour
         {
             if (successFlashCoroutine != null) StopCoroutine(successFlashCoroutine);
             successFlashCoroutine = StartCoroutine(SuccessFlashRoutine());
+        }
+
+        if (investigateSuccessGlow != null)
+        {
+            if (successGlowCoroutine != null) StopCoroutine(successGlowCoroutine);
+            successGlowCoroutine = StartCoroutine(SuccessGlowRoutine());
         }
     }
 
@@ -1360,11 +1785,23 @@ public class UIManager : MonoBehaviour
             successFlashCoroutine = null;
         }
 
+        if (successGlowCoroutine != null)
+        {
+            StopCoroutine(successGlowCoroutine);
+            successGlowCoroutine = null;
+        }
+        isPlayingSuccessGlow = false;
+
         ResetSuccessText();
 
         if (investigateSuccessFlash != null)
         {
-            investigateSuccessFlash.gameObject.SetActive(false);
+            investigateSuccessFlash.enabled = false;
+        }
+
+        if (investigateSuccessGlow != null)
+        {
+            investigateSuccessGlow.enabled = false;
         }
     }
 
@@ -1455,8 +1892,9 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator SuccessFlashRoutine()
     {
-        investigateSuccessFlash.gameObject.SetActive(true);
-
+        investigateSuccessFlash.enabled = true;
+        investigateSuccessFlash.color = successFlashColor;
+        investigateSuccessFlash.intensity = successFlashIntensity;
         float time = 0f;
         float duration = Mathf.Max(0.01f, successFlashDuration);
 
@@ -1466,15 +1904,109 @@ public class UIManager : MonoBehaviour
             float t = Mathf.Clamp01(time / duration);
             t = t * t * (3f - 2f * t);
 
-            // สว่างสุดทันทีแล้วค่อยจางลง ถ้าไล่ขึ้นก่อนจะดูเป็นฉากค่อย ๆ สว่าง ไม่ใช่แฟลช
-            Color c = successFlashColor;
-            c.a = successFlashColor.a * (1f - t);
-            investigateSuccessFlash.color = c;
+            investigateSuccessFlash.intensity = successFlashIntensity * (1f - t);
             yield return null;
         }
 
-        investigateSuccessFlash.gameObject.SetActive(false);
+        investigateSuccessFlash.intensity = 0f;
+        investigateSuccessFlash.enabled = false;
         successFlashCoroutine = null;
+    }
+
+    private IEnumerator SuccessGlowRoutine()
+    {
+        EnsureSuccessGlowBase();
+        isPlayingSuccessGlow = true;
+
+        float duration = Mathf.Max(0.01f, successGlowDuration);
+        float growDuration = duration * 0.3f;
+        float shrinkDuration = duration * 0.2f;
+        float returnDuration = duration * 0.2f;
+        float time = 0f;
+        float startIntensity = investigateSuccessGlow.intensity;
+        float startRadius = investigateSuccessGlow.pointLightOuterRadius;
+        float targetIntensity = Mathf.Max(startIntensity, successGlowSuccessIntensity);
+        float targetRadius = Mathf.Max(startRadius, successGlowMaxRadius);
+        float smallRadius = Mathf.Lerp(startRadius, targetRadius, successGlowPulseSmallRadius);
+
+        investigateSuccessGlow.enabled = true;
+        investigateSuccessGlow.color = successGlowColor;
+        investigateSuccessGlow.intensity = startIntensity;
+        investigateSuccessGlow.pointLightOuterRadius = startRadius;
+
+        while (time < growDuration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / growDuration);
+            t = t * t * (3f - 2f * t);
+            investigateSuccessGlow.intensity = Mathf.Lerp(startIntensity, targetIntensity, t);
+            investigateSuccessGlow.pointLightOuterRadius = Mathf.Lerp(
+                startRadius,
+                targetRadius,
+                t);
+            yield return null;
+        }
+
+        time = 0f;
+        while (time < shrinkDuration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / shrinkDuration);
+            t = t * t * (3f - 2f * t);
+            investigateSuccessGlow.intensity = targetIntensity;
+            investigateSuccessGlow.pointLightOuterRadius = Mathf.Lerp(targetRadius, smallRadius, t);
+            yield return null;
+        }
+
+        time = 0f;
+        while (time < returnDuration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / returnDuration);
+            t = t * t * (3f - 2f * t);
+            investigateSuccessGlow.intensity = targetIntensity;
+            investigateSuccessGlow.pointLightOuterRadius = Mathf.Lerp(smallRadius, startRadius, t);
+            yield return null;
+        }
+
+        time = 0f;
+        float fadeDuration = Mathf.Max(0.01f, duration - growDuration - shrinkDuration - returnDuration);
+        while (time < fadeDuration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / fadeDuration);
+            t = t * t * (3f - 2f * t);
+            investigateSuccessGlow.intensity = Mathf.Lerp(targetIntensity, 0f, t);
+            investigateSuccessGlow.pointLightOuterRadius = startRadius;
+            yield return null;
+        }
+
+        investigateSuccessGlow.intensity = successGlowBaseIntensity;
+        investigateSuccessGlow.pointLightOuterRadius = successGlowBaseRadius;
+        investigateSuccessGlow.enabled = false;
+        listeningGlowIntensity = 0f;
+        listeningGlowRadius = successGlowBaseRadius;
+        listeningGlowTargetIntensity = 0f;
+        listeningGlowTargetRadius = successGlowBaseRadius;
+        isPlayingSuccessGlow = false;
+        successGlowCoroutine = null;
+    }
+
+    private void EnsureSuccessGlowBase()
+    {
+        if (hasSuccessGlowBase || investigateSuccessGlow == null)
+            return;
+
+        successGlowBaseIntensity = investigateSuccessGlow.intensity;
+        successGlowBaseRadius = investigateSuccessGlow.pointLightOuterRadius;
+        listeningGlowIntensity = 0f;
+        listeningGlowRadius = successGlowBaseRadius;
+        listeningGlowTargetIntensity = 0f;
+        listeningGlowTargetRadius = successGlowBaseRadius;
+        investigateSuccessGlow.intensity = 0f;
+        investigateSuccessGlow.pointLightOuterRadius = successGlowBaseRadius;
+        investigateSuccessGlow.enabled = false;
+        hasSuccessGlowBase = true;
     }
 
     public void ShowBinocularsOverlay(bool isVisible)

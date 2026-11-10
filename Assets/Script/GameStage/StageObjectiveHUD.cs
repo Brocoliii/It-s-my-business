@@ -67,6 +67,20 @@ public class StageObjectiveHUD : MonoBehaviour
     [Tooltip("สีตัวเลขความผิดพลาดตอนใช้โควตาหมดแล้ว (พลาดอีกครั้งเดียวแพ้)")]
     public Color dangerColor = new Color(1f, 0.35f, 0.32f, 1f);
 
+    [Header("Bonus clues (over quota)")]
+    [Tooltip("Shown once clues exceed the quota. Index 0 = x1, 1 = x2 ... 4 = x5. More extra clues than sprites reuses the last sprite.")]
+    public Sprite[] bonusSprites;
+    public Image bonusImage;
+    public TextMeshProUGUI bonusText;
+    [Tooltip("{0} = number of extra clues")]
+    public string bonusFormat = "x{0}";
+    [Tooltip("Show the text together with the sprite")]
+    public bool showTextWithSprite = false;
+    public Color bonusColor = Color.white;
+    public float bonusSize = 40f;
+    public float bonusPopScale = 0.6f;
+    public float bonusPopDuration = 0.35f;
+
     [Header("แอนิเมชัน")]
     [Tooltip("ความแรงที่เม็ดไอคอนเด้งโตตอนค่าเปลี่ยน")]
     public float pipPopScale = 0.55f;
@@ -117,6 +131,8 @@ public class StageObjectiveHUD : MonoBehaviour
     private int shownRequiredClues = -1;
     private int shownMistakes = -1;
     private int shownMaxMistakes = -1;
+    private int shownBonus = -1;
+    private float bonusPopTimer;
 
     private void Awake()
     {
@@ -138,13 +154,20 @@ public class StageObjectiveHUD : MonoBehaviour
             hudCanvasGroup.blocksRaycasts = false;
         }
 
+        if (bonusImage != null) bonusImage.raycastTarget = false;
+        ApplyBonusSize();
+        SetGraphicRaycastTarget(bonusText, false);
+        UpdateBonus(0, true);
         SetGraphicRaycastTarget(clueLabelText, false);
         SetGraphicRaycastTarget(clueCounterText, false);
         SetGraphicRaycastTarget(mistakeLabelText, false);
         SetGraphicRaycastTarget(mistakeCounterText, false);
 
+
+
         if (clueLabelText != null) clueLabelText.text = clueLabel;
         if (mistakeLabelText != null) mistakeLabelText.text = mistakeLabel;
+
     }
 
     private void Start()
@@ -168,6 +191,7 @@ public class StageObjectiveHUD : MonoBehaviour
 
         UpdateRowAnimation(clueRow, dt);
         UpdateRowAnimation(mistakeRow, dt);
+        UpdateBonusPop(dt);
         UpdateDangerPulse();
         UpdateVisibility(dt);
     }
@@ -200,6 +224,10 @@ public class StageObjectiveHUD : MonoBehaviour
 
             // เม็ดเบาะแสมีเท่าโควตาของด่าน เก็บเกินโควตาได้แต่ไม่ต้องเพิ่มเม็ด
             ApplyPips(clueRow, requiredClues, Mathf.Min(clues, requiredClues), cluePipFilledColor, cluePipEmptyColor, snap);
+
+            // Required Clues = 0 means every clue is a bonus (quota is 0, so all clues are "over" it)
+            int extraClues = Mathf.Max(0, clues - requiredClues);
+            UpdateBonus(extraClues, snap);
 
             shownClues = clues;
             shownRequiredClues = requiredClues;
@@ -256,6 +284,85 @@ public class StageObjectiveHUD : MonoBehaviour
         if (index < 0 || index >= gameManager.stages.Count) return null;
 
         return gameManager.stages[index];
+    }
+
+    private void ApplyBonusSize()
+    {
+        if (bonusImage == null) return;
+
+        bonusImage.preserveAspect = true;
+        bonusImage.rectTransform.sizeDelta = new Vector2(bonusSize, bonusSize);
+
+        LayoutElement le = bonusImage.GetComponent<LayoutElement>();
+        if (le == null) le = bonusImage.gameObject.AddComponent<LayoutElement>();
+        le.minWidth = bonusSize;
+        le.minHeight = bonusSize;
+        le.preferredWidth = bonusSize;
+        le.preferredHeight = bonusSize;
+    }
+
+    private void UpdateBonus(int extra, bool snap)
+    {
+        ApplyBonusSize();
+        bool show = extra > 0;
+
+        Sprite sprite = null;
+        if (show && bonusSprites != null && bonusSprites.Length > 0)
+        {
+            sprite = bonusSprites[Mathf.Clamp(extra, 1, bonusSprites.Length) - 1];
+        }
+
+        if (bonusImage != null)
+        {
+            bonusImage.sprite = sprite;
+            bonusImage.color = bonusColor;
+            bonusImage.gameObject.SetActive(show && sprite != null);
+        }
+
+        if (bonusText != null)
+        {
+            bool showText = show && (sprite == null || showTextWithSprite);
+            bonusText.gameObject.SetActive(showText);
+            if (showText) bonusText.text = string.Format(bonusFormat, extra);
+        }
+
+        // pop only when a new extra clue is collected
+        if (!snap && show && extra > shownBonus && bonusPopDuration > 0f)
+        {
+            bonusPopTimer = bonusPopDuration;
+        }
+
+        shownBonus = extra;
+    }
+
+    private void UpdateBonusPop(float dt)
+    {
+        if (bonusPopTimer <= 0f) return;
+
+        bonusPopTimer = Mathf.Max(0f, bonusPopTimer - dt);
+
+        float progress = bonusPopDuration > 0f ? 1f - (bonusPopTimer / bonusPopDuration) : 1f;
+        Vector3 scale = Vector3.one * (1f + bonusPopScale * Mathf.Sin(progress * Mathf.PI));
+
+        if (bonusImage != null) bonusImage.rectTransform.localScale = scale;
+        if (bonusText != null) bonusText.rectTransform.localScale = scale;
+    }
+
+    private Image CreateBonusImage(RectTransform parent, string name)
+    {
+        GameObject obj = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        obj.transform.SetParent(parent, false);
+
+        Image image = obj.GetComponent<Image>();
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+
+        LayoutElement layout = obj.AddComponent<LayoutElement>();
+        layout.preferredWidth = bonusSize;
+        layout.preferredHeight = bonusSize;
+
+        obj.SetActive(false);
+        return image;
     }
 
     private void ApplyPips(PipRow row, int total, int filledCount, Color filledColor, Color emptyColor, bool snap)
@@ -481,7 +588,17 @@ public class StageObjectiveHUD : MonoBehaviour
             if (clueLabelText == null) clueLabelText = CreateText(row, "ClueLabel", clueLabel, labelColor, 170f);
             if (clueCounterText == null) clueCounterText = CreateText(row, "ClueCounter", string.Empty, counterColor, 190f);
             if (usePips && cluePipContainer == null) cluePipContainer = CreatePipContainer(row, "CluePips");
+
+            if (bonusImage == null) bonusImage = CreateBonusImage(row, "ClueBonusImage");
+            if (bonusText == null)
+            {
+                bonusText = CreateText(row, "ClueBonusText", string.Empty, clueCompleteColor, 80f);
+                bonusText.gameObject.SetActive(false);
+            }
+
         }
+
+   
 
         if (mistakeCounterText == null || (usePips && mistakePipContainer == null))
         {

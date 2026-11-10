@@ -57,11 +57,21 @@ MonoBehaviour:
   correctReactionSprite: {fileID: 21300000, guid: be786cc434abe5d40b56c2c7d8c854d1, type: 3}
   wrongReactionSprite: {fileID: 21300000, guid: 99286e19313fb0943aefded832c3b12d, type: 3}
   reactionDuration: 0.7
+  deliveryOutlineThickness: 0.04
   blackenDuration: 0.15
   fadeOutDuration: 0.25
   walkInSpeed: 5
   walkBobHeight: 0.15
   walkBobSpeed: 10
+  customArriveSound: {fileID: 8300000, guid: ee245a9c86b7f0343889e1f71aa5ccf7, type: 3}
+  customLeaveSound: {fileID: 8300000, guid: ee245a9c86b7f0343889e1f71aa5ccf7, type: 3}
+  isAnimalCustomer: 0
+  animalJumpHeight: 0.75
+  animalJumpDuration: 0.45
+  animalLandingHeight: 0.25
+  animalSortingOrderDelay: 0.15
+  animalLeavingSortingOrderDelay: 0.15
+  animalSortingOrder: 99
   bubbleAnimator: {fileID: 0}
   customerCanvas: {fileID: 1788748553496390936}
   canvasPopDuration: 0.3

@@ -34,6 +34,16 @@ public class ChiliBottle : MonoBehaviour, IDraggable
     [Header("Powder Effect")]
     [SerializeField] private ChiliPowderEffect powderEffect;
 
+    [Header("Combo Feedback")]
+    [Tooltip("Sprites for x1, x2, and x3 shown after seasoning succeeds.")]
+    [SerializeField] private Sprite[] comboSprites = new Sprite[3];
+    [SerializeField] private Vector3 comboSpriteOffset = new Vector3(0f, 0.8f, 0f);
+    [SerializeField] private float comboSpriteDuration = 0.7f;
+    [SerializeField] private float comboSpriteRise = 0.35f;
+    [SerializeField] private float comboSpriteScale = 1f;
+    [SerializeField] private string comboSpriteSortingLayer = "Dragging";
+    [SerializeField] private int comboSpriteSortingOrder = 20;
+
     private Vector3 startPos;
     private SpriteRenderer sr;
     private Sprite defaultSprite;
@@ -196,6 +206,7 @@ public class ChiliBottle : MonoBehaviour, IDraggable
                 food.spicyLevel < 3)
             {
                 food.AddSpicy();
+                ShowComboSprite(food, food.spicyLevel);
 
                 lastSeasoningTime = Time.time;
 
@@ -210,6 +221,51 @@ public class ChiliBottle : MonoBehaviour, IDraggable
         }
 
         return false;
+    }
+
+    private void ShowComboSprite(FoodInstance food, int comboLevel)
+    {
+        int spriteIndex = comboLevel - 1;
+
+        if (food == null || spriteIndex < 0 || spriteIndex >= comboSprites.Length)
+            return;
+
+        Sprite comboSprite = comboSprites[spriteIndex];
+
+        if (comboSprite == null)
+            return;
+
+        GameObject comboObject = new GameObject("ChiliComboFeedback");
+        SpriteRenderer comboRenderer = comboObject.AddComponent<SpriteRenderer>();
+        comboRenderer.sprite = comboSprite;
+        comboRenderer.sortingLayerName = comboSpriteSortingLayer;
+        comboRenderer.sortingOrder = comboSpriteSortingOrder;
+        comboObject.transform.position = food.transform.position + comboSpriteOffset;
+        comboObject.transform.localScale = Vector3.one * comboSpriteScale;
+
+        StartCoroutine(AnimateComboSprite(comboObject, comboRenderer));
+    }
+
+    private IEnumerator AnimateComboSprite(GameObject comboObject, SpriteRenderer comboRenderer)
+    {
+        float duration = Mathf.Max(0.01f, comboSpriteDuration);
+        Vector3 startPosition = comboObject.transform.position;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / duration);
+            comboObject.transform.position = startPosition + Vector3.up * (comboSpriteRise * progress);
+
+            Color color = comboRenderer.color;
+            color.a = 1f - progress;
+            comboRenderer.color = color;
+
+            yield return null;
+        }
+
+        Destroy(comboObject);
     }
 
     public void OnEndDrag()
